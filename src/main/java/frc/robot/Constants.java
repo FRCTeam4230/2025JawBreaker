@@ -1,5 +1,4 @@
-// Copyright 2021-2024 FRC 6328
-// http://github.com/Mechanical-Advantage
+// Copyright FRC 5712
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -47,8 +46,6 @@ public final class Constants {
   // PathPlanner config constants
   private static final Mass ROBOT_MASS = Kilogram.of(69.78);
   // 15.2
-
-  // drive: kS = 0.12199, kV = 0.019369, kA = 0.0010204
   private static final MomentOfInertia ROBOT_MOI = KilogramSquareMeters.of(6.0);
   private static final double WHEEL_COF = 1.9;
   public static final SwerveModuleConstants SWERVE_MODULE_CONSTANTS = TunerConstants.FrontLeft;
@@ -63,7 +60,7 @@ public final class Constants {
   public static final double DRIVE_BASE_RADIUS =
       Math.max(
           Math.max(
-              Math.hypot(TunerConstants.FrontLeft.LocationX, TunerConstants.FrontRight.LocationY),
+              Math.hypot(TunerConstants.FrontLeft.LocationX, TunerConstants.FrontLeft.LocationY),
               Math.hypot(TunerConstants.FrontRight.LocationX, TunerConstants.FrontRight.LocationY)),
           Math.max(
               Math.hypot(TunerConstants.BackLeft.LocationX, TunerConstants.BackLeft.LocationY),
