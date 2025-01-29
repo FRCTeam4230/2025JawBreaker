@@ -26,7 +26,7 @@ import org.littletonrobotics.junction.AutoLog;
 
 public interface ElevatorIO {
   @AutoLog
-  public static class ElevatorIOInputs {
+  class ElevatorIOInputs {
     public boolean leaderConnected = false;
     public boolean followerConnected = false;
     public boolean encoderConnected = false;
@@ -49,11 +49,12 @@ public interface ElevatorIO {
   }
 
   /** Updates the set of loggable inputs. */
-  public default void updateInputs(ElevatorIOInputs inputs) {}
+  default void updateInputs(ElevatorIOInputs inputs) {}
 
   /** Run closed loop at the specified velocity. */
-  public default void setDistance(Distance distance) {}
+  default void setDistance(Distance distance) {}
 
   /** Stop in open loop. */
-  public default void stop() {}
+  default void stop() {}
+
 }
