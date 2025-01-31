@@ -38,10 +38,13 @@ import frc.robot.utils.PPUtil;
  */
 public final class Constants {
 
+  public static final boolean tuningMode = true;
+
   public static final Mode simMode = Mode.SIM;
 
   public static final AngularVelocity MaxAngularRate = RotationsPerSecond.of(0.75);
   public static final AngularVelocity MaxModuleRate = RotationsPerSecond.of(20.0);
+
 
   // PathPlanner config constants
   private static final Mass ROBOT_MASS = Kilogram.of(69.78);
