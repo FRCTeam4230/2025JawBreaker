@@ -56,5 +56,4 @@ public interface ElevatorIO {
 
   /** Stop in open loop. */
   default void stop() {}
-
 }

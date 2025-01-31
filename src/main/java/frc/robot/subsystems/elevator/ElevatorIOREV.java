@@ -1,22 +1,22 @@
 package frc.robot.subsystems.elevator;
 
-import com.ctre.phoenix6.StatusSignal;
+import static edu.wpi.first.units.Units.*;
+
+import com.ctre.phoenix6.controls.PositionVoltage;
 import com.revrobotics.RelativeEncoder;
-import com.revrobotics.spark.SparkBase;
-import com.revrobotics.spark.SparkFlex;
-import com.revrobotics.spark.SparkLowLevel;
-import com.revrobotics.spark.config.EncoderConfig;
+import com.revrobotics.spark.*;
+import com.revrobotics.spark.config.ClosedLoopConfig;
+import com.revrobotics.spark.config.MAXMotionConfig;
 import com.revrobotics.spark.config.SparkBaseConfig;
 import com.revrobotics.spark.config.SparkFlexConfig;
-import com.revrobotics.spark.config.SparkMaxConfig;
-import edu.wpi.first.units.AngleUnit;
+import edu.wpi.first.math.controller.ElevatorFeedforward;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.units.measure.*;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.DutyCycleEncoder;
+import frc.robot.utils.Conversions;
 
-import static edu.wpi.first.units.Units.*;
-
-public class ElevatorIOREV implements ElevatorIO{
+public class ElevatorIOREV implements ElevatorIO {
   /** The gear ratio between the motor and the elevator mechanism */
   private static final double GEAR_RATIO = 2.0;
   /**
@@ -25,82 +25,98 @@ public class ElevatorIOREV implements ElevatorIO{
    */
   private final Distance elevatorRadius = Inches.of(2);
 
-  /** Leader motor controller **/
+  /** Leader motor controller * */
   private final SparkFlex leader = new SparkFlex(30, SparkLowLevel.MotorType.kBrushless);
-
-  /** Follower **/
+  private final RelativeEncoder leaderEncoder = leader.getEncoder();
+  /** Follower * */
   private final SparkFlex follower = new SparkFlex(31, SparkLowLevel.MotorType.kBrushless);
 
-  //Absolute position, upper and lower limit switch
+  // Absolute position, upper and lower limit switch
   private final DutyCycleEncoder encoder = new DutyCycleEncoder(3);
   private final DigitalInput upperLimitSwitch = new DigitalInput(1);
   private final DigitalInput lowerLimitSwitch = new DigitalInput(2);
 
+  private final SparkClosedLoopController pidController;
+  private ElevatorFeedforward feedforward = new ElevatorFeedforward(0, 0, 0);
 
-  public ElevatorIOREV(){
-    leader.configure(createSparkFlexConfig(false), SparkBase.ResetMode.kResetSafeParameters, SparkBase.PersistMode.kPersistParameters);
-    follower.configure(createSparkFlexConfig(true), SparkBase.ResetMode.kResetSafeParameters, SparkBase.PersistMode.kPersistParameters);
-  }
+  public ElevatorIOREV() {
+    leader.configure(
+        createSparkFlexConfig(false),
+        SparkBase.ResetMode.kResetSafeParameters,
+        SparkBase.PersistMode.kPersistParameters);
+    follower.configure(
+        createSparkFlexConfig(true),
+        SparkBase.ResetMode.kResetSafeParameters,
+        SparkBase.PersistMode.kPersistParameters);
 
-  public void setDistance(Angle distance) {
-    //
+    pidController = leader.getClosedLoopController();
   }
 
   @Override
-  public void updateInputs(ElevatorIOInputs inputs){
+  public void updateInputs(ElevatorIOInputs inputs) {
 
-
-    inputs.leaderPosition = Rotations.of(leader.getEncoder().getPosition()); // this is the encoder position
+    inputs.leaderPosition =
+        Rotations.of(leader.getEncoder().getPosition()); // this is the encoder position
     // rev does it have something like this? inputs.leaderRotorPosition = leader.get //
-    inputs.leaderVelocity = RotationsPerSecond.of(leader.getEncoder().getVelocity()); // getVelocity returns RPMS so this is totally probably wrong
-    //inputs.leaderRotorVelocity = leader.getRotorVelocity();
+    inputs.leaderVelocity =
+        RotationsPerSecond.of(
+            leader
+                .getEncoder()
+                .getVelocity()); // getVelocity returns RPMS so this is totally probably wrong
+    // inputs.leaderRotorVelocity = leader.getRotorVelocity();
 
     inputs.appliedVoltage = Volts.of(leader.getAppliedOutput());
     inputs.leaderStatorCurrent = Amps.of(leader.getOutputCurrent());
 
     inputs.followerStatorCurrent = Amps.of(follower.getOutputCurrent());
     inputs.encoderPosition = Rotations.of(encoder.get());
-    inputs.encoderVelocity = RotationsPerSecond.of(encoder.get()); //TODO: This is probably wrong and or may not be helpful?
+    inputs.encoderVelocity =
+        RotationsPerSecond.of(
+            encoder.get()); // TODO: This is probably wrong and or may not be helpful?
   }
 
-  private SparkFlexConfig createSparkFlexConfig(boolean isFollower){
+  private SparkFlexConfig createSparkFlexConfig(boolean isFollower) {
 
-    //I don't know if we will need a velocityConversionFacdtory but i'm fairly certain we will
-
-   /* EncoderConfig leaderEncoderConfig =
-        new EncoderConfig()
-            .velocityConversionFactor(Math.PI * 2 / 60 / ArmConstants.MOTOR_TO_ARM_RATIO);
-    EncoderConfig relativeEncoderConfig = new EncoderConfig().positionConversionFactor(2 * Math.PI);
-    leader.configure(
-        new SparkFlexConfig()
-            .inverted(true)
-            .idleMode(SparkBaseConfig.IdleMode.kBrake)
-            .apply(leaderEncoderConfig),
-        SparkBase.ResetMode.kResetSafeParameters,
-        SparkBase.PersistMode.kPersistParameters);
-    // The motors are mirrored, so invert
-    */
-
+    // I don't know if we will need a velocityConversionFacdtory but i'm fairly certain we will
+    //maxMotion example https://github.com/BroncBotz3481/FRC2025/blob/main/src/main/java/frc/robot/subsystems/ElevatorSubsystem.java
+    //NON maxmotion, (use profiledPidController from wpilib) https://github.com/frc868/2025-Ri3D/blob/main/src/main/java/frc/robot/subsystems/Elevator.java
     var config = new SparkFlexConfig();
     config
         .idleMode(SparkBaseConfig.IdleMode.kCoast)
-        //.encoder VELOCITY CONVERSION //TODO: fix this
+        .encoder
+        .positionConversionFactor(ElevatorConstants.kRotaionToMeters) // Converts Rotations to Meters
+        .velocityConversionFactor(ElevatorConstants.kRPMtoMPS) // Converts RPM to MPS
+        // .encoder VELOCITY CONVERSION //TODO: fix this
         .closedLoop
-          .p(24)
-          .i(0)
-          .d(1.6)
-          .velocityFF(0);
+        .feedbackSensor(ClosedLoopConfig.FeedbackSensor.kPrimaryEncoder)
+        .p(1) //TODO convert these to tuneable numbers maybe??? or make the constant the tunable and reference it here
+        .i(0)
+        .d(0)
+        .maxMotion
+        .maxVelocity(ElevatorConstants.kElevatorMaxVelocity)
+        .maxAcceleration(ElevatorConstants.kElevatorMaxAcceleration)
+        .positionMode(MAXMotionConfig.MAXMotionPositionMode.kMAXMotionTrapezoidal)
+        .allowedClosedLoopError(0.01)
+        .outputRange(-0.5, 0.5);
 
     if (isFollower) {
       config.follow(leader, true);
     }
 
-    //TODO: research SmartMotion and MaxMotion for gravity control
-    //TODO: Look at the ARM (maybe??) from 2024Lifesaver
-    /*    config.Slot0.kA = 0; // Acceleration feedforward
-    config.Slot0.kG = 0.7297; // Gravity feedforward
-     */
-
     return config;
+  }
+
+  @Override
+  public void setDistance(Distance distance) {
+    pidController.setReference(
+        Units.rotationsToDegrees(Conversions.metersToRotations(distance, 1, elevatorRadius)),
+        SparkBase.ControlType.kPosition,ClosedLoopSlot.kSlot0,
+            feedforward.calculate(leaderEncoder.getVelocity()));
+
+  }
+
+  @Override
+  public void stop() {
+    leader.stopMotor();
   }
 }

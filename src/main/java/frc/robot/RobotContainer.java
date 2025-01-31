@@ -75,7 +75,7 @@ public class RobotContainer {
 
         // flywheel = new Flywheel(new FlywheelIOCTRE()); // Disabled to prevent robot movement if
         // deployed to a real robot
-        flywheel = new Flywheel(new FlywheelIO() {});
+        //flywheel = new Flywheel(new FlywheelIO() {});
         // elevator = new Elevator(new ElevatorIOCTRE()); // Disabled to prevent robot movement if
         // deployed to a real robot
         elevator = new Elevator(new ElevatorIO() {});
