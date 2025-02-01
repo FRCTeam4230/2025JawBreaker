@@ -9,9 +9,6 @@ import com.revrobotics.spark.config.MAXMotionConfig;
 import com.revrobotics.spark.config.SparkBaseConfig;
 import com.revrobotics.spark.config.SparkFlexConfig;
 import edu.wpi.first.math.controller.ElevatorFeedforward;
-import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.util.Units;
-import edu.wpi.first.units.AngleUnit;
 import edu.wpi.first.units.measure.*;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.DutyCycleEncoder;
@@ -35,6 +32,8 @@ public class ElevatorIOREV implements ElevatorIO {
 
   // Absolute position, upper and lower limit switch
   private final DutyCycleEncoder encoder = new DutyCycleEncoder(3);
+
+  // TODO: add/handle limit switch
   private final DigitalInput upperLimitSwitch = new DigitalInput(1);
   private final DigitalInput lowerLimitSwitch = new DigitalInput(2);
 
@@ -65,7 +64,6 @@ public class ElevatorIOREV implements ElevatorIO {
             leader
                 .getEncoder()
                 .getVelocity()); // getVelocity returns RPMS so this is totally probably wrong
-    // inputs.leaderRotorVelocity = leader.getRotorVelocity();
 
     inputs.appliedVoltage = Volts.of(leader.getAppliedOutput());
     inputs.leaderStatorCurrent = Amps.of(leader.getOutputCurrent());
@@ -85,25 +83,25 @@ public class ElevatorIOREV implements ElevatorIO {
     // NON maxmotion, (use profiledPidController from wpilib)
     // https://github.com/frc868/2025-Ri3D/blob/main/src/main/java/frc/robot/subsystems/Elevator.java
     var config = new SparkFlexConfig();
+
     config
         .idleMode(SparkBaseConfig.IdleMode.kCoast)
         .encoder
         .positionConversionFactor(
-            ElevatorConstants.kRotaionToMeters) // Converts Rotations to Meters
-        .velocityConversionFactor(ElevatorConstants.kRPMtoMPS) // Converts RPM to MPS
-        // .encoder VELOCITY CONVERSION //TODO: fix this
+            ElevatorConstants.rotationToMeters) // Converts Rotations to Meters
+        .velocityConversionFactor(ElevatorConstants.rpmToMps); // Converts RPM to MPS
+    config
         .closedLoop
         .feedbackSensor(ClosedLoopConfig.FeedbackSensor.kPrimaryEncoder)
-        .p(1) // TODO convert these to tuneable numbers maybe??? or make the constant the tunable
-        // and reference it here
-        .i(0)
-        .d(0)
+        .p(ElevatorConstants.kP.get())
+        .i(ElevatorConstants.kI.get())
+        .d(ElevatorConstants.kD.get())
+        .outputRange(-0.5, 0.5)
         .maxMotion
-        .maxVelocity(ElevatorConstants.kElevatorMaxVelocity)
-        .maxAcceleration(ElevatorConstants.kElevatorMaxAcceleration)
+        .maxVelocity(ElevatorConstants.elevatorMaxVelocity)
+        .maxAcceleration(ElevatorConstants.elevatorMaxAcceleration)
         .positionMode(MAXMotionConfig.MAXMotionPositionMode.kMAXMotionTrapezoidal)
-        .allowedClosedLoopError(0.01)
-        .outputRange(-0.5, 0.5);
+        .allowedClosedLoopError(0.01);
 
     if (isFollower) {
       config.follow(leader, true);
@@ -115,12 +113,11 @@ public class ElevatorIOREV implements ElevatorIO {
   @Override
   public void setDistance(Distance distance) {
     pidController.setReference(
-            (Conversions.metersToRotations(distance, 1, elevatorRadius).in(Degrees)),
+        Conversions.metersToRotations(distance, 1, elevatorRadius).in(Degrees),
         SparkBase.ControlType.kPosition,
         ClosedLoopSlot.kSlot0,
         feedforward.calculate(leaderEncoder.getVelocity()));
   }
-
 
   @Override
   public void stop() {
