@@ -13,13 +13,17 @@ import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.wpilibj.DutyCycleEncoder;
 
 public class ArmIOREV implements ArmIO {
-  private final SparkFlex motor =
+
+  public static final double GEAR_RATIO = 0;
+
+  protected static final SparkFlex motor =
       new SparkFlex(ArmConstants.MOTOR_ID, SparkLowLevel.MotorType.kBrushless);
 
   PIDController pidController = new PIDController(0.0, 0.0, 0.0);
 
   private final RelativeEncoder velocityEncoder = motor.getEncoder();
-  private final DutyCycleEncoder encoder =
+
+  protected final DutyCycleEncoder encoder =
       new DutyCycleEncoder(ArmConstants.DUTY_CYCLE_ENCODER_PORT);
 
   public ArmIOREV() {
