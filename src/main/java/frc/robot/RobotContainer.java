@@ -25,7 +25,7 @@ import frc.robot.subsystems.drive.requests.ProfiledFieldCentricFacingAngle;
 import frc.robot.subsystems.drive.requests.SwerveSetpointGen;
 import frc.robot.subsystems.elevator.Elevator;
 import frc.robot.subsystems.elevator.ElevatorIO;
-import frc.robot.subsystems.elevator.ElevatorIOSIM;
+import frc.robot.subsystems.elevator.ElevatorIOSimRev;
 import frc.robot.subsystems.vision.Vision;
 import frc.robot.subsystems.vision.VisionIO;
 import frc.robot.subsystems.vision.VisionIOLimelight;
@@ -112,7 +112,7 @@ public class RobotContainer {
                     new Rotation3d(0, Math.toRadians(20), Math.toRadians(-90))),
                 drivetrain::getVisionParameters));
 
-        elevator = new Elevator(new ElevatorIOSIM());
+        elevator = new Elevator(new ElevatorIOSimRev());
         arm = new Arm(new ArmIOSIM());
         break;
 
@@ -246,6 +246,7 @@ public class RobotContainer {
     // reset the field-centric heading on left bumper press
     // joystick.leftBumper().onTrue(drivetrain.runOnce(drivetrain::seedFieldCentric));
     // joystick.a().onTrue(flywheel.L1()).onTrue(arm.L1()).onTrue(elevator.L1());
+    // joystick.b().onTrue(flywheel.L2()).onTrue(arm.L2()).onTrue(elevator.L2());
     // joystick.b().onTrue(flywheel.L2()).onTrue(arm.L2()).onTrue(elevator.L2());
   }
 
