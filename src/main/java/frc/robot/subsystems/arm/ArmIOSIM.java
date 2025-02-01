@@ -105,7 +105,7 @@ public class ArmIOSIM extends ArmIOREV {
     motorSim.setPosition(position.times(GEAR_RATIO).in(Degrees));
     motorSim.setVelocity(velocity.times(GEAR_RATIO).in(DegreesPerSecond));
 
-    // Update simulated CANcoder readings (direct angle measurement)
+    // Update simulated CANcoder readings (direct angle measurement).
     // encoderSim.setRawPosition(position);
     // encoderSim.setVelocity(velocity);
   }
