@@ -46,8 +46,8 @@ public class ArmIOSIM extends ArmIOCTRE {
   /** Physics simulation model for the arm mechanism */
   private final SingleJointedArmSim motorSimModel;
 
-  /** Simulation state for the leader motor */
-  private final TalonFXSimState leaderSim;
+  /** Simulation state for the motor motor */
+  private final TalonFXSimState motorSim;
   /** Simulation state for the follower motor */
   private final TalonFXSimState followerSim;
   /** Simulation state for the CANcoder */
@@ -58,7 +58,7 @@ public class ArmIOSIM extends ArmIOCTRE {
     super(); // Initialize hardware interface components
 
     // Get simulation states for all hardware
-    leaderSim = leader.getSimState();
+    motorSim = motor.getSimState();
     followerSim = follower.getSimState();
     encoderSim = encoder.getSimState();
 
@@ -100,12 +100,12 @@ public class ArmIOSIM extends ArmIOCTRE {
     super.updateInputs(inputs);
 
     // Simulate battery voltage effects on all devices
-    leaderSim.setSupplyVoltage(RobotController.getBatteryVoltage());
+    motorSim.setSupplyVoltage(RobotController.getBatteryVoltage());
     followerSim.setSupplyVoltage(RobotController.getBatteryVoltage());
     encoderSim.setSupplyVoltage(RobotController.getBatteryVoltage());
 
     // Update physics simulation
-    motorSimModel.setInputVoltage(leaderSim.getMotorVoltage());
+    motorSimModel.setInputVoltage(motorSim.getMotorVoltage());
     motorSimModel.update(0.020); // Simulate 20ms timestep (50Hz)
 
     // Get position and velocity from physics simulation
@@ -113,8 +113,8 @@ public class ArmIOSIM extends ArmIOCTRE {
     AngularVelocity velocity = RadiansPerSecond.of(motorSimModel.getVelocityRadPerSec());
 
     // Update simulated motor encoder readings (accounts for gear ratio)
-    leaderSim.setRawRotorPosition(position.times(GEAR_RATIO));
-    leaderSim.setRotorVelocity(velocity.times(GEAR_RATIO));
+    motorSim.setRawRotorPosition(position.times(GEAR_RATIO));
+    motorSim.setRotorVelocity(velocity.times(GEAR_RATIO));
 
     // Update simulated CANcoder readings (direct angle measurement)
     encoderSim.setRawPosition(position);

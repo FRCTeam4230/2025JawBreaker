@@ -13,6 +13,7 @@ package frc.robot.subsystems.arm;
 
 import static edu.wpi.first.units.Units.*;
 
+import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.Alert.AlertType;
@@ -34,12 +35,15 @@ public class Arm extends SubsystemBase {
   private final ArmIO io;
   private final ArmIOInputsAutoLogged inputs;
 
+  public final PIDController pidController =
+      new PIDController(ArmConstants.kP.get(), ArmConstants.kI.get(), ArmConstants.kD.get());
+
   // Current arm position mode
   private ArmPosition currentMode = ArmPosition.INTAKE;
 
   // Alerts for motor connection status
-  private final Alert leaderMotorAlert =
-      new Alert("Arm leader motor isn't connected", AlertType.kError);
+  private final Alert motorMotorAlert =
+      new Alert("Arm motor motor isn't connected", AlertType.kError);
   private final Alert followerMotorAlert =
       new Alert("Arm follower motor isn't connected", AlertType.kError);
   private final Alert encoderAlert = new Alert("Arm encoder isn't connected", AlertType.kError);
@@ -54,6 +58,13 @@ public class Arm extends SubsystemBase {
     this.inputs = new ArmIOInputsAutoLogged();
   }
 
+  private void updateControlConstants() {
+    pidController.setP(ArmConstants.kP.get());
+    pidController.setI(ArmConstants.kI.get());
+    pidController.setD(ArmConstants.kD.get());
+    pidController.setTolerance(ArmConstants.setpointToleranceRad.get());
+  }
+
   @Override
   public void periodic() {
     // Update and log inputs from hardware
@@ -61,8 +72,7 @@ public class Arm extends SubsystemBase {
     Logger.processInputs("Arm", inputs);
 
     // Update motor connection status alerts
-    leaderMotorAlert.set(!inputs.leaderConnected);
-    followerMotorAlert.set(!inputs.followerConnected);
+    motorMotorAlert.set(!inputs.motorConnected);
     encoderAlert.set(!inputs.encoderConnected);
   }
 

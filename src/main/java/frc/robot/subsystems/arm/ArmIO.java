@@ -11,47 +11,40 @@
 
 package frc.robot.subsystems.arm;
 
-import static edu.wpi.first.units.Units.Amps;
-import static edu.wpi.first.units.Units.Rotations;
-import static edu.wpi.first.units.Units.RotationsPerSecond;
-import static edu.wpi.first.units.Units.Volts;
+import static edu.wpi.first.units.Units.*;
 
-import edu.wpi.first.units.measure.Angle;
-import edu.wpi.first.units.measure.AngularVelocity;
-import edu.wpi.first.units.measure.Current;
-import edu.wpi.first.units.measure.Voltage;
+import edu.wpi.first.units.measure.*;
 import org.littletonrobotics.junction.AutoLog;
 
 public interface ArmIO {
   @AutoLog
-  public static class ArmIOInputs {
-    public boolean leaderConnected = false;
-    public boolean followerConnected = false;
+  class ArmIOInputs {
+    public boolean motorConnected = false;
     public boolean encoderConnected = false;
 
-    public Angle leaderPosition = Rotations.of(0);
-    public Angle leaderRotorPosition = Rotations.of(0);
+    public Angle motorPosition = Rotations.of(0);
     public Angle encoderPosition = Rotations.of(0);
 
-    public AngularVelocity leaderVelocity = RotationsPerSecond.of(0);
-    public AngularVelocity leaderRotorVelocity = RotationsPerSecond.of(0);
+    public AngularVelocity motorVelocity = RotationsPerSecond.of(0);
+
     public AngularVelocity encoderVelocity = RotationsPerSecond.of(0);
 
     public Voltage appliedVoltage = Volts.of(0.0);
-    public Current leaderStatorCurrent = Amps.of(0);
-    public Current followerStatorCurrent = Amps.of(0);
-    public Current leaderSupplyCurrent = Amps.of(0);
-    public Current followerSupplyCurrent = Amps.of(0);
-
+    public Current motorStatorCurrent = Amps.of(0);
+    public Current motorSupplyCurrent = Amps.of(0);
     public Angle armAngle = Rotations.of(0);
+
+    public Temperature motorTemperatureCelsius = Celsius.of(0.0);
+
+    public int motorCANID = -1;
   }
 
   /** Updates the set of loggable inputs. */
-  public default void updateInputs(ArmIOInputs inputs) {}
+  default void updateInputs(ArmIOInputs inputs) {}
 
   /** Run closed loop at the specified velocity. */
-  public default void setPosition(Angle angle) {}
+  default void setPosition(Angle angle) {}
 
   /** Stop in open loop. */
-  public default void stop() {}
+  default void stop() {}
 }
