@@ -109,7 +109,7 @@ public class ElevatorIOREV implements ElevatorIO {
   @Override
   public void setDistance(Distance distance) {
     pidController.setReference(
-        Units.rotationsToDegrees(Conversions.metersToRotations(distance, 1, elevatorRadius)),
+        (Conversions.metersToRotations(distance, 1, elevatorRadius).in(Degrees)),
         SparkBase.ControlType.kPosition,ClosedLoopSlot.kSlot0,
             feedforward.calculate(leaderEncoder.getVelocity()));
 
