@@ -2,7 +2,6 @@ package frc.robot.subsystems.elevator;
 
 import static edu.wpi.first.units.Units.*;
 
-import com.ctre.phoenix6.controls.PositionVoltage;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.spark.*;
 import com.revrobotics.spark.config.ClosedLoopConfig;
@@ -27,12 +26,15 @@ public class ElevatorIOREV implements ElevatorIO {
 
   /** Leader motor controller * */
   private final SparkFlex leader = new SparkFlex(30, SparkLowLevel.MotorType.kBrushless);
+
   private final RelativeEncoder leaderEncoder = leader.getEncoder();
   /** Follower * */
   private final SparkFlex follower = new SparkFlex(31, SparkLowLevel.MotorType.kBrushless);
 
   // Absolute position, upper and lower limit switch
   private final DutyCycleEncoder encoder = new DutyCycleEncoder(3);
+
+  //TODO: add/handle limit switch
   private final DigitalInput upperLimitSwitch = new DigitalInput(1);
   private final DigitalInput lowerLimitSwitch = new DigitalInput(2);
 
@@ -63,41 +65,41 @@ public class ElevatorIOREV implements ElevatorIO {
             leader
                 .getEncoder()
                 .getVelocity()); // getVelocity returns RPMS so this is totally probably wrong
-    // inputs.leaderRotorVelocity = leader.getRotorVelocity();
 
     inputs.appliedVoltage = Volts.of(leader.getAppliedOutput());
     inputs.leaderStatorCurrent = Amps.of(leader.getOutputCurrent());
 
     inputs.followerStatorCurrent = Amps.of(follower.getOutputCurrent());
     inputs.encoderPosition = Rotations.of(encoder.get());
-    inputs.encoderVelocity =
-        RotationsPerSecond.of(
-            encoder.get()); // TODO: This is probably wrong and or may not be helpful?
+    inputs.encoderVelocity = RotationsPerSecond.of(encoder.get()); // TODO: This is probably wrong and or may not be helpful?
   }
 
   private SparkFlexConfig createSparkFlexConfig(boolean isFollower) {
 
     // I don't know if we will need a velocityConversionFacdtory but i'm fairly certain we will
-    //maxMotion example https://github.com/BroncBotz3481/FRC2025/blob/main/src/main/java/frc/robot/subsystems/ElevatorSubsystem.java
-    //NON maxmotion, (use profiledPidController from wpilib) https://github.com/frc868/2025-Ri3D/blob/main/src/main/java/frc/robot/subsystems/Elevator.java
+    // maxMotion example
+    // https://github.com/BroncBotz3481/FRC2025/blob/main/src/main/java/frc/robot/subsystems/ElevatorSubsystem.java
+    // NON maxmotion, (use profiledPidController from wpilib)
+    // https://github.com/frc868/2025-Ri3D/blob/main/src/main/java/frc/robot/subsystems/Elevator.java
     var config = new SparkFlexConfig();
+
+
     config
         .idleMode(SparkBaseConfig.IdleMode.kCoast)
         .encoder
-        .positionConversionFactor(ElevatorConstants.kRotaionToMeters) // Converts Rotations to Meters
-        .velocityConversionFactor(ElevatorConstants.kRPMtoMPS) // Converts RPM to MPS
-        // .encoder VELOCITY CONVERSION //TODO: fix this
-        .closedLoop
+          .positionConversionFactor(ElevatorConstants.rotationToMeters) // Converts Rotations to Meters
+          .velocityConversionFactor(ElevatorConstants.rpmToMps); // Converts RPM to MPS
+    config.closedLoop
         .feedbackSensor(ClosedLoopConfig.FeedbackSensor.kPrimaryEncoder)
-        .p(1) //TODO convert these to tuneable numbers maybe??? or make the constant the tunable and reference it here
-        .i(0)
-        .d(0)
+        .p(ElevatorConstants.kP.get())
+        .i(ElevatorConstants.kI.get())
+        .d(ElevatorConstants.kD.get())
+        .outputRange(-0.5, 0.5)
         .maxMotion
-        .maxVelocity(ElevatorConstants.kElevatorMaxVelocity)
-        .maxAcceleration(ElevatorConstants.kElevatorMaxAcceleration)
-        .positionMode(MAXMotionConfig.MAXMotionPositionMode.kMAXMotionTrapezoidal)
-        .allowedClosedLoopError(0.01)
-        .outputRange(-0.5, 0.5);
+          .maxVelocity(ElevatorConstants.elevatorMaxVelocity)
+          .maxAcceleration(ElevatorConstants.elevatorMaxAcceleration)
+          .positionMode(MAXMotionConfig.MAXMotionPositionMode.kMAXMotionTrapezoidal)
+          .allowedClosedLoopError(0.01);
 
     if (isFollower) {
       config.follow(leader, true);
@@ -109,10 +111,10 @@ public class ElevatorIOREV implements ElevatorIO {
   @Override
   public void setDistance(Distance distance) {
     pidController.setReference(
-        Units.rotationsToDegrees(Conversions.metersToRotations(distance, 1, elevatorRadius)),
-        SparkBase.ControlType.kPosition,ClosedLoopSlot.kSlot0,
-            feedforward.calculate(leaderEncoder.getVelocity()));
-
+        Conversions.metersToRotations(distance, 1, elevatorRadius),
+        SparkBase.ControlType.kPosition,
+        ClosedLoopSlot.kSlot0,
+        feedforward.calculate(leaderEncoder.getVelocity()));
   }
 
   @Override
