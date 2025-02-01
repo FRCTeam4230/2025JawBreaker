@@ -1,9 +1,7 @@
 package frc.robot.subsystems.elevator;
 
-import edu.wpi.first.math.util.Units;
 import frc.robot.utils.LoggedTunableNumber;
 import frc.robot.utils.TunableNumberWrapper;
-
 import java.lang.invoke.MethodHandles;
 
 public class ElevatorConstants {
