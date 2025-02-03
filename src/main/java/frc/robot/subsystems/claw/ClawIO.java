@@ -32,9 +32,6 @@ public interface ClawIO {
   /** Updates the set of loggable inputs. */
   public default void updateInputs(ClawIOInputs inputs) {}
 
-  /** Run closed loop at the specified velocity. */
-  public default void setVelocity(Velocity velocity) {}
-
   /** Stop in open loop. */
   public default void stop() {}
 }
