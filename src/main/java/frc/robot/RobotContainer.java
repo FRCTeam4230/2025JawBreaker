@@ -16,8 +16,8 @@ import frc.robot.commands.DriveCommands;
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.arm.*;
 import frc.robot.subsystems.claw.Claw;
-import frc.robot.subsystems.claw.ClawIO;
 import frc.robot.subsystems.claw.ClawIOREV;
+import frc.robot.subsystems.claw.ClawIOSIMREV;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.drive.DriveIO;
 import frc.robot.subsystems.drive.DriveIOCTRE;
@@ -117,7 +117,7 @@ public class RobotContainer {
 
         elevator = new Elevator(new ElevatorIOSimRev());
         arm = new Arm(new ArmIOSIM());
-        claw = new Claw(new ClawIO() {}); // change to IOSIM
+        claw = new Claw(new ClawIOSIMREV() {}); // change to IOSIM
         break;
 
       default:

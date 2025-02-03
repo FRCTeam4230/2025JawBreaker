@@ -11,10 +11,10 @@ import com.revrobotics.spark.config.SparkMaxConfig;
 import edu.wpi.first.wpilibj.I2C;
 
 public class ClawIOREV implements ClawIO {
-  private final SparkFlex motor =
+  protected final SparkFlex motor =
       new SparkFlex(ClawConstants.clawMotorID, SparkLowLevel.MotorType.kBrushless);
 
-  private final ColorSensorV3 colorSensorV3 = new ColorSensorV3(I2C.Port.kOnboard);
+  protected final ColorSensorV3 colorSensorV3 = new ColorSensorV3(I2C.Port.kOnboard);
 
   public ClawIOREV() {
     motor.configure(
