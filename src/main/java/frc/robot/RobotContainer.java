@@ -18,7 +18,6 @@ import frc.robot.subsystems.arm.*;
 import frc.robot.subsystems.claw.Claw;
 import frc.robot.subsystems.claw.ClawIO;
 import frc.robot.subsystems.claw.ClawIOREV;
-import frc.robot.subsystems.claw.ClawIOSIM;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.drive.DriveIO;
 import frc.robot.subsystems.drive.DriveIOCTRE;
@@ -27,7 +26,7 @@ import frc.robot.subsystems.drive.requests.SwerveSetpointGen;
 import frc.robot.subsystems.elevator.Elevator;
 import frc.robot.subsystems.elevator.ElevatorIO;
 import frc.robot.subsystems.elevator.ElevatorIOREV;
-import frc.robot.subsystems.elevator.ElevatorIOSIM;
+import frc.robot.subsystems.elevator.ElevatorIOSimRev;
 import frc.robot.subsystems.vision.Vision;
 import frc.robot.subsystems.vision.VisionIO;
 import frc.robot.subsystems.vision.VisionIOLimelight;
@@ -116,7 +115,7 @@ public class RobotContainer {
                     new Rotation3d(0, Math.toRadians(20), Math.toRadians(-90))),
                 drivetrain::getVisionParameters));
 
-        elevator = new Elevator(new ElevatorIOSIM());
+        elevator = new Elevator(new ElevatorIOSimRev());
         arm = new Arm(new ArmIOSIM());
         claw = new Claw(new ClawIO() {}); // change to IOSIM
         break;

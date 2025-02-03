@@ -16,22 +16,23 @@ import frc.robot.utils.Conversions;
 
 public class ElevatorIOREV implements ElevatorIO {
   /** The gear ratio between the motor and the elevator mechanism */
-  private static final double GEAR_RATIO = 2.0;
+  protected static final double GEAR_RATIO = 2.0;
   /**
    * The radius of the elevator pulley/drum, used for converting between rotations and linear
    * distance
    */
-  private final Distance elevatorRadius = Inches.of(2);
+  protected final Distance elevatorRadius = Inches.of(2);
 
   /** Leader motor controller * */
-  private final SparkFlex leader = new SparkFlex(30, SparkLowLevel.MotorType.kBrushless);
+  protected final SparkFlex leader = new SparkFlex(30, SparkLowLevel.MotorType.kBrushless);
 
   private final RelativeEncoder leaderEncoder = leader.getEncoder();
+
   /** Follower * */
-  private final SparkFlex follower = new SparkFlex(31, SparkLowLevel.MotorType.kBrushless);
+  protected final SparkFlex follower = new SparkFlex(31, SparkLowLevel.MotorType.kBrushless);
 
   // Absolute position, upper and lower limit switch
-  private final DutyCycleEncoder encoder = new DutyCycleEncoder(3);
+  protected final DutyCycleEncoder encoder = new DutyCycleEncoder(3);
 
   // TODO: add/handle limit switch
   private final DigitalInput upperLimitSwitch = new DigitalInput(1);

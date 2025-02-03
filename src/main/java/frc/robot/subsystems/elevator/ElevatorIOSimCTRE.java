@@ -32,7 +32,7 @@ import frc.robot.utils.Conversions;
  * <p>The simulation models: - Dual Kraken X60 FOC motors - Realistic elevator physics including
  * gravity - Position and velocity feedback through simulated encoders - Battery voltage effects
  */
-public class ElevatorIOSIM extends ElevatorIOCTRE {
+public class ElevatorIOSimCTRE extends ElevatorIOCTRE {
 
   /** Physics simulation model for the elevator mechanism */
   private final ElevatorSim motorSimModel;
@@ -49,7 +49,7 @@ public class ElevatorIOSIM extends ElevatorIOCTRE {
    * parameters including: - Dual Kraken X60 FOC motors - 10 pound carriage mass - 8 foot maximum
    * height - Gravity simulation enabled
    */
-  public ElevatorIOSIM() {
+  public ElevatorIOSimCTRE() {
     super(); // Initialize hardware interface components
 
     // Get simulation states for all hardware
