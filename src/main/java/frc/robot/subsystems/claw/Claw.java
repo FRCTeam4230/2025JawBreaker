@@ -50,10 +50,12 @@ public class Claw extends SubsystemBase {
   }
 
   public Command intake() {
-    return Commands.startEnd(() -> clawIOREV.rollerSpeed(-0.5), () -> clawIOREV.stop());
+    return Commands.startEnd(
+        () -> clawIOREV.setSpeed(-(ClawConstants.INTAKE_VOLTAGE.get())), () -> clawIOREV.stop());
   }
 
   public Command extake() {
-    return Commands.startEnd(() -> clawIOREV.rollerSpeed(0.5), () -> clawIOREV.stop());
+    return Commands.startEnd(
+        () -> clawIOREV.setSpeed(ClawConstants.INTAKE_VOLTAGE.get()), () -> clawIOREV.stop());
   }
 }

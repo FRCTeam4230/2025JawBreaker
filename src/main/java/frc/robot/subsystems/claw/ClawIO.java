@@ -23,11 +23,19 @@ public interface ClawIO {
     public boolean encoderConnected = false;
     public boolean hasCoral = false;
 
-    public AngularVelocity velocity = RotationsPerSecond.of(0);
+    public boolean lowerLimit = false;
+    public boolean upperLimit = false;
+
+    public AngularVelocity motorVelocity = RotationsPerSecond.of(0);
+    public Distance proximity = Centimeters.of(0);
 
     public Voltage appliedVoltage = Volts.of(0.0);
     public Current supplyCurrent = Amps.of(0);
+
+    public Temperature motorTempCelsius = Celsius.of(0);
   }
+
+  public default void setSpeed(double velocity) {}
 
   /** Updates the set of loggable inputs. */
   public default void updateInputs(ClawIOInputs inputs) {}

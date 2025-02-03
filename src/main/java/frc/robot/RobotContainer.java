@@ -14,13 +14,11 @@ import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 import frc.robot.commands.DriveCommands;
 import frc.robot.generated.TunerConstants;
-import frc.robot.subsystems.arm.Arm;
-import frc.robot.subsystems.arm.ArmIO;
-import frc.robot.subsystems.arm.ArmIOCTRE;
-import frc.robot.subsystems.arm.ArmIOSIM;
+import frc.robot.subsystems.arm.*;
 import frc.robot.subsystems.claw.Claw;
 import frc.robot.subsystems.claw.ClawIO;
 import frc.robot.subsystems.claw.ClawIOREV;
+import frc.robot.subsystems.claw.ClawIOSIM;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.drive.DriveIO;
 import frc.robot.subsystems.drive.DriveIOCTRE;
@@ -28,6 +26,7 @@ import frc.robot.subsystems.drive.requests.ProfiledFieldCentricFacingAngle;
 import frc.robot.subsystems.drive.requests.SwerveSetpointGen;
 import frc.robot.subsystems.elevator.Elevator;
 import frc.robot.subsystems.elevator.ElevatorIO;
+import frc.robot.subsystems.elevator.ElevatorIOREV;
 import frc.robot.subsystems.elevator.ElevatorIOSIM;
 import frc.robot.subsystems.vision.Vision;
 import frc.robot.subsystems.vision.VisionIO;
@@ -79,11 +78,11 @@ public class RobotContainer {
         // flywheel = new Flywheel(new FlywheelIO() {});
         // elevator = new Elevator(new ElevatorIOCTRE()); // Disabled to prevent robot movement if
         // deployed to a real robot
-        elevator = new Elevator(new ElevatorIO() {});
+        elevator = new Elevator(new ElevatorIOREV() {});
         // arm = new Arm(new ArmIOCTRE()); // Disabled to prevent robot movement if deployed to a
         // real robot
-        arm = new Arm(new ArmIO() {});
-        claw = new Claw(new ClawIO() {});
+        arm = new Arm(new ArmIOREV() {});
+        claw = new Claw(new ClawIOREV() {});
         break;
 
       case SIM:
