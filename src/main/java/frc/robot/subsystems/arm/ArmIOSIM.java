@@ -1,26 +1,14 @@
-// Copyright FRC 5712
-// This program is free software; you can redistribute it and/or
-// modify it under the terms of the GNU General Public License
-// version 3 as published by the Free Software Foundation or
-// available in the root directory of this project.
+// Copyright (c) 2025 FRC 5712
 //
-// This program is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-// GNU General Public License for more details.
+// Use of this source code is governed by an MIT-style
+// license that can be found in the LICENSE file at
+// the root directory of this project.
 
 package frc.robot.subsystems.arm;
 
-import static edu.wpi.first.units.Units.Degrees;
-import static edu.wpi.first.units.Units.Inches;
-import static edu.wpi.first.units.Units.Kilograms;
-import static edu.wpi.first.units.Units.Meters;
-import static edu.wpi.first.units.Units.Pounds;
-import static edu.wpi.first.units.Units.Radians;
-import static edu.wpi.first.units.Units.RadiansPerSecond;
+import static edu.wpi.first.units.Units.*;
 
-import com.ctre.phoenix6.sim.CANcoderSimState;
-import com.ctre.phoenix6.sim.TalonFXSimState;
+import com.revrobotics.sim.SparkFlexSim;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N2;
 import edu.wpi.first.math.system.LinearSystem;
@@ -31,6 +19,7 @@ import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.units.measure.Mass;
 import edu.wpi.first.wpilibj.RobotController;
+import edu.wpi.first.wpilibj.simulation.DutyCycleEncoderSim;
 import edu.wpi.first.wpilibj.simulation.SingleJointedArmSim;
 
 /**
@@ -41,29 +30,27 @@ import edu.wpi.first.wpilibj.simulation.SingleJointedArmSim;
  * and moment of inertia - Position and velocity feedback through simulated encoders - Battery
  * voltage effects - Motion limits (0° to 180°)
  */
-public class ArmIOSIM extends ArmIOCTRE {
+public class ArmIOSIM extends ArmIOREV {
 
   /** Physics simulation model for the arm mechanism */
   private final SingleJointedArmSim motorSimModel;
 
-  /** Simulation state for the leader motor */
-  private final TalonFXSimState leaderSim;
-  /** Simulation state for the follower motor */
-  private final TalonFXSimState followerSim;
+  /** Simulation state for the motor */
+  private final SparkFlexSim motorSim;
   /** Simulation state for the CANcoder */
-  private final CANcoderSimState encoderSim;
+  private final DutyCycleEncoderSim encoderSim;
 
   /** Constructs a new ArmIOSIM instance. */
   public ArmIOSIM() {
     super(); // Initialize hardware interface components
 
     // Get simulation states for all hardware
-    leaderSim = leader.getSimState();
-    followerSim = follower.getSimState();
-    encoderSim = encoder.getSimState();
+    DCMotor gearbox = DCMotor.getNEO(1);
+    motorSim = new SparkFlexSim(motor, gearbox);
+    encoderSim = new DutyCycleEncoderSim(encoder);
 
     // Configure dual Kraken X60 FOC motors
-    DCMotor motor = DCMotor.getKrakenX60Foc(2);
+    // DCMotor motor = DCMotor.getKrakenX60Foc(2);
 
     // Define arm physical properties
     Distance armLength = Inches.of(12);
@@ -74,13 +61,13 @@ public class ArmIOSIM extends ArmIOCTRE {
 
     // Create arm physics model
     LinearSystem<N2, N1, N2> linearSystem =
-        LinearSystemId.createSingleJointedArmSystem(motor, armMOI, GEAR_RATIO);
+        LinearSystemId.createSingleJointedArmSystem(DCMotor.getNEO(1), armMOI, GEAR_RATIO);
 
     // Initialize arm simulation
     motorSimModel =
         new SingleJointedArmSim(
             linearSystem,
-            motor,
+            gearbox,
             GEAR_RATIO,
             armLength.in(Meters),
             Degrees.of(0).in(Radians), // Lower limit (0°)
@@ -100,12 +87,9 @@ public class ArmIOSIM extends ArmIOCTRE {
     super.updateInputs(inputs);
 
     // Simulate battery voltage effects on all devices
-    leaderSim.setSupplyVoltage(RobotController.getBatteryVoltage());
-    followerSim.setSupplyVoltage(RobotController.getBatteryVoltage());
-    encoderSim.setSupplyVoltage(RobotController.getBatteryVoltage());
+    motorSim.setBusVoltage(RobotController.getBatteryVoltage());
 
     // Update physics simulation
-    motorSimModel.setInputVoltage(leaderSim.getMotorVoltage());
     motorSimModel.update(0.020); // Simulate 20ms timestep (50Hz)
 
     // Get position and velocity from physics simulation
@@ -113,11 +97,11 @@ public class ArmIOSIM extends ArmIOCTRE {
     AngularVelocity velocity = RadiansPerSecond.of(motorSimModel.getVelocityRadPerSec());
 
     // Update simulated motor encoder readings (accounts for gear ratio)
-    leaderSim.setRawRotorPosition(position.times(GEAR_RATIO));
-    leaderSim.setRotorVelocity(velocity.times(GEAR_RATIO));
+    motorSim.setPosition(position.times(GEAR_RATIO).in(Degrees));
+    motorSim.setVelocity(velocity.times(GEAR_RATIO).in(DegreesPerSecond));
 
-    // Update simulated CANcoder readings (direct angle measurement)
-    encoderSim.setRawPosition(position);
-    encoderSim.setVelocity(velocity);
+    // Update simulated CANcoder readings (direct angle measurement).
+    // encoderSim.setRawPosition(position);
+    // encoderSim.setVelocity(velocity);
   }
 }
