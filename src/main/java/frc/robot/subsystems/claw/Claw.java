@@ -11,6 +11,8 @@
 
 package frc.robot.subsystems.claw;
 
+import static edu.wpi.first.units.Units.Volts;
+
 import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.Alert.AlertType;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -50,11 +52,11 @@ public class Claw extends SubsystemBase {
 
   public Command intake() {
     return Commands.startEnd(
-        () -> io.setSpeed(-(ClawConstants.INTAKE_VOLTAGE.get())), () -> io.stop());
+        () -> io.setVolts(Volts.of(ClawConstants.INTAKE_VOLTAGE.get()).times(-1)), () -> io.stop());
   }
 
   public Command extake() {
     return Commands.startEnd(
-        () -> io.setSpeed(ClawConstants.INTAKE_VOLTAGE.get()), () -> io.stop());
+        () -> io.setVolts(Volts.of(ClawConstants.INTAKE_VOLTAGE.get())), () -> io.stop());
   }
 }

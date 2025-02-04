@@ -8,6 +8,7 @@ import com.revrobotics.spark.SparkLowLevel;
 import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.config.SparkBaseConfig;
 import com.revrobotics.spark.config.SparkMaxConfig;
+import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.wpilibj.I2C;
 
 public class ClawIOREV implements ClawIO {
@@ -34,9 +35,10 @@ public class ClawIOREV implements ClawIO {
   }
   */
   @Override
-  public void setSpeed(double angularVelocity) {
+  public void setVolts(Voltage voltage) {
 
-    motor.set(angularVelocity);
+    // motor.set(angularVelocity);
+    motor.setVoltage(voltage);
   }
 
   public boolean hasCoral() {

@@ -35,7 +35,7 @@ public interface ClawIO {
     public Temperature motorTempCelsius = Celsius.of(0);
   }
 
-  public default void setSpeed(double velocity) {}
+  public default void setVolts(Voltage voltage) {}
 
   /** Updates the set of loggable inputs. */
   public default void updateInputs(ClawIOInputs inputs) {}
