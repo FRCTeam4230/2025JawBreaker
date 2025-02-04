@@ -116,7 +116,8 @@ public class RobotContainer {
                 drivetrain::getVisionParameters));
 
         elevator = new Elevator(new ElevatorIOSimRev());
-        arm = new Arm(new ArmIOSIM());
+        //        arm = new Arm(new ArmIOSIM());
+        arm = null;
         claw = new Claw(new ClawIOSIMREV() {}); // change to IOSIM
         break;
 
