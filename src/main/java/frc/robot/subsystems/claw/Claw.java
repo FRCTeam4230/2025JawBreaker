@@ -26,7 +26,6 @@ import org.littletonrobotics.junction.Logger;
 public class Claw extends SubsystemBase {
   // Hardware interface and inputs
   private final ClawIO io;
-  ClawIOREV clawIOREV;
   private final ClawIOInputsAutoLogged inputs;
 
   // Alerts for motor connection status
@@ -51,11 +50,11 @@ public class Claw extends SubsystemBase {
 
   public Command intake() {
     return Commands.startEnd(
-        () -> clawIOREV.setSpeed(-(ClawConstants.INTAKE_VOLTAGE.get())), () -> clawIOREV.stop());
+        () -> io.setSpeed(-(ClawConstants.INTAKE_VOLTAGE.get())), () -> io.stop());
   }
 
   public Command extake() {
     return Commands.startEnd(
-        () -> clawIOREV.setSpeed(ClawConstants.INTAKE_VOLTAGE.get()), () -> clawIOREV.stop());
+        () -> io.setSpeed(ClawConstants.INTAKE_VOLTAGE.get()), () -> io.stop());
   }
 }
