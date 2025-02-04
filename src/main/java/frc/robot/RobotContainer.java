@@ -14,10 +14,10 @@ import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 import frc.robot.commands.DriveCommands;
 import frc.robot.generated.TunerConstants;
-import frc.robot.subsystems.arm.Arm;
-import frc.robot.subsystems.arm.ArmIO;
-import frc.robot.subsystems.arm.ArmIOCTRE;
-import frc.robot.subsystems.arm.ArmIOSIM;
+import frc.robot.subsystems.arm.*;
+import frc.robot.subsystems.claw.Claw;
+import frc.robot.subsystems.claw.ClawIOREV;
+import frc.robot.subsystems.claw.ClawIOSIMREV;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.drive.DriveIO;
 import frc.robot.subsystems.drive.DriveIOCTRE;
@@ -25,6 +25,7 @@ import frc.robot.subsystems.drive.requests.ProfiledFieldCentricFacingAngle;
 import frc.robot.subsystems.drive.requests.SwerveSetpointGen;
 import frc.robot.subsystems.elevator.Elevator;
 import frc.robot.subsystems.elevator.ElevatorIO;
+import frc.robot.subsystems.elevator.ElevatorIOREV;
 import frc.robot.subsystems.elevator.ElevatorIOSimRev;
 import frc.robot.subsystems.vision.Vision;
 import frc.robot.subsystems.vision.VisionIO;
@@ -51,6 +52,7 @@ public class RobotContainer {
 
   private final Elevator elevator;
   private final Arm arm;
+  private final Claw claw;
 
   /* Setting up bindings for necessary control of the swerve drive platform */
   private final SwerveRequest.SwerveDriveBrake brake = new SwerveRequest.SwerveDriveBrake();
@@ -75,10 +77,11 @@ public class RobotContainer {
         // flywheel = new Flywheel(new FlywheelIO() {});
         // elevator = new Elevator(new ElevatorIOCTRE()); // Disabled to prevent robot movement if
         // deployed to a real robot
-        elevator = new Elevator(new ElevatorIO() {});
+        elevator = new Elevator(new ElevatorIOREV() {});
         // arm = new Arm(new ArmIOCTRE()); // Disabled to prevent robot movement if deployed to a
         // real robot
-        arm = new Arm(new ArmIO() {});
+        arm = new Arm(new ArmIOREV() {});
+        claw = new Claw(new ClawIOREV() {});
         break;
 
       case SIM:
@@ -113,7 +116,9 @@ public class RobotContainer {
                 drivetrain::getVisionParameters));
 
         elevator = new Elevator(new ElevatorIOSimRev());
-        arm = new Arm(new ArmIOSIM());
+        //        arm = new Arm(new ArmIOSIM());
+        arm = null;
+        claw = new Claw(new ClawIOSIMREV() {}); // change to IOSIM
         break;
 
       default:
@@ -129,6 +134,7 @@ public class RobotContainer {
 
         elevator = new Elevator(new ElevatorIO() {});
         arm = new Arm(new ArmIOCTRE() {});
+        claw = new Claw(new ClawIOREV());
         break;
     }
 
@@ -243,10 +249,11 @@ public class RobotContainer {
     joystick.start().and(joystick.y()).whileTrue(drivetrain.sysIdQuasistatic(Direction.kForward));
     joystick.start().and(joystick.x()).whileTrue(drivetrain.sysIdQuasistatic(Direction.kReverse));
 
+    joystick.rightBumper().whileTrue(claw.intake());
+    joystick.leftBumper().whileTrue(claw.extake());
     // reset the field-centric heading on left bumper press
     // joystick.leftBumper().onTrue(drivetrain.runOnce(drivetrain::seedFieldCentric));
     // joystick.a().onTrue(flywheel.L1()).onTrue(arm.L1()).onTrue(elevator.L1());
-    // joystick.b().onTrue(flywheel.L2()).onTrue(arm.L2()).onTrue(elevator.L2());
     // joystick.b().onTrue(flywheel.L2()).onTrue(arm.L2()).onTrue(elevator.L2());
   }
 
