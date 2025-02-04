@@ -4,15 +4,15 @@ import static edu.wpi.first.units.Units.*;
 
 import com.revrobotics.ColorSensorV3;
 import com.revrobotics.spark.SparkBase;
-import com.revrobotics.spark.SparkFlex;
 import com.revrobotics.spark.SparkLowLevel;
+import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.config.SparkBaseConfig;
 import com.revrobotics.spark.config.SparkMaxConfig;
 import edu.wpi.first.wpilibj.I2C;
 
 public class ClawIOREV implements ClawIO {
-  protected final SparkFlex motor =
-      new SparkFlex(ClawConstants.clawMotorID, SparkLowLevel.MotorType.kBrushless);
+  protected final SparkMax motor =
+      new SparkMax(ClawConstants.clawMotorID, SparkLowLevel.MotorType.kBrushless);
 
   protected final ColorSensorV3 colorSensorV3 = new ColorSensorV3(I2C.Port.kOnboard);
 
