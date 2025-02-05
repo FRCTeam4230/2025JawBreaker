@@ -1,13 +1,8 @@
-// Copyright FRC 5712
-// This program is free software; you can redistribute it and/or
-// modify it under the terms of the GNU General Public License
-// version 3 as published by the Free Software Foundation or
-// available in the root directory of this project.
+// Copyright (c) 2025 FRC 5712
 //
-// This program is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-// GNU General Public License for more details.
+// Use of this source code is governed by an MIT-style
+// license that can be found in the LICENSE file at
+// the root directory of this project.
 
 package frc.robot.subsystems.arm;
 
@@ -29,14 +24,14 @@ import edu.wpi.first.units.measure.Voltage;
 /**
  * CTRE-based implementation of the ArmIO interface for controlling a robot arm mechanism. This
  * implementation uses TalonFX motors and a CANcoder for position feedback. The arm consists of a
- * leader motor, a follower motor, and an encoder for precise angular positioning.
+ * motor motor, a follower motor, and an encoder for precise angular positioning.
  */
 public class ArmIOCTRE implements ArmIO {
   /** The gear ratio between the motor and the arm mechanism */
   public static final double GEAR_RATIO = 150;
 
-  /** The leader TalonFX motor controller (CAN ID: 20) */
-  public final TalonFX leader = new TalonFX(20);
+  /** The motor TalonFX motor controller (CAN ID: 20) */
+  public final TalonFX motor = new TalonFX(20);
   /** The follower TalonFX motor controller (CAN ID: 21) */
   public final TalonFX follower = new TalonFX(21);
 
@@ -44,20 +39,20 @@ public class ArmIOCTRE implements ArmIO {
   public final CANcoder encoder = new CANcoder(22);
 
   // Status signals for monitoring motor and encoder states
-  private final StatusSignal<Angle> leaderPosition = leader.getPosition();
-  private final StatusSignal<Angle> leaderRotorPosition = leader.getRotorPosition();
-  private final StatusSignal<AngularVelocity> leaderVelocity = leader.getVelocity();
-  private final StatusSignal<AngularVelocity> leaderRotorVelocity = leader.getRotorVelocity();
-  private final StatusSignal<Voltage> leaderAppliedVolts = leader.getMotorVoltage();
-  private final StatusSignal<Current> leaderStatorCurrent = leader.getStatorCurrent();
+  private final StatusSignal<Angle> motorPosition = motor.getPosition();
+  private final StatusSignal<Angle> motorRotorPosition = motor.getRotorPosition();
+  private final StatusSignal<AngularVelocity> motorVelocity = motor.getVelocity();
+  private final StatusSignal<AngularVelocity> motorRotorVelocity = motor.getRotorVelocity();
+  private final StatusSignal<Voltage> motorAppliedVolts = motor.getMotorVoltage();
+  private final StatusSignal<Current> motorStatorCurrent = motor.getStatorCurrent();
   private final StatusSignal<Current> followerStatorCurrent = follower.getStatorCurrent();
-  private final StatusSignal<Current> leaderSupplyCurrent = leader.getSupplyCurrent();
+  private final StatusSignal<Current> motorSupplyCurrent = motor.getSupplyCurrent();
   private final StatusSignal<Current> followerSupplyCurrent = follower.getSupplyCurrent();
   private final StatusSignal<Angle> encoderPosition = encoder.getPosition();
   private final StatusSignal<AngularVelocity> encoderVelocity = encoder.getVelocity();
 
   // Debouncers for connection status (filters out brief disconnections)
-  private final Debouncer leaderDebounce = new Debouncer(0.5);
+  private final Debouncer motorDebounce = new Debouncer(0.5);
   private final Debouncer followerDebounce = new Debouncer(0.5);
   private final Debouncer encoderDebounce = new Debouncer(0.5);
 
@@ -67,30 +62,30 @@ public class ArmIOCTRE implements ArmIO {
    * utilization for all devices.
    */
   public ArmIOCTRE() {
-    // Set up follower to mirror leader
-    follower.setControl(new Follower(leader.getDeviceID(), false));
+    // Set up follower to mirror motor
+    follower.setControl(new Follower(motor.getDeviceID(), false));
 
     // Configure both motors with identical settings
     TalonFXConfiguration config = createMotorConfiguration();
-    leader.getConfigurator().apply(config);
+    motor.getConfigurator().apply(config);
 
     // Configure update frequencies for all status signals
     BaseStatusSignal.setUpdateFrequencyForAll(
         50.0, // 50Hz update rate
-        leaderPosition,
-        leaderRotorPosition,
-        leaderVelocity,
-        leaderRotorVelocity,
-        leaderAppliedVolts,
-        leaderStatorCurrent,
+        motorPosition,
+        motorRotorPosition,
+        motorVelocity,
+        motorRotorVelocity,
+        motorAppliedVolts,
+        motorStatorCurrent,
         followerStatorCurrent,
-        leaderSupplyCurrent,
+        motorSupplyCurrent,
         followerSupplyCurrent,
         encoderPosition,
         encoderVelocity);
 
     // Optimize CAN bus usage for all devices
-    leader.optimizeBusUtilization(4, 0.1);
+    motor.optimizeBusUtilization(4, 0.1);
     follower.optimizeBusUtilization(4, 0.1);
     encoder.optimizeBusUtilization(4, 0.1);
   }
@@ -130,15 +125,15 @@ public class ArmIOCTRE implements ArmIO {
   @Override
   public void updateInputs(ArmIOInputs inputs) {
     // Refresh all sensor data
-    StatusCode leaderStatus =
+    StatusCode motorStatus =
         BaseStatusSignal.refreshAll(
-            leaderPosition,
-            leaderRotorPosition,
-            leaderVelocity,
-            leaderRotorVelocity,
-            leaderAppliedVolts,
-            leaderStatorCurrent,
-            leaderSupplyCurrent);
+            motorPosition,
+            motorRotorPosition,
+            motorVelocity,
+            motorRotorVelocity,
+            motorAppliedVolts,
+            motorStatorCurrent,
+            motorSupplyCurrent);
 
     StatusCode followerStatus =
         BaseStatusSignal.refreshAll(followerStatorCurrent, followerSupplyCurrent);
@@ -146,25 +141,20 @@ public class ArmIOCTRE implements ArmIO {
     StatusCode encoderStatus = BaseStatusSignal.refreshAll(encoderPosition, encoderVelocity);
 
     // Update connection status with debouncing
-    inputs.leaderConnected = leaderDebounce.calculate(leaderStatus.isOK());
-    inputs.followerConnected = followerDebounce.calculate(followerStatus.isOK());
+    inputs.motorConnected = motorDebounce.calculate(motorStatus.isOK());
     inputs.encoderConnected = encoderDebounce.calculate(encoderStatus.isOK());
 
     // Update position and velocity measurements
-    inputs.leaderPosition = leaderPosition.getValue();
-    inputs.leaderRotorPosition = leaderRotorPosition.getValue();
-    inputs.leaderVelocity = leaderVelocity.getValue();
-    inputs.leaderRotorVelocity = leaderRotorVelocity.getValue();
+    inputs.motorPosition = motorPosition.getValue();
+    inputs.motorVelocity = motorVelocity.getValue();
 
     inputs.encoderPosition = encoderPosition.getValue();
     inputs.encoderVelocity = encoderVelocity.getValue();
 
     // Update voltage and current measurements
-    inputs.appliedVoltage = leaderAppliedVolts.getValue();
-    inputs.leaderStatorCurrent = leaderStatorCurrent.getValue();
-    inputs.followerStatorCurrent = followerStatorCurrent.getValue();
-    inputs.leaderSupplyCurrent = leaderSupplyCurrent.getValue();
-    inputs.followerSupplyCurrent = followerSupplyCurrent.getValue();
+    inputs.appliedVoltage = motorAppliedVolts.getValue();
+    inputs.motorStatorCurrent = motorStatorCurrent.getValue();
+    inputs.motorSupplyCurrent = motorSupplyCurrent.getValue();
 
     // Calculate arm angle using encoder position
     inputs.armAngle = inputs.encoderPosition;
@@ -179,15 +169,15 @@ public class ArmIOCTRE implements ArmIO {
   @Override
   public void setPosition(Angle angle) {
     // Convert desired angle to encoder rotations
-    leader.setControl(new PositionVoltage(angle));
+    motor.setControl(new PositionVoltage(angle));
   }
 
   /**
-   * Stops all arm movement by stopping the leader motor. The follower will also stop due to the
+   * Stops all arm movement by stopping the motor motor. The follower will also stop due to the
    * follower relationship.
    */
   @Override
   public void stop() {
-    leader.stopMotor();
+    motor.stopMotor();
   }
 }
