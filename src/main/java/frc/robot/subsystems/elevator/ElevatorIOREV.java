@@ -16,7 +16,11 @@ import frc.robot.utils.Conversions;
 
 public class ElevatorIOREV implements ElevatorIO {
   /** The gear ratio between the motor and the elevator mechanism */
+<<<<<<< Updated upstream
   protected static final double GEAR_RATIO = 2.0;
+=======
+  protected static final double GEAR_RATIO = 12.0;
+>>>>>>> Stashed changes
   /**
    * The radius of the elevator pulley/drum, used for converting between rotations and linear
    * distance
@@ -25,7 +29,6 @@ public class ElevatorIOREV implements ElevatorIO {
 
   /** Leader motor controller * */
   protected final SparkFlex leader = new SparkFlex(30, SparkLowLevel.MotorType.kBrushless);
-
   private final RelativeEncoder leaderEncoder = leader.getEncoder();
 
   /** Follower * */
@@ -114,7 +117,7 @@ public class ElevatorIOREV implements ElevatorIO {
   @Override
   public void setDistance(Distance distance) {
     pidController.setReference(
-        Conversions.metersToRotations(distance, 1, elevatorRadius).in(Degrees),
+        Conversions.metersToRotations(distance, ElevatorConstants.GEAR_RATIO, elevatorRadius).in(Degrees),
         SparkBase.ControlType.kPosition,
         ClosedLoopSlot.kSlot0,
         feedforward.calculate(leaderEncoder.getVelocity()));

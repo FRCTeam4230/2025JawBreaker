@@ -17,7 +17,13 @@ public class ElevatorConstants {
   public static final double elevatorMaxVelocity = 1.0;
   public static final double elevatorMaxAcceleration = 1.0;
 
+<<<<<<< Updated upstream
   public static final LoggedTunableNumber kP = tunableTable.makeField("kP", 6);
+=======
+  public static final double GEAR_RATIO = 1/12.0;
+
+  public static final LoggedTunableNumber kP = tunableTable.makeField("kP", 1);
+>>>>>>> Stashed changes
   public static final LoggedTunableNumber kI = tunableTable.makeField("kI", 0.0);
   public static final LoggedTunableNumber kD = tunableTable.makeField("kD", 0.5);
 

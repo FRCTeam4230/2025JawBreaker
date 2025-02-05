@@ -84,15 +84,30 @@ public class ElevatorIOSimRev extends ElevatorIOREV {
     // Convert linear position/velocity to rotational units for based on encoder
     Angle position =
         Conversions.metersToRotations(
+<<<<<<< Updated upstream:src/main/java/frc/robot/subsystems/elevator/ElevatorIOSimRev.java
             Meters.of(motorSimModel.getPositionMeters()), 1, elevatorRadius);
+=======
+            Meters.of(motorSimModel.getPositionMeters()), GEAR_RATIO, elevatorRadius);
+>>>>>>> Stashed changes:src/main/java/frc/robot/subsystems/elevator/ElevatorIOSIMREV.java
 
     // Convert linear velocity to angular velocity based on encoder
     AngularVelocity velocity =
         Conversions.metersToRotationsVel(
+<<<<<<< Updated upstream:src/main/java/frc/robot/subsystems/elevator/ElevatorIOSimRev.java
             MetersPerSecond.of(motorSimModel.getVelocityMetersPerSecond()), 1, elevatorRadius);
+=======
+            MetersPerSecond.of(motorSimModel.getVelocityMetersPerSecond()),
+            GEAR_RATIO,
+            elevatorRadius);
+>>>>>>> Stashed changes:src/main/java/frc/robot/subsystems/elevator/ElevatorIOSIMREV.java
 
     // Update simulated motor readings converts through gear ratio
     leaderSim.setPosition(position.times(GEAR_RATIO).in(Degrees));
     leaderSim.setVelocity(velocity.times(GEAR_RATIO).in(DegreesPerSecond));
+<<<<<<< Updated upstream:src/main/java/frc/robot/subsystems/elevator/ElevatorIOSimRev.java
+=======
+
+    encoderSim.setPosition(motorSimModel.getPositionMeters());
+>>>>>>> Stashed changes:src/main/java/frc/robot/subsystems/elevator/ElevatorIOSIMREV.java
   }
 }
