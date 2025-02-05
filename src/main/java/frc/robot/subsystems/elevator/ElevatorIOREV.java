@@ -15,7 +15,7 @@ import frc.robot.utils.Conversions;
 
 public class ElevatorIOREV implements ElevatorIO {
   /** The gear ratio between the motor and the elevator mechanism */
-  protected static final double GEAR_RATIO = 2.0;
+  protected static final double GEAR_RATIO = 1 / 12.0;
   /**
    * The radius of the elevator pulley/drum, used for converting between rotations and linear
    * distance
