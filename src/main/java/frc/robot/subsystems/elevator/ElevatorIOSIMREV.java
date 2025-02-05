@@ -3,6 +3,7 @@ package frc.robot.subsystems.elevator;
 import static edu.wpi.first.units.Units.*;
 
 import com.revrobotics.sim.SparkFlexSim;
+import com.revrobotics.sim.SparkRelativeEncoderSim;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N2;
 import edu.wpi.first.math.system.LinearSystem;
@@ -11,8 +12,8 @@ import edu.wpi.first.math.system.plant.LinearSystemId;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.wpilibj.RobotController;
-import edu.wpi.first.wpilibj.simulation.DutyCycleEncoderSim;
 import edu.wpi.first.wpilibj.simulation.ElevatorSim;
+import edu.wpi.first.wpilibj.simulation.RoboRioSim;
 import frc.robot.utils.Conversions;
 
 /**
@@ -22,7 +23,7 @@ import frc.robot.utils.Conversions;
  * <p>The simulation models: - Dual Kraken X60 FOC motors - Realistic elevator physics including
  * gravity - Position and velocity feedback through simulated encoders - Battery voltage effects
  */
-public class ElevatorIOSimRev extends ElevatorIOREV {
+public class ElevatorIOSIMREV extends ElevatorIOREV {
 
   /** Physics simulation model for the elevator mechanism */
   private final ElevatorSim motorSimModel;
@@ -31,20 +32,20 @@ public class ElevatorIOSimRev extends ElevatorIOREV {
   private final SparkFlexSim leaderSim;
 
   /** Simulation state for the throughbore */
-  private final DutyCycleEncoderSim encoderSim;
+  private final SparkRelativeEncoderSim encoderSim;
 
   /**
    * Constructs a new ElevatorIOSIM instance. Initializes the physics simulation with realistic
    * parameters including: - Dual Neo 500 motors -10 pound carriage mass -8 foot maximum height -
    * Gravity simulation enabled
    */
-  public ElevatorIOSimRev() {
+  public ElevatorIOSIMREV() {
     super(); // Initialize hardware interface components
 
-    DCMotor motor = DCMotor.getNEO(1);
+    DCMotor motor = DCMotor.getNeoVortex(2);
     // Get simulation states for all hardware
     leaderSim = new SparkFlexSim(leader, motor);
-    encoderSim = new DutyCycleEncoderSim(encoder);
+    encoderSim = new SparkRelativeEncoderSim(leader);
 
     // Create elevator physics model
     LinearSystem<N2, N1, N2> linearSystem =
@@ -74,25 +75,32 @@ public class ElevatorIOSimRev extends ElevatorIOREV {
   public void updateInputs(ElevatorIOInputs inputs) {
     // Update base class inputs first
     super.updateInputs(inputs);
-
     leaderSim.setBusVoltage(RobotController.getBatteryVoltage());
 
     // Update physics simulation
-    motorSimModel.setInputVoltage(leaderSim.getAppliedOutput());
-    motorSimModel.update(0.020); // Simulate 20ms timestep (50Hz)
+    motorSimModel.setInput(leaderSim.getAppliedOutput() * RoboRioSim.getVInVoltage());
+    motorSimModel.update(0.02); // Simulate 20ms timestep (50Hz)
+
+    leaderSim.iterate(
+        motorSimModel.getVelocityMetersPerSecond(),
+        RoboRioSim.getVInVoltage(), // Simulated battery voltage, in Volts
+        0.02);
 
     // Convert linear position/velocity to rotational units for based on encoder
     Angle position =
         Conversions.metersToRotations(
-            Meters.of(motorSimModel.getPositionMeters()), 1, elevatorRadius);
+            Meters.of(motorSimModel.getPositionMeters()), 1 / 12.0, elevatorRadius);
 
     // Convert linear velocity to angular velocity based on encoder
     AngularVelocity velocity =
         Conversions.metersToRotationsVel(
-            MetersPerSecond.of(motorSimModel.getVelocityMetersPerSecond()), 1, elevatorRadius);
+            MetersPerSecond.of(motorSimModel.getVelocityMetersPerSecond()),
+            1 / 12.0,
+            elevatorRadius);
 
     // Update simulated motor readings converts through gear ratio
     leaderSim.setPosition(position.times(GEAR_RATIO).in(Degrees));
     leaderSim.setVelocity(velocity.times(GEAR_RATIO).in(DegreesPerSecond));
+    encoderSim.setPosition(motorSimModel.getPositionMeters());
   }
 }

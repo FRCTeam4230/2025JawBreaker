@@ -11,7 +11,6 @@ import com.revrobotics.spark.config.SparkFlexConfig;
 import edu.wpi.first.math.controller.ElevatorFeedforward;
 import edu.wpi.first.units.measure.*;
 import edu.wpi.first.wpilibj.DigitalInput;
-import edu.wpi.first.wpilibj.DutyCycleEncoder;
 import frc.robot.utils.Conversions;
 
 public class ElevatorIOREV implements ElevatorIO {
@@ -30,9 +29,6 @@ public class ElevatorIOREV implements ElevatorIO {
 
   /** Follower * */
   protected final SparkFlex follower = new SparkFlex(31, SparkLowLevel.MotorType.kBrushless);
-
-  // Absolute position, upper and lower limit switch
-  protected final DutyCycleEncoder encoder = new DutyCycleEncoder(3);
 
   // TODO: add/handle limit switch
   private final DigitalInput upperLimitSwitch = new DigitalInput(1);
@@ -70,10 +66,8 @@ public class ElevatorIOREV implements ElevatorIO {
     inputs.leaderStatorCurrent = Amps.of(leader.getOutputCurrent());
 
     inputs.followerStatorCurrent = Amps.of(follower.getOutputCurrent());
-    inputs.encoderPosition = Rotations.of(encoder.get());
-    inputs.encoderVelocity =
-        RotationsPerSecond.of(
-            encoder.get()); // TODO: This is probably wrong and or may not be helpful?
+    inputs.encoderPosition = Rotations.of(leader.getEncoder().getPosition());
+    inputs.encoderVelocity = RotationsPerSecond.of(leaderEncoder.getVelocity());
   }
 
   private SparkFlexConfig createSparkFlexConfig(boolean isFollower) {
