@@ -6,17 +6,9 @@
 
 package frc.robot.subsystems.elevator;
 
-import static edu.wpi.first.units.Units.Amps;
-import static edu.wpi.first.units.Units.Inches;
-import static edu.wpi.first.units.Units.Rotations;
-import static edu.wpi.first.units.Units.RotationsPerSecond;
-import static edu.wpi.first.units.Units.Volts;
+import static edu.wpi.first.units.Units.*;
 
-import edu.wpi.first.units.measure.Angle;
-import edu.wpi.first.units.measure.AngularVelocity;
-import edu.wpi.first.units.measure.Current;
-import edu.wpi.first.units.measure.Distance;
-import edu.wpi.first.units.measure.Voltage;
+import edu.wpi.first.units.measure.*;
 import org.littletonrobotics.junction.AutoLog;
 
 public interface ElevatorIO {
@@ -26,13 +18,13 @@ public interface ElevatorIO {
     public boolean followerConnected = false;
     public boolean encoderConnected = false;
 
-    public Angle leaderPosition = Rotations.of(0);
-    public Angle leaderRotorPosition = Rotations.of(0);
-    public Angle encoderPosition = Rotations.of(0);
+    public Distance leaderPosition = Meters.of(0);
+    public Distance leaderRotorPosition = Meters.of(0);
+    public Distance encoderPosition = Meters.of(0);
 
-    public AngularVelocity leaderVelocity = RotationsPerSecond.of(0);
-    public AngularVelocity leaderRotorVelocity = RotationsPerSecond.of(0);
-    public AngularVelocity encoderVelocity = RotationsPerSecond.of(0);
+    public LinearVelocity leaderVelocity = MetersPerSecond.of(0);
+    public LinearVelocity leaderRotorVelocity = MetersPerSecond.of(0);
+    public LinearVelocity encoderVelocity = MetersPerSecond.of(0);
 
     public Voltage appliedVoltage = Volts.of(0.0);
     public Current leaderStatorCurrent = Amps.of(0);

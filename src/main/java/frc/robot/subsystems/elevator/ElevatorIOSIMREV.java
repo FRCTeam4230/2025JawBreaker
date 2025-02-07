@@ -9,8 +9,8 @@ import edu.wpi.first.math.numbers.N2;
 import edu.wpi.first.math.system.LinearSystem;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.system.plant.LinearSystemId;
-import edu.wpi.first.units.measure.Angle;
-import edu.wpi.first.units.measure.AngularVelocity;
+import edu.wpi.first.units.measure.Distance;
+import edu.wpi.first.units.measure.LinearVelocity;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.simulation.ElevatorSim;
 import edu.wpi.first.wpilibj.simulation.RoboRioSim;
@@ -60,9 +60,9 @@ public class ElevatorIOSIMREV extends ElevatorIOREV {
         new ElevatorSim(
             linearSystem,
             motor,
-            0, // Initial position
+            0, // Minimum height
             Feet.of(8).in(Meters), // Maximum height (8 feet -> meters)
-            true, // Enable gravity simulation
+            false, // Enable gravity simulation
             0); // Start at bottom position
   }
 
@@ -81,28 +81,38 @@ public class ElevatorIOSIMREV extends ElevatorIOREV {
     motorSimModel.setInput(leaderSim.getAppliedOutput() * RoboRioSim.getVInVoltage());
     motorSimModel.update(0.02); // Simulate 20ms timestep (50Hz)
 
-    leaderSim.iterate(
-        motorSimModel.getVelocityMetersPerSecond(),
-        RoboRioSim.getVInVoltage(), // Simulated battery voltage, in Volts
-        0.02);
-
-    encoderSim.iterate(motorSimModel.getVelocityMetersPerSecond(), 0.02);
-
     // Convert linear position/velocity to rotational units for based on encoder
-    Angle position =
-        Conversions.metersToRotations(
-            Meters.of(motorSimModel.getPositionMeters()), GEAR_RATIO, elevatorRadius);
+    Distance position = Meters.of(motorSimModel.getPositionMeters());
 
     // Convert linear velocity to angular velocity based on encoder
-    AngularVelocity velocity =
-        Conversions.metersToRotationsVel(
-            MetersPerSecond.of(motorSimModel.getVelocityMetersPerSecond()),
-            GEAR_RATIO,
-            elevatorRadius);
+    LinearVelocity velocity = MetersPerSecond.of(motorSimModel.getVelocityMetersPerSecond());
+
+    Conversions.metersToRotationsVel(velocity, GEAR_RATIO, elevatorRadius);
+
+    leaderSim.iterate(
+        Conversions.metersToRotationsVel(velocity, GEAR_RATIO, elevatorRadius).magnitude(),
+        RoboRioSim.getVInVoltage(), // Simulated battery voltage, in Volts
+        0.02);
+    encoderSim.iterate(
+        Conversions.metersToRotationsVel(velocity, GEAR_RATIO, elevatorRadius).magnitude(), 0.02);
+
 
     // Update simulated motor readings converts through gear ratio
-    leaderSim.setPosition(position.times(GEAR_RATIO).in(Degrees));
-    leaderSim.setVelocity(velocity.times(GEAR_RATIO).in(DegreesPerSecond));
-    encoderSim.setPosition(motorSimModel.getPositionMeters());
+//    encoderSim.setPosition(motorSimModel.getPositionMeters());
+//    leaderSim.setPosition(motorSimModel.getPositionMeters());
+
+    //    System.out.println("leaderSim motor output: " + leaderSim.getAppliedOutput());
+    //    System.out.println("leaderSim pos: " + leaderSim.getPosition());
+    //    System.out.println("leaderSim velo: " + leaderSim.getVelocity());
+    //
+    //    System.out.println("encoderSim pos: " + encoderSim.getPosition());
+    //    System.out.println("encoderSim velo: " + encoderSim.getVelocity());
+    //    System.out.println(
+    //        "metersToRotationsVel: "
+    //            + Conversions.metersToRotationsVel(velocity, GEAR_RATIO,
+    // elevatorRadius).magnitude());
+    //
+    //    System.out.println("Applied Voltage: " + inputs.appliedVoltage);
+    //    System.out.println("Leader Stator Current: " + inputs.leaderStatorCurrent);
   }
 }

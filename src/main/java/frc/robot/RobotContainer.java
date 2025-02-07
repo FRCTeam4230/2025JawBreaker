@@ -24,7 +24,6 @@ import frc.robot.subsystems.drive.DriveIOCTRE;
 import frc.robot.subsystems.drive.requests.ProfiledFieldCentricFacingAngle;
 import frc.robot.subsystems.drive.requests.SwerveSetpointGen;
 import frc.robot.subsystems.elevator.Elevator;
-import frc.robot.subsystems.elevator.ElevatorIO;
 import frc.robot.subsystems.elevator.ElevatorIOREV;
 import frc.robot.subsystems.elevator.ElevatorIOSIMREV;
 import frc.robot.subsystems.vision.Vision;
@@ -131,8 +130,9 @@ public class RobotContainer {
             new VisionIO() {},
             new VisionIO() {});
 
-        elevator = new Elevator(new ElevatorIO() {});
-        arm = new Arm(new ArmIOREV() {});
+
+        elevator = new Elevator(new ElevatorIOREV() {});
+        arm = new Arm(new ArmIOCTRE() {});
         claw = new Claw(new ClawIOREV());
         break;
     }
@@ -248,8 +248,8 @@ public class RobotContainer {
     joystick.start().and(joystick.y()).whileTrue(drivetrain.sysIdQuasistatic(Direction.kForward));
     joystick.start().and(joystick.x()).whileTrue(drivetrain.sysIdQuasistatic(Direction.kReverse));
 
-    joystick.rightBumper().whileTrue(claw.intake());
-    joystick.leftBumper().whileTrue(claw.extake());
+    //    joystick.rightBumper().whileTrue(claw.intake());
+    //    joystick.leftBumper().whileTrue(claw.extake());
 
 
     //joystick.a().onTrue(arm.L1());
@@ -259,8 +259,8 @@ public class RobotContainer {
 
     // reset the field-centric heading on left bumper press
     // joystick.leftBumper().onTrue(drivetrain.runOnce(drivetrain::seedFieldCentric));
-    joystick.a().onTrue(elevator.L1());
-    joystick.b().onTrue(elevator.L2());
+    joystick.rightBumper().onTrue(elevator.L1());
+    joystick.leftBumper().onTrue(elevator.L2());
     joystick.x().onTrue(elevator.L3());
     joystick.y().onTrue(elevator.L4());
   }
