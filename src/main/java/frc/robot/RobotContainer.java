@@ -26,7 +26,7 @@ import frc.robot.subsystems.drive.requests.SwerveSetpointGen;
 import frc.robot.subsystems.elevator.Elevator;
 import frc.robot.subsystems.elevator.ElevatorIO;
 import frc.robot.subsystems.elevator.ElevatorIOREV;
-import frc.robot.subsystems.elevator.ElevatorIOSimRev;
+import frc.robot.subsystems.elevator.ElevatorIOSIMREV;
 import frc.robot.subsystems.vision.Vision;
 import frc.robot.subsystems.vision.VisionIO;
 import frc.robot.subsystems.vision.VisionIOLimelight;
@@ -115,10 +115,9 @@ public class RobotContainer {
                     new Rotation3d(0, Math.toRadians(20), Math.toRadians(-90))),
                 drivetrain::getVisionParameters));
 
-        elevator = new Elevator(new ElevatorIOSimRev());
+        elevator = new Elevator(new ElevatorIOSIMREV());
         arm = new Arm(new ArmIOSIM());
-
-        claw = new Claw(new ClawIOSIMREV() {}); // change to IOSIM
+        claw = new Claw(new ClawIOSIMREV()); // change to IOSIM
         break;
 
       default:
@@ -252,15 +251,18 @@ public class RobotContainer {
     joystick.rightBumper().whileTrue(claw.intake());
     joystick.leftBumper().whileTrue(claw.extake());
 
-    joystick.a().onTrue(arm.L1());
-    joystick.b().onTrue(arm.L2());
-    joystick.x().onTrue(arm.stopCommand());
-    joystick.y().onTrue(arm.L4());
+
+    //joystick.a().onTrue(arm.L1());
+    //joystick.b().onTrue(arm.L2());
+    //joystick.x().onTrue(arm.stopCommand());
+    //joystick.y().onTrue(arm.L4());
 
     // reset the field-centric heading on left bumper press
     // joystick.leftBumper().onTrue(drivetrain.runOnce(drivetrain::seedFieldCentric));
-    // joystick.a().onTrue(flywheel.L1()).onTrue(arm.L1()).onTrue(elevator.L1());
-    // joystick.b().onTrue(flywheel.L2()).onTrue(arm.L2()).onTrue(elevator.L2());
+    joystick.a().onTrue(elevator.L1());
+    joystick.b().onTrue(elevator.L2());
+    joystick.x().onTrue(elevator.L3());
+    joystick.y().onTrue(elevator.L4());
   }
 
   public Command getAutonomousCommand() {
