@@ -52,11 +52,11 @@ public class Claw extends SubsystemBase {
 
   public Command intake() {
     return Commands.startEnd(
-        () -> io.setVolts(Volts.of(ClawConstants.INTAKE_VOLTAGE.get()).times(-1)), () -> io.stop());
+        () -> io.setVolts(Volts.of(ClawConstants.INTAKE_VOLTAGE.get()).times(-1)), io::stop);
   }
 
   public Command extake() {
     return Commands.startEnd(
-        () -> io.setVolts(Volts.of(ClawConstants.INTAKE_VOLTAGE.get())), () -> io.stop());
+        () -> io.setVolts(Volts.of(ClawConstants.INTAKE_VOLTAGE.get())), io::stop);
   }
 }

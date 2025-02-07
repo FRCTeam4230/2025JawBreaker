@@ -6,6 +6,7 @@ import com.revrobotics.RelativeEncoder;
 import com.revrobotics.spark.*;
 import com.revrobotics.spark.config.ClosedLoopConfig;
 import com.revrobotics.spark.config.MAXMotionConfig;
+import com.revrobotics.spark.config.SparkBaseConfig;
 import com.revrobotics.spark.config.SparkFlexConfig;
 import edu.wpi.first.math.controller.ElevatorFeedforward;
 import edu.wpi.first.units.measure.*;
@@ -14,7 +15,7 @@ import frc.robot.utils.Conversions;
 
 public class ElevatorIOREV implements ElevatorIO {
   /** The gear ratio between the motor and the elevator mechanism */
-  protected static final double GEAR_RATIO = 1 / 12.0;
+  protected static final double GEAR_RATIO = 12.0;
   /**
    * The radius of the elevator pulley/drum, used for converting between rotations and linear
    * distance
@@ -54,13 +55,12 @@ public class ElevatorIOREV implements ElevatorIO {
 
     inputs.leaderPosition =
         Conversions.rotationsToMeters(
-            Rotations.of(leader.getEncoder().getPosition()),
-            GEAR_RATIO,
-            elevatorRadius); // this is the encoder position
+            Rotations.of(leader.getEncoder().getPosition()), GEAR_RATIO, elevatorRadius);
+
     // rev does it have something like this? inputs.leaderRotorPosition = leader.get //
     inputs.leaderVelocity =
         Conversions.rotationsToMetersVel(
-            RotationsPerSecond.of(leaderEncoder.getVelocity() / 60),
+            RotationsPerSecond.of(leaderEncoder.getVelocity()),
             GEAR_RATIO,
             elevatorRadius); // getVelocity returns RPMS so this is totally probably wrong
 
@@ -88,6 +88,11 @@ public class ElevatorIOREV implements ElevatorIO {
     // https://github.com/frc868/2025-Ri3D/blob/main/src/main/java/frc/robot/subsystems/Elevator.java
     var config = new SparkFlexConfig();
 
+    config
+        .idleMode(SparkBaseConfig.IdleMode.kCoast)
+        .encoder
+        .positionConversionFactor(ElevatorConstants.rotationToMeters)
+        .velocityConversionFactor(ElevatorConstants.rpmToMps);
     config
         .closedLoop
         .feedbackSensor(ClosedLoopConfig.FeedbackSensor.kPrimaryEncoder)

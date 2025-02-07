@@ -130,7 +130,6 @@ public class RobotContainer {
             new VisionIO() {},
             new VisionIO() {});
 
-
         elevator = new Elevator(new ElevatorIOREV() {});
         arm = new Arm(new ArmIOCTRE() {});
         claw = new Claw(new ClawIOREV());
@@ -251,14 +250,15 @@ public class RobotContainer {
     //    joystick.rightBumper().whileTrue(claw.intake());
     //    joystick.leftBumper().whileTrue(claw.extake());
 
-
-    //joystick.a().onTrue(arm.L1());
-    //joystick.b().onTrue(arm.L2());
-    //joystick.x().onTrue(arm.stopCommand());
-    //joystick.y().onTrue(arm.L4());
+    // joystick.a().onTrue(arm.L1());
+    // joystick.b().onTrue(arm.L2());
+    // joystick.x().onTrue(arm.stopCommand());
+    // joystick.y().onTrue(arm.L4());
 
     // reset the field-centric heading on left bumper press
     // joystick.leftBumper().onTrue(drivetrain.runOnce(drivetrain::seedFieldCentric));
+    joystick.a().onTrue(elevator.L1());
+    joystick.b().onTrue(elevator.L2());
     joystick.rightBumper().onTrue(elevator.L1());
     joystick.leftBumper().onTrue(elevator.L2());
     joystick.x().onTrue(elevator.L3());
