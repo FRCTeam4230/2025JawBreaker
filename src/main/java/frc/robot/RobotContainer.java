@@ -116,8 +116,8 @@ public class RobotContainer {
                 drivetrain::getVisionParameters));
 
         elevator = new Elevator(new ElevatorIOSimRev());
-        //        arm = new Arm(new ArmIOSIM());
-        arm = null;
+        arm = new Arm(new ArmIOSIM());
+
         claw = new Claw(new ClawIOSIMREV() {}); // change to IOSIM
         break;
 
@@ -133,7 +133,7 @@ public class RobotContainer {
             new VisionIO() {});
 
         elevator = new Elevator(new ElevatorIO() {});
-        arm = new Arm(new ArmIOCTRE() {});
+        arm = new Arm(new ArmIOREV() {});
         claw = new Claw(new ClawIOREV());
         break;
     }
@@ -223,7 +223,7 @@ public class RobotContainer {
             .withDeadband(MaxSpeed.times(0.1))
             .withDriveRequestType(DriveRequestType.OpenLoopVoltage);
     // Set PID for ProfiledFieldCentricFacingAngle
-    driveFacingAngle.HeadingController.setPID(7, 0, 0);
+    driveFacingAngle.HeadingController.setPID(0, 0, 0);
     joystick
         .y()
         .whileTrue(
@@ -251,6 +251,12 @@ public class RobotContainer {
 
     joystick.rightBumper().whileTrue(claw.intake());
     joystick.leftBumper().whileTrue(claw.extake());
+
+    joystick.a().onTrue(arm.L1());
+    joystick.b().onTrue(arm.L2());
+    joystick.x().onTrue(arm.stopCommand());
+    joystick.y().onTrue(arm.L4());
+
     // reset the field-centric heading on left bumper press
     // joystick.leftBumper().onTrue(drivetrain.runOnce(drivetrain::seedFieldCentric));
     // joystick.a().onTrue(flywheel.L1()).onTrue(arm.L1()).onTrue(elevator.L1());

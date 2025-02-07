@@ -8,25 +8,25 @@ public class ArmConstants {
   private static final TunableNumberWrapper tunableTable =
       new TunableNumberWrapper(MethodHandles.lookup().lookupClass());
 
-  public static final int MOTOR_ID = -1;
-  public static final LoggedTunableNumber kP = tunableTable.makeField("kP", 0.0);
+  public static final int MOTOR_ID = 83;
+  public static final LoggedTunableNumber kP = tunableTable.makeField("kP", 0.1);
   public static final LoggedTunableNumber kI = tunableTable.makeField("kI", 0.0);
   public static final LoggedTunableNumber kD = tunableTable.makeField("kD", 0.0);
   public static final LoggedTunableNumber setpointToleranceRad =
       tunableTable.makeField("setpoint tolerance rad", 0.0);
   public static final double ARM_ENCODER_OFFSET_RAD = 0;
-  public static final int DUTY_CYCLE_ENCODER_PORT = 0;
+  public static final int DUTY_CYCLE_ENCODER_PORT = 21;
 
   public static final LoggedTunableNumber MAX_ARM_PID_VOLTS =
       tunableTable.makeField("max arm pid volts", 0.0);
 
   public static final double MAX_ARM_VOLTS = 0;
-  public static final double MOTOR_TO_ARM_RATIO = 1 * 1 / 1;
+  public static final double MOTOR_TO_ARM_RATIO = 1 / 1 * 1;
 
-  public static class Positions {
-    public static final LoggedTunableNumber PICKUP_POS_RAD =
-        tunableTable.makeField("pickup pos", 0.0);
-    public static final LoggedTunableNumber PLACE_POS_RAD =
-        tunableTable.makeField("place pos", 0.0);
-  }
+  //  public static class Positions {
+  //    public static final LoggedTunableNumber PICKUP_POS_RAD =
+  //        tunableTable.makeField("pickup pos", 0.0);
+  //    public static final LoggedTunableNumber PLACE_POS_RAD =
+  //        tunableTable.makeField("place pos", 0.0);
+  //  }
 }
