@@ -223,7 +223,7 @@ public class RobotContainer {
             .withDeadband(MaxSpeed.times(0.1))
             .withDriveRequestType(DriveRequestType.OpenLoopVoltage);
     // Set PID for ProfiledFieldCentricFacingAngle
-    driveFacingAngle.HeadingController.setPID(0, 0, 0);
+    driveFacingAngle.HeadingController.setPID(7, 0, 0);
     joystick
         .y()
         .whileTrue(

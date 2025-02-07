@@ -83,17 +83,6 @@ public class ArmIOSIM extends ArmIOREV {
             Degrees.of(180).in(Radians), // Upper limit (180)
             false, // Enable gravity simulation
             Degrees.of(90).in(Radians)); // Start at 90°
-
-    //    motorSimModel =
-    //        new SingleJointedArmSim(
-    //            gearbox,
-    //            GEAR_RATIO,
-    //            SingleJointedArmSim.estimateMOI(armLength.in(Meters), armMass.in(Kilograms)),
-    //            armLength.in(Meters),
-    //            Degrees.of(0).in(Radians),
-    //            Degrees.of(180).in(Radians),
-    //            true,
-    //            Degrees.of(90).in(Radians));
   }
 
   /**

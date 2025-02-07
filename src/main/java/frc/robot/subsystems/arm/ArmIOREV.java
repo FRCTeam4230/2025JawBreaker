@@ -46,14 +46,14 @@ public class ArmIOREV implements ArmIO {
         .feedbackSensor(ClosedLoopConfig.FeedbackSensor.kPrimaryEncoder)
         // Set PID values for position control. We don't need to pass a closed loop
         // slot, as it will default to slot 0.
-        .p(0.2)
-        .i(0.2)
-        .d(0.2)
+        .p(0.1)
+        .i(0)
+        .d(0)
         .outputRange(-1, 1)
         // Set PID values for velocity control in slot 1
-        .p(0.2, ClosedLoopSlot.kSlot1)
-        .i(0.2, ClosedLoopSlot.kSlot1)
-        .d(0.2, ClosedLoopSlot.kSlot1)
+        .p(0.1, ClosedLoopSlot.kSlot1)
+        .i(0, ClosedLoopSlot.kSlot1)
+        .d(0, ClosedLoopSlot.kSlot1)
         .velocityFF(1.0 / 1.0, ClosedLoopSlot.kSlot1)
         .outputRange(-1, 1, ClosedLoopSlot.kSlot1);
 
@@ -83,6 +83,6 @@ public class ArmIOREV implements ArmIO {
 
   @Override
   public void setPosition(Angle angle) {
-    System.out.println("ArmMode target angle: " + angle.in(Rotations));
+    controller.setReference(angle.in(Degrees), SparkBase.ControlType.kPosition);
   }
 }
