@@ -65,7 +65,6 @@ public class Arm extends SubsystemBase {
     // Update and log inputs from hardware
     io.updateInputs(inputs);
     Logger.processInputs("Arm", inputs);
-    // updateControlConstants();
 
     // Update motor connection status alerts
     motorMotorAlert.set(!inputs.motorConnected);

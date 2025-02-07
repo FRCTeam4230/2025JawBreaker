@@ -9,6 +9,7 @@ import edu.wpi.first.math.numbers.N2;
 import edu.wpi.first.math.system.LinearSystem;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.system.plant.LinearSystemId;
+import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.units.measure.LinearVelocity;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.simulation.ElevatorSim;
@@ -62,7 +63,7 @@ public class ElevatorIOSIMREV extends ElevatorIOREV {
             0, // Minimum height
             Feet.of(8).in(Meters), // Maximum height (8 feet -> meters)
             false, // Enable gravity simulation
-            0); // Start at bottom position
+            1); // Start at bottom position
   }
 
   /**
@@ -80,6 +81,9 @@ public class ElevatorIOSIMREV extends ElevatorIOREV {
     motorSimModel.setInput(leaderSim.getAppliedOutput() * RoboRioSim.getVInVoltage());
     motorSimModel.update(0.02); // Simulate 20ms timestep (50Hz)
 
+    // Convert linear position/velocity to rotational units for based on encoder
+    Distance position = Meters.of(motorSimModel.getPositionMeters());
+
     // Convert linear velocity to angular velocity based on encoder
     LinearVelocity velocity = MetersPerSecond.of(motorSimModel.getVelocityMetersPerSecond());
 
@@ -93,8 +97,8 @@ public class ElevatorIOSIMREV extends ElevatorIOREV {
         Conversions.metersToRotationsVel(velocity, GEAR_RATIO, elevatorRadius).magnitude(), 0.02);
 
     // Update simulated motor readings converts through gear ratio
-    //    encoderSim.setPosition(motorSimModel.getPositionMeters());
-    //    leaderSim.setPosition(motorSimModel.getPositionMeters());
+    encoderSim.setPosition(motorSimModel.getPositionMeters());
+    leaderSim.setPosition(motorSimModel.getPositionMeters());
 
     //    System.out.println("leaderSim motor output: " + leaderSim.getAppliedOutput());
     //    System.out.println("leaderSim pos: " + leaderSim.getPosition());
