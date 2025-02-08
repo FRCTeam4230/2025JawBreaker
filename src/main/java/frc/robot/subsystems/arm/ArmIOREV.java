@@ -78,7 +78,7 @@ public class ArmIOREV implements ArmIO {
     // inputs.motorBrownOut = motor.getFaults().other;
     inputs.motorCANID = motor.getDeviceId();
 
-    inputs.encoderPosition = inputs.motorPosition;
+    inputs.encoderPosition = Radians.of(Rotations.of(encoder.get()).in(Radians));
   }
 
   @Override

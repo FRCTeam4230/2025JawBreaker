@@ -39,6 +39,8 @@ public class RobotContainer {
   private LinearVelocity MaxSpeed = TunerConstants.kSpeedAt12Volts;
   private final TunableController joystick =
       new TunableController(0).withControllerType(TunableControllerType.QUADRATIC);
+  private final TunableController testJoystick =
+      new TunableController(1).withControllerType(TunableControllerType.QUADRATIC);
 
   private final LoggedDashboardChooser<Command> autoChooser;
 
@@ -249,6 +251,11 @@ public class RobotContainer {
     joystick.rightBumper().whileTrue(claw.intake());
     joystick.leftBumper().whileTrue(claw.extake());
 
+    testJoystick.a().onTrue(arm.intake());
+    testJoystick.x().onTrue(arm.L2());
+    testJoystick.b().onTrue(arm.L3());
+    testJoystick.y().onTrue(arm.L4());
+
     // joystick.a().onTrue(arm.L1());
     // joystick.b().onTrue(arm.L2());
     // joystick.x().onTrue(arm.stopCommand());
@@ -260,6 +267,7 @@ public class RobotContainer {
     //    joystick.b().onTrue(elevator.L2());
     //    joystick.x().onTrue(elevator.L3());
     //    joystick.y().onTrue(elevator.L4());
+
   }
 
   public Command getAutonomousCommand() {

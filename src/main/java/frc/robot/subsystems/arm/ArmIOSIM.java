@@ -81,7 +81,7 @@ public class ArmIOSIM extends ArmIOREV {
             armLength.in(Meters),
             Degrees.of(0).in(Radians), // Lower limit (0°)
             Degrees.of(180).in(Radians), // Upper limit (180)
-            false, // Enable gravity simulation
+            true, // Enable gravity simulation
             Degrees.of(90).in(Radians)); // Start at 90°
   }
 
