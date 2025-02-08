@@ -12,6 +12,7 @@ import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.Alert.AlertType;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SelectCommand;
@@ -51,6 +52,7 @@ public class Arm extends SubsystemBase {
   public Arm(ArmIO io) {
     this.io = io;
     this.inputs = new ArmIOInputsAutoLogged();
+    SmartDashboard.putData(this);
   }
 
   private void updateControlConstants() {
@@ -100,8 +102,8 @@ public class Arm extends SubsystemBase {
   private enum ArmMode {
     STOP(Degrees.of(0)), // Stop the arm
     INTAKE(Degrees.of(0)), // Arm tucked in
-    L1(Degrees.of(10)), // SHOULD BE 90 Position for scoring in L1
-    L2(Degrees.of(30)), // SHOULD BE 135 Position for scoring in L2
+    L1(Degrees.of(90)), //  Position for scoring in L1
+    L2(Degrees.of(135)), //  Position for scoring in L2
     L3(Degrees.of(135)), // Position for scoring in L3
     L4(Degrees.of(180)); // Position for scoring in L4
 

@@ -253,8 +253,7 @@ public class RobotContainer {
 
     testJoystick.a().onTrue(arm.intake());
     testJoystick.x().onTrue(arm.stopCommand());
-    testJoystick.b().onTrue(arm.L1());
-    testJoystick.y().onTrue(arm.L2());
+    testJoystick.y().onTrue(arm.L1());
 
     // joystick.a().onTrue(arm.L1());
     // joystick.b().onTrue(arm.L2());

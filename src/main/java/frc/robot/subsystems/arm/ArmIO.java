@@ -19,7 +19,6 @@ public interface ArmIO {
 
     public Angle motorPosition = Rotations.of(0);
     public Angle encoderPosition = Rotations.of(0);
-    public Angle encoderPositionInRadians = Radians.of(encoderPosition.in(Radians));
 
     public AngularVelocity motorVelocity = RotationsPerSecond.of(0);
     public AngularVelocity encoderVelocity = RotationsPerSecond.of(0);
