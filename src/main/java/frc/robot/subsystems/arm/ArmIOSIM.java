@@ -69,7 +69,8 @@ public class ArmIOSIM extends ArmIOREV {
 
     // Create arm physics model
     LinearSystem<N2, N1, N2> linearSystem =
-        LinearSystemId.createSingleJointedArmSystem(DCMotor.getNEO(2), armMOI, GEAR_RATIO);
+        LinearSystemId.createSingleJointedArmSystem(
+            DCMotor.getNEO(2), armMOI, ArmConstants.GEAR_RATIO);
 
     // Initialize arm simulation
 
@@ -77,11 +78,11 @@ public class ArmIOSIM extends ArmIOREV {
         new SingleJointedArmSim(
             linearSystem,
             gearbox,
-            GEAR_RATIO,
+            ArmConstants.GEAR_RATIO,
             armLength.in(Meters),
             Degrees.of(0).in(Radians), // Lower limit (0°)
             Degrees.of(180).in(Radians), // Upper limit (180)
-            false, // Enable gravity simulation
+            true, // Enable gravity simulation
             Degrees.of(90).in(Radians)); // Start at 90°
   }
 
@@ -114,8 +115,8 @@ public class ArmIOSIM extends ArmIOREV {
     AngularVelocity velocity = RadiansPerSecond.of(motorSimModel.getVelocityRadPerSec());
 
     // Update simulated motor encoder readings (accounts for gear ratio)
-    motorSim.setPosition(position.times(GEAR_RATIO).in(Degrees));
-    motorSim.setVelocity(velocity.times(GEAR_RATIO).in(DegreesPerSecond));
+    motorSim.setPosition(position.times(ArmConstants.GEAR_RATIO).in(Degrees));
+    motorSim.setVelocity(velocity.times(ArmConstants.GEAR_RATIO).in(DegreesPerSecond));
 
     // Update simulated CANcoder readings (direct angle measurement).
 

@@ -23,19 +23,23 @@ public class ElevatorIOREV implements ElevatorIO {
   protected final Distance elevatorRadius = Inches.of(2);
 
   /** Leader motor controller * */
-  protected final SparkFlex leader = new SparkFlex(30, SparkLowLevel.MotorType.kBrushless);
+  protected final SparkFlex leader =
+      new SparkFlex(ElevatorConstants.LEADER_MOTOR_ID, SparkLowLevel.MotorType.kBrushless);
 
   private final RelativeEncoder leaderEncoder = leader.getEncoder();
 
   /** Follower * */
-  protected final SparkFlex follower = new SparkFlex(31, SparkLowLevel.MotorType.kBrushless);
+  protected final SparkFlex follower =
+      new SparkFlex(ElevatorConstants.FOLLOWER_MOTOR_ID, SparkLowLevel.MotorType.kBrushless);
 
   // TODO: add/handle limit switch
-  private final DigitalInput upperLimitSwitch = new DigitalInput(1);
-  private final DigitalInput lowerLimitSwitch = new DigitalInput(2);
+  private final DigitalInput upperLimitSwitch =
+      new DigitalInput(ElevatorConstants.UPPER_LIMIT_SWITCH_DIO_PORT);
+  private final DigitalInput lowerLimitSwitch =
+      new DigitalInput(ElevatorConstants.LOWER_LIMIT_SWITCH_DIO_PORT);
 
   private final SparkClosedLoopController pidController;
-  private ElevatorFeedforward feedforward = new ElevatorFeedforward(0, 0, 0);
+  private ElevatorFeedforward feedforward = new ElevatorFeedforward(0.1, 0.1, 0.1);
 
   public ElevatorIOREV() {
     leader.configure(

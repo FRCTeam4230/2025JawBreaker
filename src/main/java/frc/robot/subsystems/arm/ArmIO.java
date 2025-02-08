@@ -21,7 +21,6 @@ public interface ArmIO {
     public Angle encoderPosition = Rotations.of(0);
 
     public AngularVelocity motorVelocity = RotationsPerSecond.of(0);
-
     public AngularVelocity encoderVelocity = RotationsPerSecond.of(0);
 
     public Voltage appliedVoltage = Volts.of(0.0);

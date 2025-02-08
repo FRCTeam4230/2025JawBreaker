@@ -39,6 +39,8 @@ public class RobotContainer {
   private LinearVelocity MaxSpeed = TunerConstants.kSpeedAt12Volts;
   private final TunableController joystick =
       new TunableController(0).withControllerType(TunableControllerType.QUADRATIC);
+  private final TunableController testJoystick =
+      new TunableController(1).withControllerType(TunableControllerType.QUADRATIC);
 
   private final LoggedDashboardChooser<Command> autoChooser;
 
@@ -78,8 +80,6 @@ public class RobotContainer {
         // elevator = new Elevator(new ElevatorIOCTRE()); // Disabled to prevent robot movement if
         // deployed to a real robot
         elevator = new Elevator(new ElevatorIOREV() {});
-        // arm = new Arm(new ArmIOCTRE()); // Disabled to prevent robot movement if deployed to a
-        // real robot
         arm = new Arm(new ArmIOREV() {});
         claw = new Claw(new ClawIOREV() {});
         break;
@@ -251,18 +251,22 @@ public class RobotContainer {
     joystick.rightBumper().whileTrue(claw.intake());
     joystick.leftBumper().whileTrue(claw.extake());
 
+    testJoystick.a().onTrue(arm.intake());
+    testJoystick.x().onTrue(arm.stopCommand());
+    testJoystick.y().onTrue(arm.L1());
 
-    //joystick.a().onTrue(arm.L1());
-    //joystick.b().onTrue(arm.L2());
-    //joystick.x().onTrue(arm.stopCommand());
-    //joystick.y().onTrue(arm.L4());
+    // joystick.a().onTrue(arm.L1());
+    // joystick.b().onTrue(arm.L2());
+    // joystick.x().onTrue(arm.stopCommand());
+    // joystick.y().onTrue(arm.L4());
 
     // reset the field-centric heading on left bumper press
     // joystick.leftBumper().onTrue(drivetrain.runOnce(drivetrain::seedFieldCentric));
-    joystick.a().onTrue(elevator.L1());
-    joystick.b().onTrue(elevator.L2());
-    joystick.x().onTrue(elevator.L3());
-    joystick.y().onTrue(elevator.L4());
+    //    joystick.a().onTrue(elevator.L1());
+    //    joystick.b().onTrue(elevator.L2());
+    //    joystick.x().onTrue(elevator.L3());
+    //    joystick.y().onTrue(elevator.L4());
+
   }
 
   public Command getAutonomousCommand() {
