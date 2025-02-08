@@ -100,8 +100,8 @@ public class Arm extends SubsystemBase {
   private enum ArmMode {
     STOP(Degrees.of(0)), // Stop the arm
     INTAKE(Degrees.of(0)), // Arm tucked in
-    L1(Degrees.of(90)), // Position for scoring in L1
-    L2(Degrees.of(135)), // Position for scoring in L2
+    L1(Degrees.of(10)), // SHOULD BE 90 Position for scoring in L1
+    L2(Degrees.of(30)), // SHOULD BE 135 Position for scoring in L2
     L3(Degrees.of(135)), // Position for scoring in L3
     L4(Degrees.of(180)); // Position for scoring in L4
 

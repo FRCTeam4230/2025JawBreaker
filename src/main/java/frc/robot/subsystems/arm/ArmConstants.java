@@ -21,7 +21,7 @@ public class ArmConstants {
       tunableTable.makeField("max arm pid volts", 0.0);
 
   public static final double MAX_ARM_VOLTS = 0;
-  public static final double MOTOR_TO_ARM_RATIO = 1 / 1 * 1;
+  public static final double GEAR_RATIO = 1.0 / 20.0;
 
   //  public static class Positions {
   //    public static final LoggedTunableNumber PICKUP_POS_RAD =

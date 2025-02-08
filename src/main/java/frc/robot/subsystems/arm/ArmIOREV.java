@@ -10,11 +10,8 @@ import com.revrobotics.spark.config.SparkBaseConfig;
 import com.revrobotics.spark.config.SparkFlexConfig;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.wpilibj.DutyCycleEncoder;
-import frc.robot.utils.Conversions;
 
 public class ArmIOREV implements ArmIO {
-
-  public static final double GEAR_RATIO = 1;
 
   protected static final SparkFlex motor =
       new SparkFlex(ArmConstants.MOTOR_ID, SparkLowLevel.MotorType.kBrushless);
@@ -33,7 +30,8 @@ public class ArmIOREV implements ArmIO {
 
     EncoderConfig encoderConfig =
         new EncoderConfig()
-            .velocityConversionFactor(Math.PI * 2 / 60 / ArmConstants.MOTOR_TO_ARM_RATIO);
+            .velocityConversionFactor(Math.PI * 2 / 60 / ArmConstants.GEAR_RATIO)
+            .positionConversionFactor(Math.PI * 2 / ArmConstants.GEAR_RATIO);
 
     EncoderConfig relativeEncoderConfig = new EncoderConfig().positionConversionFactor(2 * Math.PI);
     motor.configure(
@@ -55,25 +53,26 @@ public class ArmIOREV implements ArmIO {
         .p(0.1, ClosedLoopSlot.kSlot1)
         .i(0, ClosedLoopSlot.kSlot1)
         .d(0, ClosedLoopSlot.kSlot1)
-        .velocityFF(1.0 / 1.0, ClosedLoopSlot.kSlot1)
         .outputRange(-1, 1, ClosedLoopSlot.kSlot1);
 
     motor.configure(
         motorConfig,
         SparkBase.ResetMode.kResetSafeParameters,
         SparkBase.PersistMode.kNoPersistParameters);
+
+    motor.getEncoder().setPosition(0);
   }
 
   public void updateInputs(ArmIOInputs inputs) {
     inputs.motorPosition =
-        Radian.of(
-            (encoder.get() * Math.PI * 2)
+        Rotations.of(
+            motor.getEncoder().getPosition()
                 - ArmConstants.ARM_ENCODER_OFFSET_RAD); // offset in radians but could need degree
-    inputs.motorVelocity =
-        RevolutionsPerSecond.of(
-            velocityEncoder.getVelocity()); // currently rps, could potentially be rpm
+    inputs.motorVelocity = RotationsPerSecond.of(velocityEncoder.getVelocity()).div(60);
+
     inputs.appliedVoltage = Volts.of(motor.getAppliedOutput() * motor.getBusVoltage());
     inputs.motorSupplyCurrent = Amps.of(motor.getOutputCurrent());
+
     inputs.motorTemperatureCelsius = Celsius.of(motor.getMotorTemperature());
     // inputs.motorSensorFault = motor.getFaults().sensor;
     // inputs.motorBrownOut = motor.getFaults().other;
@@ -83,10 +82,16 @@ public class ArmIOREV implements ArmIO {
     inputs.encoderPositionInRadians = Radians.of(inputs.encoderPosition.in(Radians));
     inputs.encoderVelocity = RotationsPerSecond.of(velocityEncoder.getVelocity()).div(60);
 
+    inputs.armAngle = inputs.encoderPosition;
+
   }
 
   @Override
   public void setPosition(Angle angle) {
-    controller.setReference(angle.in(Degrees), SparkBase.ControlType.kPosition);
+    controller.setReference(-(angle.in(Degrees)), SparkBase.ControlType.kPosition); // inverted
+  }
+
+  public void stop() {
+    motor.stopMotor();
   }
 }
