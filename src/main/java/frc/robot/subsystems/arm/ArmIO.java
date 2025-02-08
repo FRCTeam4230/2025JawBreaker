@@ -32,8 +32,6 @@ public interface ArmIO {
     public Temperature motorTemperatureCelsius = Celsius.of(0.0);
 
     public int motorCANID = -1;
-
-
   }
 
   /** Updates the set of loggable inputs. */

@@ -30,10 +30,9 @@ public class ArmIOREV implements ArmIO {
 
     EncoderConfig encoderConfig =
         new EncoderConfig()
-            .velocityConversionFactor(Math.PI * 2 / 60 / ArmConstants.GEAR_RATIO)
-            .positionConversionFactor(Math.PI * 2 / ArmConstants.GEAR_RATIO);
+            .velocityConversionFactor((Math.PI * 2 / 60) * ArmConstants.GEAR_RATIO)
+            .positionConversionFactor((Math.PI * 2) * ArmConstants.GEAR_RATIO);
 
-    EncoderConfig relativeEncoderConfig = new EncoderConfig().positionConversionFactor(2 * Math.PI);
     motor.configure(
         new SparkFlexConfig().idleMode(SparkBaseConfig.IdleMode.kBrake).apply(encoderConfig),
         SparkBase.ResetMode.kResetSafeParameters,
@@ -48,12 +47,12 @@ public class ArmIOREV implements ArmIO {
         .p(0.1)
         .i(0)
         .d(0)
-        .outputRange(-1, 1)
+        .outputRange(-0.05, 0.05)
         // Set PID values for velocity control in slot 1
         .p(0.1, ClosedLoopSlot.kSlot1)
         .i(0, ClosedLoopSlot.kSlot1)
         .d(0, ClosedLoopSlot.kSlot1)
-        .outputRange(-1, 1, ClosedLoopSlot.kSlot1);
+        .outputRange(-0.05, 0.05, ClosedLoopSlot.kSlot1);
 
     motor.configure(
         motorConfig,
@@ -83,12 +82,11 @@ public class ArmIOREV implements ArmIO {
     inputs.encoderVelocity = RotationsPerSecond.of(velocityEncoder.getVelocity()).div(60);
 
     inputs.armAngle = inputs.encoderPosition;
-
   }
 
   @Override
   public void setPosition(Angle angle) {
-    controller.setReference(-(angle.in(Rotations)), SparkBase.ControlType.kPosition); // inverted
+    controller.setReference(-(angle.in(Degrees)), SparkBase.ControlType.kPosition); // inverted
   }
 
   public void stop() {
