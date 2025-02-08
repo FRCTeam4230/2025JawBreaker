@@ -10,6 +10,7 @@ import com.revrobotics.spark.config.SparkBaseConfig;
 import com.revrobotics.spark.config.SparkFlexConfig;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.wpilibj.DutyCycleEncoder;
+import frc.robot.utils.Conversions;
 
 public class ArmIOREV implements ArmIO {
 
@@ -78,7 +79,10 @@ public class ArmIOREV implements ArmIO {
     // inputs.motorBrownOut = motor.getFaults().other;
     inputs.motorCANID = motor.getDeviceId();
 
-    inputs.encoderPosition = Radians.of(Rotations.of(encoder.get()).in(Radians));
+    inputs.encoderPosition = Rotations.of(encoder.get());
+    inputs.encoderPositionInRadians = Radians.of(inputs.encoderPosition.in(Radians));
+    inputs.encoderVelocity = RotationsPerSecond.of(velocityEncoder.getVelocity()).div(60);
+
   }
 
   @Override
