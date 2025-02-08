@@ -9,6 +9,7 @@ import com.revrobotics.spark.config.EncoderConfig;
 import com.revrobotics.spark.config.SparkBaseConfig;
 import com.revrobotics.spark.config.SparkFlexConfig;
 import edu.wpi.first.units.measure.Angle;
+import edu.wpi.first.wpilibj.DutyCycleEncoder;
 
 public class ArmIOREV implements ArmIO {
 
@@ -18,8 +19,8 @@ public class ArmIOREV implements ArmIO {
 
   private final RelativeEncoder velocityEncoder = motor.getEncoder();
 
-  //  protected final DutyCycleEncoder encoder =
-  //      new DutyCycleEncoder(ArmConstants.DUTY_CYCLE_ENCODER_PORT);
+  protected final DutyCycleEncoder encoder =
+      new DutyCycleEncoder(ArmConstants.DUTY_CYCLE_ENCODER_PORT);
 
   private SparkClosedLoopController controller;
 
@@ -76,8 +77,7 @@ public class ArmIOREV implements ArmIO {
     // inputs.motorBrownOut = motor.getFaults().other;
     inputs.motorCANID = motor.getDeviceId();
 
-    //    inputs.encoderPosition =
-    // Rotations.of(encoder.get()).minus(ArmConstants.ARM_ENCODER_OFFSET_RAD);
+    inputs.armAngle = Rotations.of(encoder.get()).minus(ArmConstants.ARM_ENCODER_OFFSET_RAD);
     inputs.encoderPosition = Rotations.of(velocityEncoder.getPosition());
     inputs.encoderVelocity = RotationsPerSecond.of(velocityEncoder.getVelocity()).div(60);
 
@@ -86,7 +86,7 @@ public class ArmIOREV implements ArmIO {
 
   @Override
   public void setPosition(Angle angle) {
-    controller.setReference(angle.in(Degrees), SparkBase.ControlType.kPosition); // inverted
+    controller.setReference(angle.in(Degrees), SparkBase.ControlType.kPosition);
   }
 
   public void stop() {
