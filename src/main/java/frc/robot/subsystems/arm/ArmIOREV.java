@@ -88,7 +88,7 @@ public class ArmIOREV implements ArmIO {
 
   @Override
   public void setPosition(Angle angle) {
-    controller.setReference(-(angle.in(Degrees)), SparkBase.ControlType.kPosition); // inverted
+    controller.setReference(-(angle.in(Rotations)), SparkBase.ControlType.kPosition); // inverted
   }
 
   public void stop() {
