@@ -80,7 +80,14 @@ public class Arm extends SubsystemBase {
    * @param position The target angle position
    */
   private void setPosition(Angle position) {
-    io.setPosition(position);
+    io.setPosition(Radians.of(position.in(Radians)));
+    System.out.println(
+        "Angle: "
+            + position
+            + "\nAngle in Radians: "
+            + position.in(Radians)
+            + "\nAngle in Rotations: "
+            + position.in(Rotations));
   }
 
   /** Stops the arm motors. */
@@ -241,6 +248,9 @@ public class Arm extends SubsystemBase {
     return setPositionCommand(ArmMode.INTAKE);
   }
 
+  public Command reconfigPID() {
+    return Commands.runOnce(io::reconfigurePID);
+  }
   /**
    * @return Command to stop the arm
    */

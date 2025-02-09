@@ -31,6 +31,9 @@ public interface ArmIO {
     public Temperature motorTemperatureCelsius = Celsius.of(0.0);
 
     public int motorCANID = -1;
+
+    public double feedbackSensorValue;
+    public double motorPositionFactor;
   }
 
   /** Updates the set of loggable inputs. */
@@ -41,4 +44,6 @@ public interface ArmIO {
 
   /** Stop in open loop. */
   default void stop() {}
+
+  default void reconfigurePID() {}
 }
