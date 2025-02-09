@@ -8,6 +8,7 @@ import com.revrobotics.spark.config.EncoderConfig;
 import com.revrobotics.spark.config.SparkBaseConfig;
 import com.revrobotics.spark.config.SparkFlexConfig;
 import edu.wpi.first.units.measure.Angle;
+import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.wpilibj.DutyCycleEncoder;
 import org.littletonrobotics.junction.AutoLogOutput;
 
@@ -15,26 +16,35 @@ public class ArmIOREV implements ArmIO {
 
   protected static final SparkFlex motor =
       new SparkFlex(ArmConstants.MOTOR_ID, SparkLowLevel.MotorType.kBrushless);
-
   private final RelativeEncoder velocityEncoder = motor.getEncoder();
-
   protected final DutyCycleEncoder encoder =
       new DutyCycleEncoder(ArmConstants.DUTY_CYCLE_ENCODER_PORT);
-  @AutoLogOutput private final SparkClosedLoopController controller;
 
+  @AutoLogOutput
+  private final SparkClosedLoopController controller;
+
+  /*
+    Construct the IO. let child classes override PID control
+   */
   public ArmIOREV() {
-
     controller = motor.getClosedLoopController();
 
-    EncoderConfig encoderConfig =
-        new EncoderConfig()
-            .velocityConversionFactor((Math.PI * 2) * ArmConstants.GEAR_RATIO)
-            //            .positionConversionFactor((Math.PI * 2) * ArmConstants.GEAR_RATIO);
-            //            .velocityConversionFactor(1)
-            .positionConversionFactor((Math.PI * 2) * ArmConstants.GEAR_RATIO);
+    motor.configure(
+        new SparkFlexConfig()
+            .idleMode(SparkBaseConfig.IdleMode.kBrake)
+            .inverted(true)
+            .smartCurrentLimit(60)
+            .apply(getEncoderConfig())
+            .apply(getMotorConfig()),
+        SparkBase.ResetMode.kResetSafeParameters,
+        SparkBase.PersistMode.kPersistParameters);
+
+    resetEncoder();
+  }
+
+  protected SparkFlexConfig getMotorConfig() {
     SparkFlexConfig motorConfig = new SparkFlexConfig();
     motorConfig
-        .inverted(true)
         .closedLoop
         // .feedbackSensor(ClosedLoopConfig.FeedbackSensor.kPrimaryEncoder)
         // Set PID values for position control. We don't need to pass a closed loop
@@ -49,15 +59,15 @@ public class ArmIOREV implements ArmIO {
         .d(0, ClosedLoopSlot.kSlot1)
         .outputRange(-0.2, 0.2, ClosedLoopSlot.kSlot1);
 
-    motor.configure(
-        new SparkFlexConfig()
-            .idleMode(SparkBaseConfig.IdleMode.kBrake)
-            .apply(encoderConfig)
-            .apply(motorConfig),
-        SparkBase.ResetMode.kResetSafeParameters,
-        SparkBase.PersistMode.kPersistParameters);
+    return motorConfig;
+  }
 
-    motor.getEncoder().setPosition(0);
+  protected EncoderConfig getEncoderConfig(){
+    EncoderConfig encoderConfig =
+        new EncoderConfig()
+            .velocityConversionFactor((Math.PI * 2) * ArmConstants.GEAR_RATIO)
+            .positionConversionFactor((Math.PI * 2) * ArmConstants.GEAR_RATIO);
+    return encoderConfig;
   }
 
   public void updateInputs(ArmIOInputs inputs) {
@@ -77,15 +87,12 @@ public class ArmIOREV implements ArmIO {
     inputs.encoderVelocity = RotationsPerSecond.of(velocityEncoder.getVelocity()).div(60);
 
     //    inputs.armAngle = inputs.encoderPosition;
-
-    inputs.feedbackSensorValue = motor.configAccessor.closedLoop.getFeedbackSensor().value;
     inputs.motorPositionFactor = motor.configAccessor.encoder.getPositionConversionFactor();
-    motor.configAccessor.closedLoop.getPositionWrappingEnabled();
+
   }
 
   @Override
   public void setPosition(Angle angle) {
-
     controller.setReference(angle.baseUnitMagnitude(), SparkBase.ControlType.kPosition);
   }
 
@@ -105,6 +112,11 @@ public class ArmIOREV implements ArmIO {
         motorConfig,
         SparkBase.ResetMode.kNoResetSafeParameters,
         SparkBase.PersistMode.kPersistParameters);
+  }
+
+  @Override
+  public void resetEncoder() {
+    motor.getEncoder().setPosition(0);
   }
 }
 

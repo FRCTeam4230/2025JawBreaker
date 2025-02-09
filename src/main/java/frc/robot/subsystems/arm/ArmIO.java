@@ -30,11 +30,11 @@ public interface ArmIO {
 
     public Temperature motorTemperatureCelsius = Celsius.of(0.0);
 
-    public int motorCANID = -1;
+    public int motorCANID = ArmConstants.MOTOR_ID;
 
-    public double feedbackSensorValue;
     public double motorPositionFactor;
   }
+
 
   /** Updates the set of loggable inputs. */
   default void updateInputs(ArmIOInputs inputs) {}
@@ -46,4 +46,6 @@ public interface ArmIO {
   default void stop() {}
 
   default void reconfigurePID() {}
+
+  default void resetEncoder() {}
 }

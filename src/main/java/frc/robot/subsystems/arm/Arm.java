@@ -31,8 +31,6 @@ public class Arm extends SubsystemBase {
   private final ArmIO io;
   private final ArmIOInputsAutoLogged inputs;
 
-  public final PIDController pidController =
-      new PIDController(ArmConstants.kP.get(), ArmConstants.kI.get(), ArmConstants.kD.get());
 
   // Current arm position mode
   private ArmMode currentMode = ArmMode.INTAKE;
@@ -52,14 +50,6 @@ public class Arm extends SubsystemBase {
   public Arm(ArmIO io) {
     this.io = io;
     this.inputs = new ArmIOInputsAutoLogged();
-    SmartDashboard.putData(this);
-  }
-
-  private void updateControlConstants() {
-    pidController.setP(ArmConstants.kP.get());
-    pidController.setI(ArmConstants.kI.get());
-    pidController.setD(ArmConstants.kD.get());
-    pidController.setTolerance(ArmConstants.setpointToleranceRad.get());
   }
 
   @Override
@@ -67,7 +57,6 @@ public class Arm extends SubsystemBase {
     // Update and log inputs from hardware
     io.updateInputs(inputs);
     Logger.processInputs("Arm", inputs);
-    // updateControlConstants();
 
     // Update motor connection status alerts
     motorMotorAlert.set(!inputs.motorConnected);

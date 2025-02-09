@@ -25,11 +25,4 @@ public class ArmConstants {
 
   public static final double MAX_ARM_VOLTS = 0;
   public static final double GEAR_RATIO = 1.0 / 20.0;
-
-  //  public static class Positions {
-  //    public static final LoggedTunableNumber PICKUP_POS_RAD =
-  //        tunableTable.makeField("pickup pos", 0.0);
-  //    public static final LoggedTunableNumber PLACE_POS_RAD =
-  //        tunableTable.makeField("place pos", 0.0);
-  //  }
 }
