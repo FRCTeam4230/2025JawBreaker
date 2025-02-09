@@ -30,7 +30,7 @@ public class ArmIOREVWpiLibClosedLoop extends ArmIOREV {
 
   @Override
   public void setPosition(Angle position) {
-    //TODO: store the SetPoint, this is the angle to the PID contorller
+    this.armSetPointAngle = position;
   }
 
   /**

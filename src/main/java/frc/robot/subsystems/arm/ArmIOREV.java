@@ -19,6 +19,7 @@ public class ArmIOREV implements ArmIO {
   private final RelativeEncoder velocityEncoder = motor.getEncoder();
   protected final DutyCycleEncoder encoder =
       new DutyCycleEncoder(ArmConstants.DUTY_CYCLE_ENCODER_PORT);
+  protected Angle armSetPointAngle = Rotations.of(0);
 
   @AutoLogOutput
   private final SparkClosedLoopController controller;
@@ -88,11 +89,13 @@ public class ArmIOREV implements ArmIO {
 
     //    inputs.armAngle = inputs.encoderPosition;
     inputs.motorPositionFactor = motor.configAccessor.encoder.getPositionConversionFactor();
+    inputs.armSetPointAngle = this.armSetPointAngle;
 
   }
 
   @Override
   public void setPosition(Angle angle) {
+    this.armSetPointAngle = angle;
     controller.setReference(angle.baseUnitMagnitude(), SparkBase.ControlType.kPosition);
   }
 

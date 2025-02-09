@@ -27,11 +27,11 @@ public interface ArmIO {
     public Current motorStatorCurrent = Amps.of(0);
     public Current motorSupplyCurrent = Amps.of(0);
     public Angle armAngle = Rotations.of(0);
+    public Angle armSetPointAngle = Rotations.of(0);
 
     public Temperature motorTemperatureCelsius = Celsius.of(0.0);
 
     public int motorCANID = ArmConstants.MOTOR_ID;
-
     public double motorPositionFactor;
   }
 
