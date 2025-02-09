@@ -31,7 +31,6 @@ public class Arm extends SubsystemBase {
   private final ArmIO io;
   private final ArmIOInputsAutoLogged inputs;
 
-
   // Current arm position mode
   private ArmMode currentMode = ArmMode.INTAKE;
 

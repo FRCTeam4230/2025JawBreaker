@@ -9,7 +9,9 @@ import com.revrobotics.spark.config.SparkBaseConfig;
 import com.revrobotics.spark.config.SparkFlexConfig;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.Voltage;
+import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.DutyCycleEncoder;
+import frc.robot.subsystems.elevator.ElevatorConstants;
 import org.littletonrobotics.junction.AutoLogOutput;
 
 public class ArmIOREV implements ArmIO {
@@ -20,6 +22,13 @@ public class ArmIOREV implements ArmIO {
   protected final DutyCycleEncoder encoder =
       new DutyCycleEncoder(ArmConstants.DUTY_CYCLE_ENCODER_PORT);
   protected Angle armSetPointAngle = Rotations.of(0);
+
+  private final DigitalInput upperLimitSwitch =
+      new DigitalInput(ArmConstants.UPPER_LIMIT_SWITCH_DIO_PORT);
+  private final DigitalInput lowerLimitSwitch =
+      new DigitalInput(ArmConstants.LOWER_LIMIT_SWITCH_DIO_PORT);
+
+
 
   @AutoLogOutput
   private final SparkClosedLoopController controller;
@@ -72,6 +81,9 @@ public class ArmIOREV implements ArmIO {
   }
 
   public void updateInputs(ArmIOInputs inputs) {
+    inputs.upperLimit = upperLimitSwitch.get();
+    inputs.lowerLimit = lowerLimitSwitch.get();
+
     inputs.motorPosition = Rotations.of(motor.getEncoder().getPosition());
     inputs.motorVelocity = RotationsPerSecond.of(velocityEncoder.getVelocity()).div(60);
 
@@ -90,7 +102,6 @@ public class ArmIOREV implements ArmIO {
     //    inputs.armAngle = inputs.encoderPosition;
     inputs.motorPositionFactor = motor.configAccessor.encoder.getPositionConversionFactor();
     inputs.armSetPointAngle = this.armSetPointAngle;
-
   }
 
   @Override

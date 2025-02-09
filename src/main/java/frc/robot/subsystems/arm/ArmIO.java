@@ -33,6 +33,8 @@ public interface ArmIO {
 
     public int motorCANID = ArmConstants.MOTOR_ID;
     public double motorPositionFactor;
+    public boolean lowerLimit = false;
+    public boolean upperLimit = false;
   }
 
 
