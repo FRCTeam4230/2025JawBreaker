@@ -66,11 +66,8 @@ public class LoggedTunableNumber {
    * @return The current value
    */
   public double get() {
-    if (!hasDefault.get()) {
-      return 0.0;
-    } else {
-      return Constants.tuningMode ? dashboardNumber.get() : defaultValue;
-    }
+
+    return Constants.tuningMode ? dashboardNumber.get() : defaultValue;
   }
 
   /**
