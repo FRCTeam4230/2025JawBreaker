@@ -6,12 +6,13 @@ import edu.wpi.first.units.measure.Angle;
 
 public class ArmIOREVWpiLibClosedLoop extends ArmIOREV {
 
-  private final PIDController pidController = new PIDController(0, 0, 0);
+  private final PIDController pidController;
 
   public ArmIOREVWpiLibClosedLoop() {
     super();
+    pidController = new PIDController(ArmConstants.kP.get(), ArmConstants.kI.get(), ArmConstants.kD.get());
   }
-  
+
   /**
    * @return EncoderConfig
    */
