@@ -28,7 +28,7 @@ public class ArmIOREV implements ArmIO {
   private final DigitalInput lowerLimitSwitch =
       new DigitalInput(ArmConstants.LOWER_LIMIT_SWITCH_DIO_PORT);
 
-
+  protected final Voltage ZERO_VOLTS = Volts.of(0);
 
   @AutoLogOutput
   private final SparkClosedLoopController controller;

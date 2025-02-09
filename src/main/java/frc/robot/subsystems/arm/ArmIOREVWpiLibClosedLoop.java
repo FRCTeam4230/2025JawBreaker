@@ -45,28 +45,19 @@ public class ArmIOREVWpiLibClosedLoop extends ArmIOREV {
   public void updateInputs(ArmIOInputs inputs) {
     super.updateInputs(inputs);
 
+    //TODO: Do the PID calculations here and then call
     Voltage calculatedVolts = Volts.of(pidController.calculate(inputs.armAngle.baseUnitMagnitude(), armSetPointAngle.baseUnitMagnitude()));
 
-    if (inputs.upperLimit && calculatedVolts.magnitude() > 0) {
-      calculatedVolts = Volts.of(0);
-    } else if (inputs.lowerLimit && calculatedVolts.magnitude() < 0) {
-      calculatedVolts = Volts.of(0);
+    if (inputs.upperLimit && calculatedVolts.gt(ZERO_VOLTS) ||
+        inputs.lowerLimit && calculatedVolts.lt(ZERO_VOLTS)){
+
+      calculatedVolts = ZERO_VOLTS;
+    }else {
+      calculatedVolts = Volts.of(MathUtil.clamp(calculatedVolts.baseUnitMagnitude(), ArmConstants.MAX_ARM_VOLTS, ArmConstants.MAX_ARM_VOLTS));
     }
-    
-    //TODO: Do the PID calculations here and then call
+
+    inputs.attemptedVoltage = calculatedVolts;
     motor.setVoltage(calculatedVolts);
   }
 
-  private void limitAndSetVolts(double volts) {
-    if (volts < 0 && lastInputs.lowerLimit) {
-      volts = 0;
-    }
-    if (volts > -.1 && lastInputs.upperLimit) {
-      volts = 0;
-      //      volts = -0.5;
-    }
-    volts = MathUtil.clamp(volts, -ArmConstants.MAX_ARM_VOLTS, ArmConstants.MAX_ARM_VOLTS);
-    Logger.recordOutput(LOGGING_PREFIX + "attemptedVolts", volts);
-    armIO.setVoltage(volts);
-  }
 }

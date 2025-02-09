@@ -35,6 +35,7 @@ public interface ArmIO {
     public double motorPositionFactor;
     public boolean lowerLimit = false;
     public boolean upperLimit = false;
+    public Voltage attemptedVoltage = Volts.of(0);
   }
 
 

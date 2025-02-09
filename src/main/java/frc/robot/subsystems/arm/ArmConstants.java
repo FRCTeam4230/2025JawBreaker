@@ -26,6 +26,7 @@ public class ArmConstants {
   public static final LoggedTunableNumber MAX_ARM_PID_VOLTS =
       tunableTable.makeField("max arm pid volts", 0.0);
 
-  public static final double MAX_ARM_VOLTS = 0;
+  public static final double MAX_ARM_VOLTS = 12;
+  public static final double MIN_ARM_VOLTS = -12;
   public static final double GEAR_RATIO = 1.0 / 20.0;
 }
