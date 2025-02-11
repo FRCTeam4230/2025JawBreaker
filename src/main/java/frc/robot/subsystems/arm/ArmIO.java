@@ -29,6 +29,9 @@ public interface ArmIO {
     public Angle armAngle = Rotations.of(0);
     public Angle setpoint = Rotations.of(0);
 
+    public boolean upperlimit = false;
+    public boolean lowerlimit = false;
+
     public Temperature motorTemperatureCelsius = Celsius.of(0.0);
 
     public int motorCANID = -1;

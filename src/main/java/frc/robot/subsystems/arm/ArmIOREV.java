@@ -23,6 +23,7 @@ import com.revrobotics.spark.config.ClosedLoopConfig.FeedbackSensor;
 import com.revrobotics.spark.config.SparkFlexConfig;
 import com.revrobotics.spark.config.SparkMaxConfig;
 import edu.wpi.first.units.measure.Angle;
+import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.RobotController;
 
 /**
@@ -39,6 +40,10 @@ public class ArmIOREV implements ArmIO {
   /** Leader motor controller (CAN ID 20) */
   public final SparkFlex leader = new SparkFlex(ArmConstants.MOTOR_ID, MotorType.kBrushless);
 
+  private final DigitalInput upperLimitSwitch =
+      new DigitalInput(ArmConstants.UPPER_LIMIT_SWITCH_DIO_PORT);
+  private final DigitalInput lowerLimitSwitch =
+      new DigitalInput(ArmConstants.LOWER_LIMIT_SWITCH_DIO_PORT);
   /**
    * The SparkMax’s built–in relative encoder is used to determine the leader’s position. (An
    * absolute encoder could be used if available.)
@@ -110,6 +115,13 @@ public class ArmIOREV implements ArmIO {
     // Use the integrated encoder measurement as the arm’s current angle.
     inputs.armAngle = Rotations.of(armRot);
     inputs.setpoint = setpoint;
+
+    inputs.lowerlimit = !lowerLimitSwitch.get();
+    inputs.upperlimit = !upperLimitSwitch.get();
+
+    if (inputs.lowerlimit) {
+      leaderEncoder.setPosition(0);
+    }
   }
 
   /**
