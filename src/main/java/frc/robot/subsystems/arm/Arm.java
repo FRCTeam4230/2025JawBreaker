@@ -55,13 +55,6 @@ public class Arm extends SubsystemBase {
     SmartDashboard.putData(this);
   }
 
-  private void updateControlConstants() {
-    pidController.setP(ArmConstants.kP.get());
-    pidController.setI(ArmConstants.kI.get());
-    pidController.setD(ArmConstants.kD.get());
-    pidController.setTolerance(ArmConstants.setpointToleranceRad.get());
-  }
-
   @Override
   public void periodic() {
     // Update and log inputs from hardware
@@ -81,13 +74,6 @@ public class Arm extends SubsystemBase {
    */
   private void setPosition(Angle position) {
     io.setPosition(position);
-    System.out.println(
-        "Angle: "
-            + position
-            + "\nAngle in Radians: "
-            + position.in(Radians)
-            + "\nAngle in Rotations: "
-            + position.in(Rotations));
   }
 
   /** Stops the arm motors. */

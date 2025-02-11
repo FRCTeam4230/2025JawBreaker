@@ -10,6 +10,7 @@ import static edu.wpi.first.units.Units.Amps;
 import static edu.wpi.first.units.Units.Rotations;
 import static edu.wpi.first.units.Units.RotationsPerSecond;
 import static edu.wpi.first.units.Units.Volts;
+import static frc.robot.subsystems.arm.ArmConstants.GEAR_RATIO;
 
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.spark.SparkBase.ControlType;
@@ -19,9 +20,10 @@ import com.revrobotics.spark.SparkClosedLoopController;
 import com.revrobotics.spark.SparkFlex;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.config.ClosedLoopConfig.FeedbackSensor;
-import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
+import com.revrobotics.spark.config.SparkFlexConfig;
 import com.revrobotics.spark.config.SparkMaxConfig;
 import edu.wpi.first.units.measure.Angle;
+import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.RobotController;
 
 /**
@@ -34,11 +36,14 @@ import edu.wpi.first.wpilibj.RobotController;
  */
 public class ArmIOREV implements ArmIO {
   /** The gear ratio between motor and arm (for converting motor rotations to arm angle) */
-  public static final double GEAR_RATIO = 20;
 
   /** Leader motor controller (CAN ID 20) */
-  public final SparkFlex leader = new SparkFlex(20, MotorType.kBrushless);
+  public final SparkFlex leader = new SparkFlex(ArmConstants.MOTOR_ID, MotorType.kBrushless);
 
+  private final DigitalInput upperLimitSwitch =
+      new DigitalInput(ArmConstants.UPPER_LIMIT_SWITCH_DIO_PORT);
+  private final DigitalInput lowerLimitSwitch =
+      new DigitalInput(ArmConstants.LOWER_LIMIT_SWITCH_DIO_PORT);
   /**
    * The SparkMax’s built–in relative encoder is used to determine the leader’s position. (An
    * absolute encoder could be used if available.)
@@ -47,6 +52,7 @@ public class ArmIOREV implements ArmIO {
 
   private SparkClosedLoopController closedLoopController = leader.getClosedLoopController();
 
+  private Angle setpoint;
   /**
    * Constructs a new ArmIOREV instance.
    *
@@ -57,12 +63,19 @@ public class ArmIOREV implements ArmIO {
   public ArmIOREV() {
     // Set both motors to coast mode
     SparkMaxConfig leaderConfig = new SparkMaxConfig();
-    leaderConfig.smartCurrentLimit(50).idleMode(IdleMode.kCoast);
+    // leaderConfig.smartCurrentLimit(50).idleMode(IdleMode.kBrake);
     leaderConfig
+        .inverted(true)
         .encoder
         .velocityConversionFactor((1.0 / GEAR_RATIO) / 60.0) // Converts RPM to rotations per second
         .positionConversionFactor(1.0 / GEAR_RATIO); // Converts motor rotations to arm rotations
-    leaderConfig.closedLoop.feedbackSensor(FeedbackSensor.kPrimaryEncoder).p(0.0005).i(0.0).d(0.0);
+    leaderConfig
+        .closedLoop
+        .outputRange(-1, 1)
+        .feedbackSensor(FeedbackSensor.kPrimaryEncoder)
+        .p(ArmConstants.kP.get())
+        .i(ArmConstants.kI.get())
+        .d(ArmConstants.kP.get());
 
     leader.configure(leaderConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
   }
@@ -101,6 +114,14 @@ public class ArmIOREV implements ArmIO {
 
     // Use the integrated encoder measurement as the arm’s current angle.
     inputs.armAngle = Rotations.of(armRot);
+    inputs.setpoint = setpoint;
+
+    inputs.lowerlimit = !lowerLimitSwitch.get();
+    inputs.upperlimit = !upperLimitSwitch.get();
+
+    if (inputs.lowerlimit) {
+      leaderEncoder.setPosition(0);
+    }
   }
 
   /**
@@ -114,11 +135,26 @@ public class ArmIOREV implements ArmIO {
   public void setPosition(Angle angle) {
     // The setpoint is in rotations.
     closedLoopController.setReference(angle.in(Rotations), ControlType.kPosition);
+    this.setpoint = angle;
   }
 
   /** Stops all arm movement. */
   @Override
   public void stop() {
     leader.stopMotor();
+  }
+
+  @Override
+  public void reconfigurePID() {
+    // Reconfigure the PID gains for the closed-loop controller.
+    // Note: This is a demonstration and should be tuned for your specific mechanism.
+    SparkFlexConfig leaderConfig = new SparkFlexConfig();
+    leaderConfig
+        .closedLoop
+        .p(ArmConstants.kP.get())
+        .i(ArmConstants.kI.get())
+        .d(ArmConstants.kD.get());
+    leader.configure(
+        leaderConfig, ResetMode.kNoResetSafeParameters, PersistMode.kPersistParameters);
   }
 }
