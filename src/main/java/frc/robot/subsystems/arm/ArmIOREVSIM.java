@@ -13,6 +13,7 @@ import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.Pounds;
 import static edu.wpi.first.units.Units.Radians;
 import static edu.wpi.first.units.Units.Rotations;
+import static frc.robot.subsystems.arm.ArmConstants.GEAR_RATIO;
 
 import com.revrobotics.sim.SparkFlexSim;
 import edu.wpi.first.math.numbers.N1;
