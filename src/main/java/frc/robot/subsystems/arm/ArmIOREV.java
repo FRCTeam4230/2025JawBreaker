@@ -20,7 +20,6 @@ import com.revrobotics.spark.SparkClosedLoopController;
 import com.revrobotics.spark.SparkFlex;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.config.ClosedLoopConfig.FeedbackSensor;
-import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.config.SparkFlexConfig;
 import com.revrobotics.spark.config.SparkMaxConfig;
 import edu.wpi.first.units.measure.Angle;
@@ -48,6 +47,7 @@ public class ArmIOREV implements ArmIO {
 
   private SparkClosedLoopController closedLoopController = leader.getClosedLoopController();
 
+  private Angle setpoint;
   /**
    * Constructs a new ArmIOREV instance.
    *
@@ -58,7 +58,7 @@ public class ArmIOREV implements ArmIO {
   public ArmIOREV() {
     // Set both motors to coast mode
     SparkMaxConfig leaderConfig = new SparkMaxConfig();
-    leaderConfig.smartCurrentLimit(50).idleMode(IdleMode.kBrake);
+    // leaderConfig.smartCurrentLimit(50).idleMode(IdleMode.kBrake);
     leaderConfig
         .inverted(true)
         .encoder
@@ -66,6 +66,7 @@ public class ArmIOREV implements ArmIO {
         .positionConversionFactor(1.0 / GEAR_RATIO); // Converts motor rotations to arm rotations
     leaderConfig
         .closedLoop
+        .outputRange(-1, 1)
         .feedbackSensor(FeedbackSensor.kPrimaryEncoder)
         .p(ArmConstants.kP.get())
         .i(ArmConstants.kI.get())
@@ -108,7 +109,7 @@ public class ArmIOREV implements ArmIO {
 
     // Use the integrated encoder measurement as the arm’s current angle.
     inputs.armAngle = Rotations.of(armRot);
-
+    inputs.setpoint = setpoint;
   }
 
   /**
@@ -122,6 +123,7 @@ public class ArmIOREV implements ArmIO {
   public void setPosition(Angle angle) {
     // The setpoint is in rotations.
     closedLoopController.setReference(angle.in(Rotations), ControlType.kPosition);
+    this.setpoint = angle;
   }
 
   /** Stops all arm movement. */
