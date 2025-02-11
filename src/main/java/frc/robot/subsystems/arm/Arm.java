@@ -80,7 +80,7 @@ public class Arm extends SubsystemBase {
    * @param position The target angle position
    */
   private void setPosition(Angle position) {
-    io.setPosition(Radians.of(position.in(Radians)));
+    io.setPosition(position);
     System.out.println(
         "Angle: "
             + position
