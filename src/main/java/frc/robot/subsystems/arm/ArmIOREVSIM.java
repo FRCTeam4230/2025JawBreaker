@@ -46,14 +46,14 @@ public class ArmIOREVSIM extends ArmIOREV {
     super(); // Initialize REV hardware interface components
 
     // Choose a motor model for simulation; here we assume two NEOs in parallel.
-    DCMotor motor = DCMotor.getNeoVortex(2);
+    DCMotor motor = DCMotor.getNeoVortex(1);
 
     // Retrieve simulation state objects from the REV devices.
     leaderSim = new SparkFlexSim(leader, motor);
 
     // Define arm physical properties.
-    Distance armLength = Inches.of(12);
-    Mass armMass = Pounds.of(15);
+    Distance armLength = Inches.of(23.75);
+    Mass armMass = Pounds.of(4.84);
 
     // Calculate the arm's moment of inertia (MOI) using WPILib's helper.
     double armMOI = SingleJointedArmSim.estimateMOI(armLength.in(Meters), armMass.in(Kilograms));
@@ -64,7 +64,7 @@ public class ArmIOREVSIM extends ArmIOREV {
     LinearSystem<N2, N1, N2> linearSystem =
         LinearSystemId.createSingleJointedArmSystem(motor, armMOI, GEAR_RATIO);
 
-    Angle startingAngle = Degrees.of(90);
+    Angle startingAngle = Degrees.of(0);
     // Initialize the arm simulation:
     armSimModel =
         new SingleJointedArmSim(
@@ -74,7 +74,7 @@ public class ArmIOREVSIM extends ArmIOREV {
             armLength.in(Meters),
             Degrees.of(0).in(Radians),
             Degrees.of(180).in(Radians),
-            true,
+            false,
             startingAngle.in(Radians));
     leaderSim.setPosition(startingAngle.in(Rotations));
   }

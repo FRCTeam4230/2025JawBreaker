@@ -34,7 +34,7 @@ import edu.wpi.first.wpilibj.RobotController;
  */
 public class ArmIOREV implements ArmIO {
   /** The gear ratio between motor and arm (for converting motor rotations to arm angle) */
-  public static final double GEAR_RATIO = 150;
+  public static final double GEAR_RATIO = 20;
 
   /** Leader motor controller (CAN ID 20) */
   public final SparkFlex leader = new SparkFlex(20, MotorType.kBrushless);
@@ -75,7 +75,7 @@ public class ArmIOREV implements ArmIO {
   @Override
   public void updateInputs(ArmIOInputs inputs) {
     // In hardware we assume the devices are connected.
-    inputs.leaderConnected = true;
+    inputs.motorConnected = true;
     // inputs.followerConnected = true;
     inputs.encoderConnected = true;
 
@@ -84,21 +84,19 @@ public class ArmIOREV implements ArmIO {
     double armRot = leaderEncoder.getPosition();
     double armVelRotPerSec = leaderEncoder.getVelocity();
 
-    inputs.leaderPosition = Rotations.of(armRot);
+    inputs.motorPosition = Rotations.of(armRot);
     // For the motor’s rotor position we reconstruct the raw (pre–conversion) value.
-    inputs.leaderRotorPosition = Rotations.of(armRot * GEAR_RATIO);
-    inputs.leaderVelocity = RotationsPerSecond.of(armVelRotPerSec);
-    inputs.leaderRotorVelocity = RotationsPerSecond.of(armVelRotPerSec * GEAR_RATIO);
+    inputs.motorVelocity = RotationsPerSecond.of(armVelRotPerSec);
 
     // The applied voltage is the output percentage multiplied by the current battery voltage.
     inputs.appliedVoltage =
         Volts.of(leader.getAppliedOutput() * RobotController.getBatteryVoltage());
 
     // Currents are read from the SparkMax.
-    inputs.leaderStatorCurrent = Amps.of(leader.getOutputCurrent());
+    inputs.motorStatorCurrent = Amps.of(leader.getOutputCurrent());
     // inputs.followerStatorCurrent = Amps.of(follower.getOutputCurrent());
     // For demonstration, assume the supply current is similar.
-    inputs.leaderSupplyCurrent = Amps.of(leader.getOutputCurrent());
+    inputs.motorSupplyCurrent = Amps.of(leader.getOutputCurrent());
     // inputs.followerSupplyCurrent = Amps.of(follower.getOutputCurrent());
 
     // Use the integrated encoder measurement as the arm’s current angle.
