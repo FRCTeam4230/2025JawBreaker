@@ -11,7 +11,6 @@ import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.DutyCycleEncoder;
-import frc.robot.subsystems.elevator.ElevatorConstants;
 import org.littletonrobotics.junction.AutoLogOutput;
 
 public class ArmIOREV implements ArmIO {
@@ -30,12 +29,11 @@ public class ArmIOREV implements ArmIO {
 
   protected final Voltage ZERO_VOLTS = Volts.of(0);
 
-  @AutoLogOutput
-  private final SparkClosedLoopController controller;
+  @AutoLogOutput private final SparkClosedLoopController controller;
 
   /*
-    Construct the IO. let child classes override PID control
-   */
+   Construct the IO. let child classes override PID control
+  */
   public ArmIOREV() {
     controller = motor.getClosedLoopController();
 
@@ -72,7 +70,7 @@ public class ArmIOREV implements ArmIO {
     return motorConfig;
   }
 
-  protected EncoderConfig getEncoderConfig(){
+  protected EncoderConfig getEncoderConfig() {
     EncoderConfig encoderConfig =
         new EncoderConfig()
             .velocityConversionFactor((Math.PI * 2) * ArmConstants.GEAR_RATIO)
@@ -133,5 +131,3 @@ public class ArmIOREV implements ArmIO {
     motor.getEncoder().setPosition(0);
   }
 }
-
-

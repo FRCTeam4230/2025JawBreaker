@@ -15,9 +15,6 @@ import edu.wpi.first.math.numbers.N2;
 import edu.wpi.first.math.system.LinearSystem;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.system.plant.LinearSystemId;
-import edu.wpi.first.math.util.Units;
-import edu.wpi.first.units.measure.Angle;
-import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.units.measure.Mass;
 import edu.wpi.first.wpilibj.RobotController;
@@ -50,7 +47,8 @@ public class ArmIOSIM extends ArmIOREV {
     super(); // Initialize hardware interface components
 
     // Get simulation states for all hardware
-    DCMotor gearbox = DCMotor.getNEO(2);
+    DCMotor gearbox = DCMotor.getNEO(1);
+
     motorSim = new SparkFlexSim(motor, gearbox);
     velocityEncoderSim = new SparkRelativeEncoderSim(motor);
     encoderSim = new DutyCycleEncoderSim(ArmConstants.DUTY_CYCLE_ENCODER_PORT);
@@ -70,7 +68,7 @@ public class ArmIOSIM extends ArmIOREV {
     // Create arm physics model
     LinearSystem<N2, N1, N2> linearSystem =
         LinearSystemId.createSingleJointedArmSystem(
-            DCMotor.getNEO(2), armMOI, ArmConstants.GEAR_RATIO);
+            DCMotor.getNEO(1), armMOI, ArmConstants.GEAR_RATIO);
 
     // Initialize arm simulation
 
@@ -84,6 +82,9 @@ public class ArmIOSIM extends ArmIOREV {
             Degrees.of(180).in(Radians), // Upper limit (180)
             true, // Enable gravity simulation
             Degrees.of(90).in(Radians)); // Start at 90°
+
+    motorSim.setPosition((Degrees.of(90)).in(Radians));
+    motorSimModel.setState(motorSim.getPosition(), motorSim.getVelocity());
   }
 
   /**
@@ -99,27 +100,38 @@ public class ArmIOSIM extends ArmIOREV {
     // Simulate battery voltage effects on all devices
     motorSim.setBusVoltage(RobotController.getBatteryVoltage());
     motorSimModel.setInput(motorSim.getAppliedOutput() * RoboRioSim.getVInVoltage());
-
     // Update physics simulation
     motorSimModel.update(0.02); // Simulate 20ms timestep (50Hz)
 
-    motorSim.iterate(
-        Units.radiansPerSecondToRotationsPerMinute( // motor velocity, in RPM
-            motorSimModel.getVelocityRadPerSec()),
-        RoboRioSim.getVInVoltage(), // Simulated battery voltage, in Volts
-        0.02);
+    //    motorSim.iterate(
+    //        // motor velocity, in RPM
+    //        motorSimModel.getVelocityRadPerSec() * (Math.PI * 2),
+    //        RoboRioSim.getVInVoltage(), // Simulated battery voltage, in Volts
+    //        0.02);
+
     velocityEncoderSim.iterate(motorSim.getVelocity(), 0.02);
 
     // Get position and velocity from physics simulation
-    Angle position = Radians.of(motorSimModel.getAngleRads());
-    AngularVelocity velocity = RadiansPerSecond.of(motorSimModel.getVelocityRadPerSec());
+
+    //    System.out.println(
+    //        "motorSimModel position radians: "
+    //            + motorSimModel.getAngleRads()
+    //            + "\n velocity: "
+    //            + motorSimModel.getVelocityRadPerSec());
+    System.out.println(
+        "motorSimModel position radians: "
+            + motorSim.getPosition()
+            + "\n velocity: "
+            + motorSim.getVelocity()
+            + "\n setpoint: "
+            + motorSim.getSetpoint());
 
     // Update simulated motor encoder readings (accounts for gear ratio)
-    motorSim.setPosition(position.times(ArmConstants.GEAR_RATIO).in(Degrees));
-    motorSim.setVelocity(velocity.times(ArmConstants.GEAR_RATIO).in(DegreesPerSecond));
+    motorSim.setPosition(motorSimModel.getAngleRads());
+    motorSim.setVelocity((motorSimModel.getVelocityRadPerSec() * 2 * Math.PI));
 
     // Update simulated CANcoder readings (direct angle measurement).
-
-    encoderSim.set(velocity.in(DegreesPerSecond));
+    encoderSim.set(motorSimModel.getVelocityRadPerSec());
+    encoderSim.set(motorSimModel.getAngleRads());
   }
 }

@@ -38,7 +38,6 @@ public interface ArmIO {
     public Voltage attemptedVoltage = Volts.of(0);
   }
 
-
   /** Updates the set of loggable inputs. */
   default void updateInputs(ArmIOInputs inputs) {}
 
