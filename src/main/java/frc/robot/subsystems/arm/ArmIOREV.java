@@ -1,6 +1,7 @@
 package frc.robot.subsystems.arm;
 
 import static edu.wpi.first.units.Units.*;
+import static frc.robot.subsystems.arm.ArmConstants.GEAR_RATIO;
 
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.spark.*;
@@ -9,37 +10,29 @@ import com.revrobotics.spark.config.SparkBaseConfig;
 import com.revrobotics.spark.config.SparkFlexConfig;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.Voltage;
-import edu.wpi.first.wpilibj.DigitalInput;
-import edu.wpi.first.wpilibj.DutyCycleEncoder;
-import frc.robot.subsystems.elevator.ElevatorConstants;
+import edu.wpi.first.wpilibj.RobotController;
 import org.littletonrobotics.junction.AutoLogOutput;
 
 public class ArmIOREV implements ArmIO {
 
-  protected static final SparkFlex motor =
+  protected final SparkFlex leader =
       new SparkFlex(ArmConstants.MOTOR_ID, SparkLowLevel.MotorType.kBrushless);
-  private final RelativeEncoder velocityEncoder = motor.getEncoder();
-  protected final DutyCycleEncoder encoder =
-      new DutyCycleEncoder(ArmConstants.DUTY_CYCLE_ENCODER_PORT);
-  protected Angle armSetPointAngle = Rotations.of(0);
 
-  private final DigitalInput upperLimitSwitch =
-      new DigitalInput(ArmConstants.UPPER_LIMIT_SWITCH_DIO_PORT);
-  private final DigitalInput lowerLimitSwitch =
-      new DigitalInput(ArmConstants.LOWER_LIMIT_SWITCH_DIO_PORT);
+  private final RelativeEncoder leaderEncoder = leader.getEncoder();
+
+  protected Angle armSetPointAngle = Rotations.of(0);
 
   protected final Voltage ZERO_VOLTS = Volts.of(0);
 
   @AutoLogOutput
-  private final SparkClosedLoopController controller;
+  private final SparkClosedLoopController controller = leader.getClosedLoopController();
 
   /*
-    Construct the IO. let child classes override PID control
-   */
+   Construct the IO. let child classes override PID control
+  */
   public ArmIOREV() {
-    controller = motor.getClosedLoopController();
 
-    motor.configure(
+    leader.configure(
         new SparkFlexConfig()
             .idleMode(SparkBaseConfig.IdleMode.kBrake)
             .inverted(true)
@@ -62,56 +55,57 @@ public class ArmIOREV implements ArmIO {
         .p(ArmConstants.kP.get())
         .i(ArmConstants.kI.get())
         .d(ArmConstants.kD.get())
-        .outputRange(-0.2, 0.2)
-        // Set PID values for velocity control in slot 1
-        .p(0.1, ClosedLoopSlot.kSlot1)
-        .i(0, ClosedLoopSlot.kSlot1)
-        .d(0, ClosedLoopSlot.kSlot1)
-        .outputRange(-0.2, 0.2, ClosedLoopSlot.kSlot1);
+        .outputRange(-0.2, 0.2);
 
     return motorConfig;
   }
 
-  protected EncoderConfig getEncoderConfig(){
-    EncoderConfig encoderConfig =
-        new EncoderConfig()
-            .velocityConversionFactor((Math.PI * 2) * ArmConstants.GEAR_RATIO)
-            .positionConversionFactor((Math.PI * 2) * ArmConstants.GEAR_RATIO);
-    return encoderConfig;
+  protected EncoderConfig getEncoderConfig() {
+    return new EncoderConfig()
+        .velocityConversionFactor((1.0 / GEAR_RATIO) / 60.0)
+        .positionConversionFactor(1.0 / GEAR_RATIO);
   }
 
   public void updateInputs(ArmIOInputs inputs) {
-    inputs.upperLimit = upperLimitSwitch.get();
-    inputs.lowerLimit = lowerLimitSwitch.get();
 
-    inputs.motorPosition = Rotations.of(motor.getEncoder().getPosition());
-    inputs.motorVelocity = RotationsPerSecond.of(velocityEncoder.getVelocity()).div(60);
+    // In hardware we assume the devices are connected.
+    inputs.leaderConnected = true;
+    // inputs.followerConnected = true;
+    inputs.encoderConnected = true;
 
-    inputs.appliedVoltage = Volts.of(motor.getAppliedOutput() * motor.getBusVoltage());
-    inputs.motorSupplyCurrent = Amps.of(motor.getOutputCurrent());
+    // Get the arm’s current position (in rotations) and angular velocity (rotations per second)
+    // from the integrated encoder.
+    double armRot = leaderEncoder.getPosition();
+    double armVelRotPerSec = leaderEncoder.getVelocity();
 
-    inputs.motorTemperatureCelsius = Celsius.of(motor.getMotorTemperature());
+    inputs.leaderPosition = Rotations.of(armRot);
+    inputs.leaderRotorPosition = Rotations.of(armRot * GEAR_RATIO);
+    inputs.leaderVelocity = RotationsPerSecond.of(armVelRotPerSec);
+    inputs.leaderRotorVelocity = RotationsPerSecond.of(armVelRotPerSec * GEAR_RATIO);
+
+    inputs.appliedVoltage =
+        Volts.of(leader.getAppliedOutput() * RobotController.getBatteryVoltage());
+    inputs.leaderStatorCurrent = Amps.of(leader.getOutputCurrent());
+    inputs.leaderSupplyCurrent = Amps.of(leader.getOutputCurrent());
+
+    // inputs.motorTemperatureCelsius = Celsius.of(motor.getMotorTemperature());
     // inputs.motorSensorFault = motor.getFaults().sensor;
     // inputs.motorBrownOut = motor.getFaults().other;
-    inputs.motorCANID = motor.getDeviceId();
+    inputs.motorCANID = leader.getDeviceId();
+    inputs.armAngle = Rotations.of(armRot);
 
-    inputs.armAngle = Rotations.of(encoder.get()).minus(ArmConstants.ARM_ENCODER_OFFSET_RAD);
-    inputs.encoderPosition = Rotations.of(encoder.get());
-    inputs.encoderVelocity = RotationsPerSecond.of(velocityEncoder.getVelocity()).div(60);
-
-    //    inputs.armAngle = inputs.encoderPosition;
-    inputs.motorPositionFactor = motor.configAccessor.encoder.getPositionConversionFactor();
+    inputs.motorPositionFactor = leader.configAccessor.encoder.getPositionConversionFactor();
     inputs.armSetPointAngle = this.armSetPointAngle;
   }
 
   @Override
   public void setPosition(Angle angle) {
     this.armSetPointAngle = angle;
-    controller.setReference(angle.baseUnitMagnitude(), SparkBase.ControlType.kPosition);
+    controller.setReference(angle.in(Rotations), SparkBase.ControlType.kPosition);
   }
 
   public void stop() {
-    motor.stopMotor();
+    leader.stopMotor();
   }
 
   @Override
@@ -122,7 +116,7 @@ public class ArmIOREV implements ArmIO {
         .p(ArmConstants.kP.get())
         .i(ArmConstants.kI.get())
         .d(ArmConstants.kD.get());
-    motor.configure(
+    leader.configure(
         motorConfig,
         SparkBase.ResetMode.kNoResetSafeParameters,
         SparkBase.PersistMode.kPersistParameters);
@@ -130,8 +124,6 @@ public class ArmIOREV implements ArmIO {
 
   @Override
   public void resetEncoder() {
-    motor.getEncoder().setPosition(0);
+    leader.getEncoder().setPosition(0);
   }
 }
-
-

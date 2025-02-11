@@ -141,7 +141,7 @@ public class ArmIOCTRE implements ArmIO {
     StatusCode encoderStatus = BaseStatusSignal.refreshAll(encoderPosition, encoderVelocity);
 
     // Update connection status with debouncing
-    inputs.motorConnected = motorDebounce.calculate(motorStatus.isOK());
+    inputs.leaderConnected = motorDebounce.calculate(motorStatus.isOK());
     inputs.encoderConnected = encoderDebounce.calculate(encoderStatus.isOK());
 
     // Update position and velocity measurements

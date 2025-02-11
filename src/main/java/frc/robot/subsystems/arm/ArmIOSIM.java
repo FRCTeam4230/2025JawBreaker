@@ -9,7 +9,6 @@ package frc.robot.subsystems.arm;
 import static edu.wpi.first.units.Units.*;
 
 import com.revrobotics.sim.SparkFlexSim;
-import com.revrobotics.sim.SparkRelativeEncoderSim;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N2;
 import edu.wpi.first.math.system.LinearSystem;
@@ -17,11 +16,8 @@ import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.system.plant.LinearSystemId;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.units.measure.Angle;
-import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.units.measure.Mass;
-import edu.wpi.first.wpilibj.RobotController;
-import edu.wpi.first.wpilibj.simulation.DutyCycleEncoderSim;
 import edu.wpi.first.wpilibj.simulation.RoboRioSim;
 import edu.wpi.first.wpilibj.simulation.SingleJointedArmSim;
 
@@ -29,7 +25,7 @@ import edu.wpi.first.wpilibj.simulation.SingleJointedArmSim;
  * Simulation implementation of the arm subsystem. This class extends ArmIOREV to provide a
  * physics-based simulation of the arm mechanism using WPILib's simulation classes.
  *
- * <p>The simulation models: - Dual Kraken X60 FOC motors - Realistic arm physics including gravity
+ * <p>The simulation models: - Duadl Kraken X60 FOC motors - Realistic arm physics including gravity
  * and moment of inertia - Position and velocity feedback through simulated encoders - Battery
  * voltage effects - Motion limits (0° to 180°)
  */
@@ -41,24 +37,13 @@ public class ArmIOSIM extends ArmIOREV {
   /** Simulation state for the motor */
   private final SparkFlexSim motorSim;
 
-  private final SparkRelativeEncoderSim velocityEncoderSim;
-  /** Simulation state for the CANcoder */
-  private final DutyCycleEncoderSim encoderSim;
-
   /** Constructs a new ArmIOSIM instance. */
   public ArmIOSIM() {
     super(); // Initialize hardware interface components
 
     // Get simulation states for all hardware
-    DCMotor gearbox = DCMotor.getNEO(2);
-    motorSim = new SparkFlexSim(motor, gearbox);
-    velocityEncoderSim = new SparkRelativeEncoderSim(motor);
-    encoderSim = new DutyCycleEncoderSim(ArmConstants.DUTY_CYCLE_ENCODER_PORT);
-
-    // encoderSim = new SparkRelativeEncoderSim(motor);
-
-    // Configure dual Kraken X60 FOC motors
-    // DCMotor motor = DCMotor.getKrakenX60Foc(2);
+    DCMotor gearbox = DCMotor.getNeoVortex(1);
+    motorSim = new SparkFlexSim(leader, gearbox);
 
     // Define arm physical properties
     Distance armLength = Inches.of(23.75);
@@ -69,10 +54,10 @@ public class ArmIOSIM extends ArmIOREV {
 
     // Create arm physics model
     LinearSystem<N2, N1, N2> linearSystem =
-        LinearSystemId.createSingleJointedArmSystem(
-            DCMotor.getNEO(2), armMOI, ArmConstants.GEAR_RATIO);
+        LinearSystemId.createSingleJointedArmSystem(gearbox, armMOI, ArmConstants.GEAR_RATIO);
 
     // Initialize arm simulation
+    Angle startingAngle = Degrees.of(90);
 
     motorSimModel =
         new SingleJointedArmSim(
@@ -83,7 +68,9 @@ public class ArmIOSIM extends ArmIOREV {
             Degrees.of(0).in(Radians), // Lower limit (0°)
             Degrees.of(180).in(Radians), // Upper limit (180)
             true, // Enable gravity simulation
-            Degrees.of(90).in(Radians)); // Start at 90°
+            startingAngle.in(Radians));
+
+    motorSim.setPosition(startingAngle.in(Rotations)); // Start at 90°
   }
 
   /**
@@ -97,19 +84,23 @@ public class ArmIOSIM extends ArmIOREV {
     super.updateInputs(inputs);
 
     // Simulate battery voltage effects on all devices
-    motorSim.setBusVoltage(RobotController.getBatteryVoltage());
     motorSimModel.setInput(motorSim.getAppliedOutput() * RoboRioSim.getVInVoltage());
-
-    // Update physics simulation
     motorSimModel.update(0.02); // Simulate 20ms timestep (50Hz)
 
+    // Similarly, convert angular velocity (rad/s) into motor RPM.
+    // First, arm velocity in revolutions per second is (simAngularVelocityRadPerSec / (2π)).
+    // Then, motor RPM = (arm rev/s) * 60 * GEAR_RATIO.
+    double simulatedMotorRPM =
+        Units.radiansPerSecondToRotationsPerMinute(
+            motorSimModel.getVelocityRadPerSec() * ArmConstants.GEAR_RATIO);
+
     motorSim.iterate(
-        Units.radiansPerSecondToRotationsPerMinute( // motor velocity, in RPM
-            motorSimModel.getVelocityRadPerSec()),
+        simulatedMotorRPM,
         RoboRioSim.getVInVoltage(), // Simulated battery voltage, in Volts
         0.02);
-    velocityEncoderSim.iterate(motorSim.getVelocity(), 0.02);
+    // velocityEncoderSim.iterate(motorSim.getVelocity(), 0.02);
 
+    /*
     // Get position and velocity from physics simulation
     Angle position = Radians.of(motorSimModel.getAngleRads());
     AngularVelocity velocity = RadiansPerSecond.of(motorSimModel.getVelocityRadPerSec());
@@ -119,7 +110,8 @@ public class ArmIOSIM extends ArmIOREV {
     motorSim.setVelocity(velocity.times(ArmConstants.GEAR_RATIO).in(DegreesPerSecond));
 
     // Update simulated CANcoder readings (direct angle measurement).
-
     encoderSim.set(velocity.in(DegreesPerSecond));
+
+     */
   }
 }

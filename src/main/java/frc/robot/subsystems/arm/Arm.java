@@ -8,11 +8,9 @@ package frc.robot.subsystems.arm;
 
 import static edu.wpi.first.units.Units.*;
 
-import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.Alert.AlertType;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SelectCommand;
@@ -58,7 +56,7 @@ public class Arm extends SubsystemBase {
     Logger.processInputs("Arm", inputs);
 
     // Update motor connection status alerts
-    motorMotorAlert.set(!inputs.motorConnected);
+    motorMotorAlert.set(!inputs.leaderConnected);
     encoderAlert.set(!inputs.encoderConnected);
   }
 
@@ -90,7 +88,7 @@ public class Arm extends SubsystemBase {
    */
   @AutoLogOutput
   public Angle getPosition() {
-    return inputs.encoderPosition;
+    return inputs.armAngle;
   }
 
   /** Enumeration of available arm positions with their corresponding target angles. */
