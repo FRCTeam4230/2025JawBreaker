@@ -1,5 +1,7 @@
 package frc.robot;
 
+import static edu.wpi.first.units.Units.Degrees;
+
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 import com.ctre.phoenix6.swerve.SwerveRequest;
 import com.pathplanner.lib.auto.AutoBuilder;
@@ -14,6 +16,9 @@ import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 import frc.robot.commands.DriveCommands;
 import frc.robot.generated.TunerConstants;
+import frc.robot.subsystems.Climber.Climber;
+import frc.robot.subsystems.Climber.ClimberIOREV;
+import frc.robot.subsystems.Climber.ClimberIOSIM;
 import frc.robot.subsystems.arm.*;
 import frc.robot.subsystems.claw.Claw;
 import frc.robot.subsystems.claw.ClawIOREV;
@@ -55,6 +60,7 @@ public class RobotContainer {
   private final Elevator elevator;
   private final Arm arm;
   private final Claw claw;
+  private final Climber climber;
 
   /* Setting up bindings for necessary control of the swerve drive platform */
   private final SwerveRequest.SwerveDriveBrake brake = new SwerveRequest.SwerveDriveBrake();
@@ -82,6 +88,7 @@ public class RobotContainer {
         elevator = new Elevator(new ElevatorIOREV() {});
         arm = new Arm(new ArmIOREV() {});
         claw = new Claw(new ClawIOREV() {});
+        climber = new Climber(new ClimberIOREV() {});
         break;
 
       case SIM:
@@ -118,6 +125,7 @@ public class RobotContainer {
         elevator = new Elevator(new ElevatorIOSIMREV());
         arm = new Arm(new ArmIOREVSIM());
         claw = new Claw(new ClawIOSIMREV());
+        climber = new Climber(new ClimberIOSIM());
         break;
 
       default:
@@ -133,7 +141,8 @@ public class RobotContainer {
 
         elevator = new Elevator(new ElevatorIO() {});
         arm = new Arm(new ArmIOREV() {});
-        claw = new Claw(new ClawIOREV());
+        claw = new Claw(new ClawIOREV() {});
+        climber = new Climber(new ClimberIOREV() {});
         break;
     }
 
@@ -257,6 +266,9 @@ public class RobotContainer {
     testJoystick.b().onTrue(elevator.L3());
 
     testJoystick.back().onTrue(arm.reconfigPID());
+
+    testJoystick.leftBumper().onTrue(climber.climberOut(Degrees.of(45)));
+    testJoystick.rightBumper().onTrue(climber.climberOut(Degrees.of(90)));
 
     // joystick.a().onTrue(arm.L1());
     // joystick.b().onTrue(arm.L2());

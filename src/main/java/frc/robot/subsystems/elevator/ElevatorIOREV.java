@@ -22,12 +22,14 @@ public class ElevatorIOREV implements ElevatorIO {
    */
   protected final Distance elevatorRadius = Inches.of((1 + 7.0 / 8.0) / 2);
 
+  private Angle setpoint;
+
   /** Leader motor controller * */
   protected final SparkFlex leader =
       new SparkFlex(ElevatorConstants.LEADER_MOTOR_ID, SparkLowLevel.MotorType.kBrushless);
 
   private final RelativeEncoder leaderEncoder = leader.getEncoder();
-
+  private final DutyCycleEncoder leaderDutyCycleEncoder = new DutyCycleEncoder(5);
 
   /** Follower * */
   protected final SparkFlex follower =
@@ -108,6 +110,10 @@ public class ElevatorIOREV implements ElevatorIO {
     inputs.encoderPosition = Rotations.of(leader.getEncoder().getPosition());
     inputs.encoderVelocity = RotationsPerSecond.of(leaderEncoder.getVelocity());
 
+    inputs.setpoint = setpoint;
+
+    inputs.dutyCycleEncoderPosition = Rotations.of(leaderDutyCycleEncoder.get());
+
     inputs.lowerLimit = !lowerLimitSwitch.get();
     inputs.upperLimit = !upperLimitSwitch.get();
 
@@ -120,7 +126,9 @@ public class ElevatorIOREV implements ElevatorIO {
   @Override
   public void setDistance(Distance distance) {
     double rotations = distance.in(Meters) / elevatorRadius.in(Meters);
+    setpoint = Rotations.of(rotations);
     pidController.setReference(rotations, SparkBase.ControlType.kPosition, ClosedLoopSlot.kSlot0);
+
     // feedforward.calculate(leaderEncoder.getVelocity()));
   }
 

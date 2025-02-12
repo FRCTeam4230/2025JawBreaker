@@ -44,6 +44,10 @@ public interface ElevatorIO {
     public boolean upperLimit = false;
 
     public Distance elevatorDistance = Inches.of(0);
+
+    public Angle setpoint;
+
+    public Angle dutyCycleEncoderPosition = Rotations.of(0);
   }
 
   /** Updates the set of loggable inputs. */
