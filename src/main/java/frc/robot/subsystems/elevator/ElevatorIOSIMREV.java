@@ -58,7 +58,7 @@ public class ElevatorIOSIMREV extends ElevatorIOREV {
             motor,
             0, // Initial position
             Feet.of(8).in(Meters), // Maximum height (8 feet -> meters)
-            false, // Enable gravity simulation
+            true, // Enable gravity simulation
             0); // Start at bottom position
   }
 
@@ -77,7 +77,7 @@ public class ElevatorIOSIMREV extends ElevatorIOREV {
     motorSimModel.update(0.02);
 
     double simulatedMotorRPM =
-        motorSimModel.getVelocityMetersPerSecond() / elevatorRadius.in(Meters) / GEAR_RATIO;
+        motorSimModel.getVelocityMetersPerSecond() / elevatorRadius.in(Meters);
 
     leaderSim.iterate(simulatedMotorRPM, RobotController.getBatteryVoltage(), 0.02);
 

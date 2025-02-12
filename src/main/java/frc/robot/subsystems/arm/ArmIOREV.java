@@ -76,7 +76,7 @@ public class ArmIOREV implements ArmIO {
         .feedbackSensor(FeedbackSensor.kPrimaryEncoder)
         .p(ArmConstants.kP.get())
         .i(ArmConstants.kI.get())
-        .d(ArmConstants.kP.get());
+        .d(ArmConstants.kD.get());
 
     leader.configure(leaderConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
   }

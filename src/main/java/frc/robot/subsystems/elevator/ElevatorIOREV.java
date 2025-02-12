@@ -11,6 +11,7 @@ import com.revrobotics.spark.config.SparkFlexConfig;
 import edu.wpi.first.math.controller.ElevatorFeedforward;
 import edu.wpi.first.units.measure.*;
 import edu.wpi.first.wpilibj.DigitalInput;
+import edu.wpi.first.wpilibj.DutyCycleEncoder;
 
 public class ElevatorIOREV implements ElevatorIO {
   /** The gear ratio between the motor and the elevator mechanism */
@@ -19,13 +20,14 @@ public class ElevatorIOREV implements ElevatorIO {
    * The radius of the elevator pulley/drum, used for converting between rotations and linear
    * distance
    */
-  protected final Distance elevatorRadius = Inches.of(1);
+  protected final Distance elevatorRadius = Inches.of((1 + 7.0 / 8.0) / 2);
 
   /** Leader motor controller * */
   protected final SparkFlex leader =
       new SparkFlex(ElevatorConstants.LEADER_MOTOR_ID, SparkLowLevel.MotorType.kBrushless);
 
   private final RelativeEncoder leaderEncoder = leader.getEncoder();
+
 
   /** Follower * */
   protected final SparkFlex follower =
@@ -109,20 +111,15 @@ public class ElevatorIOREV implements ElevatorIO {
     inputs.lowerLimit = !lowerLimitSwitch.get();
     inputs.upperLimit = !upperLimitSwitch.get();
 
-    if (inputs.upperLimit) {
+    if ((inputs.lowerLimit && inputs.leaderVelocity.magnitude() < 0)
+        || (inputs.upperLimit && inputs.leaderVelocity.magnitude() > 0)) {
       stop();
     }
-    if (inputs.lowerLimit && inputs.leaderVelocity.magnitude() < 0) {
-      stop();
-    }
-    //    else if (inputs.lowerLimit) {
-    //      leaderEncoder.setPosition(0);
-    //    }
   }
 
   @Override
   public void setDistance(Distance distance) {
-    double rotations = distance.in(Meters) / elevatorRadius.in(Meters) / GEAR_RATIO;
+    double rotations = distance.in(Meters) / elevatorRadius.in(Meters);
     pidController.setReference(rotations, SparkBase.ControlType.kPosition, ClosedLoopSlot.kSlot0);
     // feedforward.calculate(leaderEncoder.getVelocity()));
   }
