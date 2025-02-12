@@ -145,19 +145,19 @@ public class ArmIOCTRE implements ArmIO {
     inputs.encoderConnected = encoderDebounce.calculate(encoderStatus.isOK());
 
     // Update position and velocity measurements
-    inputs.motorPosition = motorPosition.getValue();
-    inputs.motorVelocity = motorVelocity.getValue();
+    inputs.leaderPosition = motorPosition.getValue();
+    inputs.leaderVelocity = motorVelocity.getValue();
 
-    inputs.encoderPosition = encoderPosition.getValue();
-    inputs.encoderVelocity = encoderVelocity.getValue();
+    // inputs.encoderPosition = encoderPosition.getValue();
+    // inputs.encoderVelocity = encoderVelocity.getValue();
 
     // Update voltage and current measurements
     inputs.appliedVoltage = motorAppliedVolts.getValue();
-    inputs.motorStatorCurrent = motorStatorCurrent.getValue();
-    inputs.motorSupplyCurrent = motorSupplyCurrent.getValue();
+    inputs.leaderStatorCurrent = motorStatorCurrent.getValue();
+    inputs.leaderSupplyCurrent = motorSupplyCurrent.getValue();
 
     // Calculate arm angle using encoder position
-    inputs.armAngle = inputs.encoderPosition;
+    // inputs.armAngle = inputs.encoderPosition;
   }
 
   /**

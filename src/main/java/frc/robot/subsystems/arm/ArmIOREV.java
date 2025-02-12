@@ -20,6 +20,7 @@ import com.revrobotics.spark.SparkClosedLoopController;
 import com.revrobotics.spark.SparkFlex;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.config.ClosedLoopConfig.FeedbackSensor;
+import com.revrobotics.spark.config.EncoderConfig;
 import com.revrobotics.spark.config.SparkFlexConfig;
 import com.revrobotics.spark.config.SparkMaxConfig;
 import edu.wpi.first.units.measure.Angle;
@@ -52,7 +53,7 @@ public class ArmIOREV implements ArmIO {
 
   private SparkClosedLoopController closedLoopController = leader.getClosedLoopController();
 
-  private Angle setpoint;
+  protected Angle armSetPointAngle;
   /**
    * Constructs a new ArmIOREV instance.
    *
@@ -64,11 +65,8 @@ public class ArmIOREV implements ArmIO {
     // Set both motors to coast mode
     SparkMaxConfig leaderConfig = new SparkMaxConfig();
     // leaderConfig.smartCurrentLimit(50).idleMode(IdleMode.kBrake);
-    leaderConfig
-        .inverted(true)
-        .encoder
-        .velocityConversionFactor((1.0 / GEAR_RATIO) / 60.0) // Converts RPM to rotations per second
-        .positionConversionFactor(1.0 / GEAR_RATIO); // Converts motor rotations to arm rotations
+    leaderConfig.inverted(true);
+    // Converts motor rotations to arm rotations
     leaderConfig
         .closedLoop
         .outputRange(-1, 1)
@@ -77,7 +75,14 @@ public class ArmIOREV implements ArmIO {
         .i(ArmConstants.kI.get())
         .d(ArmConstants.kP.get());
 
+    leaderConfig.apply(getEncoderConfig());
     leader.configure(leaderConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+  }
+
+  protected EncoderConfig getEncoderConfig() {
+    return new EncoderConfig()
+        .velocityConversionFactor((1.0 / GEAR_RATIO) / 60.0) // Converts RPM to rotations per second
+        .positionConversionFactor(1.0 / GEAR_RATIO);
   }
 
   /**
@@ -114,7 +119,7 @@ public class ArmIOREV implements ArmIO {
 
     // Use the integrated encoder measurement as the arm’s current angle.
     inputs.armAngle = Rotations.of(armRot);
-    inputs.armSetPointAngle = setpoint;
+    inputs.armSetPointAngle = armSetPointAngle;
 
     inputs.lowerLimit = !lowerLimitSwitch.get();
     inputs.upperLimit = !upperLimitSwitch.get();
@@ -135,7 +140,7 @@ public class ArmIOREV implements ArmIO {
   public void setPosition(Angle angle) {
     // The setpoint is in rotations.
     closedLoopController.setReference(angle.in(Rotations), ControlType.kPosition);
-    this.setpoint = angle;
+    this.armSetPointAngle = angle;
   }
 
   /** Stops all arm movement. */

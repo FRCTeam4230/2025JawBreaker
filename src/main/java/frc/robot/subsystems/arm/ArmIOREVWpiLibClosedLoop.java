@@ -21,6 +21,8 @@ public class ArmIOREVWpiLibClosedLoop extends ArmIOREV {
   private final DigitalInput lowerLimitSwitch =
       new DigitalInput(ArmConstants.LOWER_LIMIT_SWITCH_DIO_PORT);
 
+  private static final Voltage ZERO_VOLTS = Volts.of(0);
+
   public ArmIOREVWpiLibClosedLoop() {
     super();
     pidController =
