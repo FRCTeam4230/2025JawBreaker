@@ -17,6 +17,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SelectCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import java.util.Map;
 import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
@@ -28,7 +29,7 @@ import org.littletonrobotics.junction.Logger;
  */
 public class Arm extends SubsystemBase {
   // Hardware interface and inputs
-  private final ArmIO io;
+  private ArmIO io = null;
   private final ArmIOInputsAutoLogged inputs;
 
   public final PIDController pidController =
@@ -243,4 +244,22 @@ public class Arm extends SubsystemBase {
   public final Command stopCommand() {
     return setPositionCommand(ArmMode.STOP);
   }
+
+  private SysIdRoutine armSysIdRoutine =
+      new SysIdRoutine(
+          new SysIdRoutine.Config(
+              null,
+              Volts.of(4),
+              null,
+              state -> Logger.recordOutput("Arm/SysIdArm_State", state.toString())),
+          new SysIdRoutine.Mechanism((voltage) -> io.setVoltage(voltage), null, this));
+
+  public Command runQStaticArmSysId(SysIdRoutine.Direction direction) {
+    return armSysIdRoutine.quasistatic(direction);
+  }
+
+  public Command runDynamicArmSysId(SysIdRoutine.Direction direction) {
+    return armSysIdRoutine.dynamic(direction);
+  }
+
 }

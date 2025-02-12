@@ -41,13 +41,25 @@ public interface ArmIO {
   }
 
   /** Updates the set of loggable inputs. */
-  default void updateInputs(ArmIOInputs inputs) {}
+  default void updateInputs(ArmIOInputs inputs) {
+    throw new RuntimeException("updateInputs not implemented");
+  }
 
   /** Run closed loop at the specified velocity. */
-  default void setPosition(Angle angle) {}
+  default void setPosition(Angle angle) {
+    throw new RuntimeException("setPosition not implemented");
+  }
 
   /** Stop in open loop. */
-  default void stop() {}
+  default void stop() {
+    throw new RuntimeException("stop not implemented");
+  }
 
-  default void reconfigurePID() {}
+  default void reconfigurePID() {
+    throw new RuntimeException("reconfigurePID not implemented");
+  }
+
+  default void setVoltage(Voltage voltage) {
+    throw new RuntimeException("setVoltage not implemented");
+  }
 }
