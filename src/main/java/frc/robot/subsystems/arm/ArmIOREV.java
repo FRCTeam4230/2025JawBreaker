@@ -21,7 +21,6 @@ public class ArmIOREV implements ArmIO {
   private final RelativeEncoder leaderEncoder = leader.getEncoder();
 
   protected Angle armSetPointAngle = Rotations.of(0);
-
   protected final Voltage ZERO_VOLTS = Volts.of(0);
 
   @AutoLogOutput
