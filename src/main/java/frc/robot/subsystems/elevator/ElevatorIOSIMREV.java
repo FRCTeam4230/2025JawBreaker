@@ -9,12 +9,8 @@ import edu.wpi.first.math.numbers.N2;
 import edu.wpi.first.math.system.LinearSystem;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.system.plant.LinearSystemId;
-import edu.wpi.first.units.measure.Angle;
-import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.simulation.ElevatorSim;
-import edu.wpi.first.wpilibj.simulation.RoboRioSim;
-import frc.robot.utils.Conversions;
 
 /**
  * Simulation implementation of the elevator subsystem. This class extends ElevatorIOCTRE to provide
@@ -62,7 +58,7 @@ public class ElevatorIOSIMREV extends ElevatorIOREV {
             motor,
             0, // Initial position
             Feet.of(8).in(Meters), // Maximum height (8 feet -> meters)
-            true, // Enable gravity simulation
+            false, // Enable gravity simulation
             0); // Start at bottom position
   }
 
@@ -75,32 +71,42 @@ public class ElevatorIOSIMREV extends ElevatorIOREV {
   public void updateInputs(ElevatorIOInputs inputs) {
     // Update base class inputs first
     super.updateInputs(inputs);
-    leaderSim.setBusVoltage(RobotController.getBatteryVoltage());
 
-    // Update physics simulation
-    motorSimModel.setInput(leaderSim.getAppliedOutput() * RoboRioSim.getVInVoltage());
-    motorSimModel.update(0.02); // Simulate 20ms timestep (50Hz)
+    motorSimModel.setInputVoltage(
+        leaderSim.getAppliedOutput() * RobotController.getBatteryVoltage());
+    motorSimModel.update(0.02);
 
-    leaderSim.iterate(
-        motorSimModel.getVelocityMetersPerSecond(),
-        RoboRioSim.getVInVoltage(), // Simulated battery voltage, in Volts
-        0.02);
+    double simulatedMotorRPM =
+        motorSimModel.getVelocityMetersPerSecond() / elevatorRadius.in(Meters) / GEAR_RATIO;
 
-    // Convert linear position/velocity to rotational units for based on encoder
-    Angle position =
-        Conversions.metersToRotations(
-            Meters.of(motorSimModel.getPositionMeters()), 1 / 12.0, elevatorRadius);
+    leaderSim.iterate(simulatedMotorRPM, RobotController.getBatteryVoltage(), 0.02);
 
-    // Convert linear velocity to angular velocity based on encoder
-    AngularVelocity velocity =
-        Conversions.metersToRotationsVel(
-            MetersPerSecond.of(motorSimModel.getVelocityMetersPerSecond()),
-            1 / 12.0,
-            elevatorRadius);
-
-    // Update simulated motor readings converts through gear ratio
-    leaderSim.setPosition(position.times(GEAR_RATIO).in(Degrees));
-    leaderSim.setVelocity(velocity.times(GEAR_RATIO).in(DegreesPerSecond));
-    encoderSim.setPosition(motorSimModel.getPositionMeters());
+    //    leaderSim.setBusVoltage(RobotController.getBatteryVoltage());
+    //
+    //    // Update physics simulation
+    //    motorSimModel.setInput(leaderSim.getAppliedOutput() * RoboRioSim.getVInVoltage());
+    //    motorSimModel.update(0.02); // Simulate 20ms timestep (50Hz)
+    //
+    //    leaderSim.iterate(
+    //        motorSimModel.getVelocityMetersPerSecond(),
+    //        RoboRioSim.getVInVoltage(), // Simulated battery voltage, in Volts
+    //        0.02);
+    //
+    //    // Convert linear position/velocity to rotational units for based on encoder
+    //    Angle position =
+    //        Conversions.metersToRotations(
+    //            Meters.of(motorSimModel.getPositionMeters()), 1 / 12.0, elevatorRadius);
+    //
+    //    // Convert linear velocity to angular velocity based on encoder
+    //    AngularVelocity velocity =
+    //        Conversions.metersToRotationsVel(
+    //            MetersPerSecond.of(motorSimModel.getVelocityMetersPerSecond()),
+    //            1 / 12.0,
+    //            elevatorRadius);
+    //
+    //    // Update simulated motor readings converts through gear ratio
+    //    leaderSim.setPosition(position.times(GEAR_RATIO).in(Degrees));
+    //    leaderSim.setVelocity(velocity.times(GEAR_RATIO).in(DegreesPerSecond));
+    //    encoderSim.setPosition(motorSimModel.getPositionMeters());
   }
 }

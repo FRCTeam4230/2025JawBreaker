@@ -40,6 +40,9 @@ public interface ElevatorIO {
     public Current leaderSupplyCurrent = Amps.of(0);
     public Current followerSupplyCurrent = Amps.of(0);
 
+    public boolean lowerLimit = false;
+    public boolean upperLimit = false;
+
     public Distance elevatorDistance = Inches.of(0);
   }
 

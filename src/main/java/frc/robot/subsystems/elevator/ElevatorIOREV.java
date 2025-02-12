@@ -11,16 +11,15 @@ import com.revrobotics.spark.config.SparkFlexConfig;
 import edu.wpi.first.math.controller.ElevatorFeedforward;
 import edu.wpi.first.units.measure.*;
 import edu.wpi.first.wpilibj.DigitalInput;
-import frc.robot.utils.Conversions;
 
 public class ElevatorIOREV implements ElevatorIO {
   /** The gear ratio between the motor and the elevator mechanism */
-  protected static final double GEAR_RATIO = 1.0 / 12.0;
+  protected static final double GEAR_RATIO = 12.0;
   /**
    * The radius of the elevator pulley/drum, used for converting between rotations and linear
    * distance
    */
-  protected final Distance elevatorRadius = Inches.of(2);
+  protected final Distance elevatorRadius = Inches.of(1);
 
   /** Leader motor controller * */
   protected final SparkFlex leader =
@@ -32,14 +31,13 @@ public class ElevatorIOREV implements ElevatorIO {
   protected final SparkFlex follower =
       new SparkFlex(ElevatorConstants.FOLLOWER_MOTOR_ID, SparkLowLevel.MotorType.kBrushless);
 
-  // TODO: add/handle limit switch
   private final DigitalInput upperLimitSwitch =
       new DigitalInput(ElevatorConstants.UPPER_LIMIT_SWITCH_DIO_PORT);
   private final DigitalInput lowerLimitSwitch =
       new DigitalInput(ElevatorConstants.LOWER_LIMIT_SWITCH_DIO_PORT);
 
   private final SparkClosedLoopController pidController;
-  private ElevatorFeedforward feedforward = new ElevatorFeedforward(0.1, 0.1, 0.1);
+  private ElevatorFeedforward feedforward = new ElevatorFeedforward(0, 0, 0);
 
   public ElevatorIOREV() {
     leader.configure(
@@ -54,26 +52,6 @@ public class ElevatorIOREV implements ElevatorIO {
     pidController = leader.getClosedLoopController();
   }
 
-  @Override
-  public void updateInputs(ElevatorIOInputs inputs) {
-
-    inputs.leaderPosition =
-        Rotations.of(leader.getEncoder().getPosition()); // this is the encoder position
-    // rev does it have something like this? inputs.leaderRotorPosition = leader.get //
-    inputs.leaderVelocity =
-        RotationsPerSecond.of(
-            leader
-                .getEncoder()
-                .getVelocity()); // getVelocity returns RPMS so this is totally probably wrong
-
-    inputs.appliedVoltage = Volts.of(leader.getAppliedOutput());
-    inputs.leaderStatorCurrent = Amps.of(leader.getOutputCurrent());
-
-    inputs.followerStatorCurrent = Amps.of(follower.getOutputCurrent());
-    inputs.encoderPosition = Rotations.of(leader.getEncoder().getPosition());
-    inputs.encoderVelocity = RotationsPerSecond.of(leaderEncoder.getVelocity());
-  }
-
   private SparkFlexConfig createSparkFlexConfig(boolean isFollower) {
 
     // I don't know if we will need a velocityConversionFacdtory but i'm fairly certain we will
@@ -83,12 +61,12 @@ public class ElevatorIOREV implements ElevatorIO {
     // https://github.com/frc868/2025-Ri3D/blob/main/src/main/java/frc/robot/subsystems/Elevator.java
     var config = new SparkFlexConfig();
 
+    config.idleMode(SparkBaseConfig.IdleMode.kCoast);
+    config.inverted(true);
     config
-        .idleMode(SparkBaseConfig.IdleMode.kCoast)
         .encoder
-        .positionConversionFactor(
-            ElevatorConstants.rotationToMeters) // Converts Rotations to Meters
-        .velocityConversionFactor(ElevatorConstants.rpmToMps); // Converts RPM to MPS
+        .velocityConversionFactor((1.0 / GEAR_RATIO) / 60.0)
+        .positionConversionFactor(1.0 / GEAR_RATIO);
     config
         .closedLoop
         .feedbackSensor(ClosedLoopConfig.FeedbackSensor.kPrimaryEncoder)
@@ -110,12 +88,43 @@ public class ElevatorIOREV implements ElevatorIO {
   }
 
   @Override
+  public void updateInputs(ElevatorIOInputs inputs) {
+
+    double elevatorRot = leaderEncoder.getPosition();
+    // this is the encoder position
+    // rev does it have something like this? inputs.leaderRotorPosition = leader.get //
+    double elevatorVelRotPerSec = leaderEncoder.getVelocity();
+    // getVelocity returns RPMS so this is totally probably wrong
+
+    inputs.leaderPosition = Rotations.of(elevatorRot);
+    inputs.leaderVelocity = RotationsPerSecond.of(elevatorVelRotPerSec);
+
+    inputs.appliedVoltage = Volts.of(leader.getAppliedOutput());
+    inputs.leaderStatorCurrent = Amps.of(leader.getOutputCurrent());
+
+    inputs.followerStatorCurrent = Amps.of(follower.getOutputCurrent());
+    inputs.encoderPosition = Rotations.of(leader.getEncoder().getPosition());
+    inputs.encoderVelocity = RotationsPerSecond.of(leaderEncoder.getVelocity());
+
+    inputs.lowerLimit = !lowerLimitSwitch.get();
+    inputs.upperLimit = !upperLimitSwitch.get();
+
+    if (inputs.upperLimit) {
+      stop();
+    }
+    if (inputs.lowerLimit && inputs.leaderVelocity.magnitude() < 0) {
+      stop();
+    }
+    //    else if (inputs.lowerLimit) {
+    //      leaderEncoder.setPosition(0);
+    //    }
+  }
+
+  @Override
   public void setDistance(Distance distance) {
-    pidController.setReference(
-        Conversions.metersToRotations(distance, 1, elevatorRadius).in(Degrees),
-        SparkBase.ControlType.kPosition,
-        ClosedLoopSlot.kSlot0,
-        feedforward.calculate(leaderEncoder.getVelocity()));
+    double rotations = distance.in(Meters) / elevatorRadius.in(Meters) / GEAR_RATIO;
+    pidController.setReference(rotations, SparkBase.ControlType.kPosition, ClosedLoopSlot.kSlot0);
+    // feedforward.calculate(leaderEncoder.getVelocity()));
   }
 
   @Override

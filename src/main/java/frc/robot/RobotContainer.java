@@ -117,7 +117,7 @@ public class RobotContainer {
 
         elevator = new Elevator(new ElevatorIOSIMREV());
         arm = new Arm(new ArmIOREVSIM());
-        claw = new Claw(new ClawIOSIMREV()); // change to IOSIM
+        claw = new Claw(new ClawIOSIMREV());
         break;
 
       default:
@@ -251,10 +251,10 @@ public class RobotContainer {
     joystick.rightBumper().whileTrue(claw.intake());
     joystick.leftBumper().whileTrue(claw.extake());
 
-    testJoystick.a().onTrue(arm.intake());
-    testJoystick.x().onTrue(arm.stopCommand());
-    testJoystick.y().onTrue(arm.L1());
-    testJoystick.b().onTrue(arm.L2());
+    testJoystick.a().onTrue(elevator.L1());
+    testJoystick.x().onTrue(elevator.L2());
+    testJoystick.y().onTrue(elevator.stopCommand());
+    testJoystick.b().onTrue(elevator.L3());
 
     testJoystick.back().onTrue(arm.reconfigPID());
 
