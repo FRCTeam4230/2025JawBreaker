@@ -11,7 +11,6 @@ import com.revrobotics.spark.config.SparkFlexConfig;
 import edu.wpi.first.math.controller.ElevatorFeedforward;
 import edu.wpi.first.units.measure.*;
 import edu.wpi.first.wpilibj.DigitalInput;
-import edu.wpi.first.wpilibj.DutyCycleEncoder;
 
 public class ElevatorIOREV implements ElevatorIO {
   /** The gear ratio between the motor and the elevator mechanism */
@@ -27,7 +26,6 @@ public class ElevatorIOREV implements ElevatorIO {
       new SparkFlex(ElevatorConstants.LEADER_MOTOR_ID, SparkLowLevel.MotorType.kBrushless);
 
   private final RelativeEncoder leaderEncoder = leader.getEncoder();
-
 
   /** Follower * */
   protected final SparkFlex follower =
@@ -120,7 +118,8 @@ public class ElevatorIOREV implements ElevatorIO {
   @Override
   public void setDistance(Distance distance) {
     double rotations = distance.in(Meters) / elevatorRadius.in(Meters);
-    pidController.setReference(rotations, SparkBase.ControlType.kPosition, ClosedLoopSlot.kSlot0);
+    pidController.setReference(
+        rotations, SparkBase.ControlType.kMAXMotionPositionControl, ClosedLoopSlot.kSlot0);
     // feedforward.calculate(leaderEncoder.getVelocity()));
   }
 
