@@ -31,6 +31,7 @@ public class ElevatorIOREV implements ElevatorIO {
   private final RelativeEncoder leaderEncoder = leader.getEncoder();
   private final DutyCycleEncoder leaderDutyCycleEncoder = new DutyCycleEncoder(5);
 
+
   /** Follower * */
   protected final SparkFlex follower =
       new SparkFlex(ElevatorConstants.FOLLOWER_MOTOR_ID, SparkLowLevel.MotorType.kBrushless);

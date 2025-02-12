@@ -15,6 +15,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SelectCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import java.util.Map;
 import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
@@ -26,7 +27,7 @@ import org.littletonrobotics.junction.Logger;
  */
 public class Elevator extends SubsystemBase {
   // Hardware interface and inputs
-  private final ElevatorIO io;
+  private ElevatorIO io = null;
   private final ElevatorIOInputsAutoLogged inputs;
 
   // Current elevator distance mode
@@ -247,5 +248,22 @@ public class Elevator extends SubsystemBase {
    */
   public final Command stopCommand() {
     return setPositionCommand(ElevatorMode.STOP);
+  }
+
+  private SysIdRoutine elevatorSysIdRoutine =
+      new SysIdRoutine(
+          new SysIdRoutine.Config(
+              null,
+              Volts.of(4),
+              null,
+              state -> Logger.recordOutput("Elevator/SysIdElevator_State", state.toString())),
+          new SysIdRoutine.Mechanism((voltage) -> io.setVoltage(voltage), null, this));
+
+  public final Command runQStaticElevatorSysId(SysIdRoutine.Direction direction) {
+    return elevatorSysIdRoutine.quasistatic(direction);
+  }
+
+  public final Command runDynamicElevatorSysId(SysIdRoutine.Direction direction) {
+    return elevatorSysIdRoutine.dynamic(direction);
   }
 }
