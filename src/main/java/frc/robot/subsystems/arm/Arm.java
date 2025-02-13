@@ -54,6 +54,11 @@ public class Arm extends SubsystemBase {
     this.io = io;
     this.inputs = new ArmIOInputsAutoLogged();
     SmartDashboard.putData(this);
+
+    // TODO
+    //      if(inputs.motorPosition.gt(Rotations.of(0))){
+    //
+    //      }
   }
 
   @Override
@@ -249,7 +254,7 @@ public class Arm extends SubsystemBase {
       new SysIdRoutine(
           new SysIdRoutine.Config(
               null,
-              Volts.of(4),
+              Volts.of(1),
               null,
               state -> Logger.recordOutput("Arm/SysIdArm_State", state.toString())),
           new SysIdRoutine.Mechanism((voltage) -> io.setVoltage(voltage), null, this));
@@ -261,5 +266,4 @@ public class Arm extends SubsystemBase {
   public Command runDynamicArmSysId(SysIdRoutine.Direction direction) {
     return armSysIdRoutine.dynamic(direction);
   }
-
 }

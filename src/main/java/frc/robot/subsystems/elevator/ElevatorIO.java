@@ -54,7 +54,7 @@ public interface ElevatorIO {
   default void updateInputs(ElevatorIOInputs inputs) {}
 
   /** Run closed loop at the specified velocity. */
-  default void setDistance(Distance distance) {}
+  default void setDistance(Angle distance) {}
 
   /** Stop in open loop. */
   default void stop() {}

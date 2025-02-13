@@ -3,15 +3,13 @@ package frc.robot.subsystems.elevator;
 import static edu.wpi.first.units.Units.*;
 
 import com.revrobotics.RelativeEncoder;
+import com.revrobotics.sim.SparkFlexExternalEncoderSim;
 import com.revrobotics.spark.*;
-import com.revrobotics.spark.config.ClosedLoopConfig;
-import com.revrobotics.spark.config.MAXMotionConfig;
-import com.revrobotics.spark.config.SparkBaseConfig;
-import com.revrobotics.spark.config.SparkFlexConfig;
+import com.revrobotics.spark.config.*;
 import edu.wpi.first.math.controller.ElevatorFeedforward;
 import edu.wpi.first.units.measure.*;
 import edu.wpi.first.wpilibj.DigitalInput;
-import edu.wpi.first.wpilibj.DutyCycleEncoder;
+import edu.wpi.first.wpilibj.Encoder;
 
 public class ElevatorIOREV implements ElevatorIO {
   /** The gear ratio between the motor and the elevator mechanism */
@@ -29,7 +27,13 @@ public class ElevatorIOREV implements ElevatorIO {
       new SparkFlex(ElevatorConstants.LEADER_MOTOR_ID, SparkLowLevel.MotorType.kBrushless);
 
   private final RelativeEncoder leaderEncoder = leader.getEncoder();
-  private final DutyCycleEncoder leaderDutyCycleEncoder = new DutyCycleEncoder(5);
+  private final Encoder leaderExternalEncoder = new Encoder(5, 6);
+
+  /*
+ Encoder can take two ports, this gives the correct value in rotations for the elevator (when divided by -8192, which is how many ticks are in a rotation)
+ ClosedLoopConfig.FeedbackSensor.kAlternateOrExternalEncoder is what seems to be the correct thing to pass to the feedback sensor
+ Maybe using ExternalEncoderConfig will work but it doesn't seem to have a way of applying the correct encoder to it, there is also something called SparkFlexExternalEncoder, but it doesn't seem to work yet
+   */
 
   /** Follower * */
   protected final SparkFlex follower =
@@ -53,6 +57,7 @@ public class ElevatorIOREV implements ElevatorIO {
         SparkBase.ResetMode.kResetSafeParameters,
         SparkBase.PersistMode.kPersistParameters);
 
+    leaderEncoder.setPosition(0);
     pidController = leader.getClosedLoopController();
   }
 
@@ -64,7 +69,7 @@ public class ElevatorIOREV implements ElevatorIO {
     // NON maxmotion, (use profiledPidController from wpilib)
     // https://github.com/frc868/2025-Ri3D/blob/main/src/main/java/frc/robot/subsystems/Elevator.java
     var config = new SparkFlexConfig();
-
+    config.closedLoop.feedbackSensor(ClosedLoopConfig.FeedbackSensor.kPrimaryEncoder);
     config.idleMode(SparkBaseConfig.IdleMode.kCoast);
     config.inverted(true);
     config
@@ -73,16 +78,18 @@ public class ElevatorIOREV implements ElevatorIO {
         .positionConversionFactor(1.0 / GEAR_RATIO);
     config
         .closedLoop
-        .feedbackSensor(ClosedLoopConfig.FeedbackSensor.kPrimaryEncoder)
+        .feedbackSensor(ClosedLoopConfig.FeedbackSensor.kAlternateOrExternalEncoder)
         .p(ElevatorConstants.kP.get())
         .i(ElevatorConstants.kI.get())
         .d(ElevatorConstants.kD.get())
-        .outputRange(-0.5, 0.5)
+        .outputRange(-0.1, 0.1)
         .maxMotion
         .maxVelocity(ElevatorConstants.elevatorMaxVelocity)
         .maxAcceleration(ElevatorConstants.elevatorMaxAcceleration)
         .positionMode(MAXMotionConfig.MAXMotionPositionMode.kMAXMotionTrapezoidal)
         .allowedClosedLoopError(0.01);
+
+    config.externalEncoder.countsPerRevolution(-8192);
 
     if (isFollower) {
       config.follow(leader, true);
@@ -112,7 +119,7 @@ public class ElevatorIOREV implements ElevatorIO {
 
     inputs.setpoint = setpoint;
 
-    inputs.dutyCycleEncoderPosition = Rotations.of(leaderDutyCycleEncoder.get());
+    inputs.dutyCycleEncoderPosition = Rotations.of(leaderExternalEncoder.get() / -8192.0);
 
     inputs.lowerLimit = !lowerLimitSwitch.get();
     inputs.upperLimit = !upperLimitSwitch.get();
@@ -124,10 +131,10 @@ public class ElevatorIOREV implements ElevatorIO {
   }
 
   @Override
-  public void setDistance(Distance distance) {
-    double rotations = distance.in(Meters) / elevatorRadius.in(Meters);
-    setpoint = Rotations.of(rotations);
-    pidController.setReference(rotations, SparkBase.ControlType.kPosition, ClosedLoopSlot.kSlot0);
+  public void setDistance(Angle distance) {
+    setpoint = distance.div(Math.PI);
+    pidController.setReference(
+        distance.in(Rotations) / Math.PI, SparkBase.ControlType.kPosition, ClosedLoopSlot.kSlot0);
 
     // feedforward.calculate(leaderEncoder.getVelocity()));
   }

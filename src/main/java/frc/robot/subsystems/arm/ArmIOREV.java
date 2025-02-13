@@ -20,9 +20,11 @@ import com.revrobotics.spark.SparkClosedLoopController;
 import com.revrobotics.spark.SparkFlex;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.config.ClosedLoopConfig.FeedbackSensor;
+import com.revrobotics.spark.config.SparkBaseConfig;
 import com.revrobotics.spark.config.SparkFlexConfig;
 import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.units.measure.Angle;
+import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.RobotController;
 
@@ -64,7 +66,7 @@ public class ArmIOREV implements ArmIO {
   public ArmIOREV() {
     // Set both motors to coast mode
     SparkFlexConfig leaderConfig = new SparkFlexConfig();
-    // leaderConfig.smartCurrentLimit(50).idleMode(IdleMode.kBrake);
+    leaderConfig.idleMode(SparkBaseConfig.IdleMode.kBrake);
     leaderConfig
         .inverted(true)
         .encoder
@@ -120,8 +122,12 @@ public class ArmIOREV implements ArmIO {
     inputs.lowerLimit = !lowerLimitSwitch.get();
     inputs.upperLimit = !upperLimitSwitch.get();
 
-    if (inputs.lowerLimit) {
-      leaderEncoder.setPosition(0);
+    //    if (inputs.lowerLimit) {
+    //      leaderEncoder.setPosition(0);
+    //    }
+    if ((inputs.lowerLimit && inputs.motorVelocity.magnitude() < 0)
+        || (inputs.upperLimit && inputs.motorVelocity.magnitude() > 0)) {
+      stop();
     }
   }
 
@@ -157,5 +163,10 @@ public class ArmIOREV implements ArmIO {
         .d(ArmConstants.kD.get());
     leader.configure(
         leaderConfig, ResetMode.kNoResetSafeParameters, PersistMode.kPersistParameters);
+  }
+
+  @Override
+  public void setVoltage(Voltage voltage) {
+    leader.setVoltage(voltage);
   }
 }
