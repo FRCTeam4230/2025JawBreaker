@@ -20,9 +20,11 @@ import com.revrobotics.spark.SparkClosedLoopController;
 import com.revrobotics.spark.SparkFlex;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.config.ClosedLoopConfig.FeedbackSensor;
+import com.revrobotics.spark.config.SparkBaseConfig;
 import com.revrobotics.spark.config.SparkFlexConfig;
-import com.revrobotics.spark.config.SparkMaxConfig;
+import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.units.measure.Angle;
+import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.RobotController;
 
@@ -36,7 +38,6 @@ import edu.wpi.first.wpilibj.RobotController;
  */
 public class ArmIOREV implements ArmIO {
   /** The gear ratio between motor and arm (for converting motor rotations to arm angle) */
-
   /** Leader motor controller (CAN ID 20) */
   public final SparkFlex leader = new SparkFlex(ArmConstants.MOTOR_ID, MotorType.kBrushless);
 
@@ -51,6 +52,7 @@ public class ArmIOREV implements ArmIO {
   public final RelativeEncoder leaderEncoder = leader.getEncoder();
 
   private SparkClosedLoopController closedLoopController = leader.getClosedLoopController();
+  private ArmFeedforward feedforward = new ArmFeedforward(0, 0, 0);
 
   private Angle setpoint;
   /**
@@ -62,8 +64,8 @@ public class ArmIOREV implements ArmIO {
    */
   public ArmIOREV() {
     // Set both motors to coast mode
-    SparkMaxConfig leaderConfig = new SparkMaxConfig();
-    // leaderConfig.smartCurrentLimit(50).idleMode(IdleMode.kBrake);
+    SparkFlexConfig leaderConfig = new SparkFlexConfig();
+    leaderConfig.idleMode(SparkBaseConfig.IdleMode.kBrake);
     leaderConfig
         .inverted(true)
         .encoder
@@ -75,7 +77,7 @@ public class ArmIOREV implements ArmIO {
         .feedbackSensor(FeedbackSensor.kPrimaryEncoder)
         .p(ArmConstants.kP.get())
         .i(ArmConstants.kI.get())
-        .d(ArmConstants.kP.get());
+        .d(ArmConstants.kD.get());
 
     leader.configure(leaderConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
   }
@@ -116,11 +118,15 @@ public class ArmIOREV implements ArmIO {
     inputs.armAngle = Rotations.of(armRot);
     inputs.setpoint = setpoint;
 
-    inputs.lowerlimit = !lowerLimitSwitch.get();
-    inputs.upperlimit = !upperLimitSwitch.get();
+    inputs.lowerLimit = !lowerLimitSwitch.get();
+    inputs.upperLimit = !upperLimitSwitch.get();
 
-    if (inputs.lowerlimit) {
-      leaderEncoder.setPosition(0);
+    //    if (inputs.lowerLimit) {
+    //      leaderEncoder.setPosition(0);
+    //    }
+    if ((inputs.lowerLimit && inputs.motorVelocity.magnitude() < 0)
+        || (inputs.upperLimit && inputs.motorVelocity.magnitude() > 0)) {
+      stop();
     }
   }
 
@@ -156,5 +162,10 @@ public class ArmIOREV implements ArmIO {
         .d(ArmConstants.kD.get());
     leader.configure(
         leaderConfig, ResetMode.kNoResetSafeParameters, PersistMode.kPersistParameters);
+  }
+
+  @Override
+  public void setVoltage(Voltage voltage) {
+    leader.setVoltage(voltage);
   }
 }

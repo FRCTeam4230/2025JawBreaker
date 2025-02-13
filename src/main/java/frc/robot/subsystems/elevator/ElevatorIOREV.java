@@ -4,42 +4,47 @@ import static edu.wpi.first.units.Units.*;
 
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.spark.*;
-import com.revrobotics.spark.config.ClosedLoopConfig;
-import com.revrobotics.spark.config.MAXMotionConfig;
-import com.revrobotics.spark.config.SparkBaseConfig;
-import com.revrobotics.spark.config.SparkFlexConfig;
+import com.revrobotics.spark.config.*;
 import edu.wpi.first.math.controller.ElevatorFeedforward;
 import edu.wpi.first.units.measure.*;
 import edu.wpi.first.wpilibj.DigitalInput;
-import frc.robot.utils.Conversions;
+import edu.wpi.first.wpilibj.Encoder;
 
 public class ElevatorIOREV implements ElevatorIO {
   /** The gear ratio between the motor and the elevator mechanism */
-  protected static final double GEAR_RATIO = 1.0 / 12.0;
+  protected static final double GEAR_RATIO = 12.0;
   /**
    * The radius of the elevator pulley/drum, used for converting between rotations and linear
    * distance
    */
-  protected final Distance elevatorRadius = Inches.of(2);
+  protected final Distance elevatorRadius = Inches.of((1 + 7.0 / 8.0) / 2);
+
+  private Angle setpoint;
 
   /** Leader motor controller * */
   protected final SparkFlex leader =
       new SparkFlex(ElevatorConstants.LEADER_MOTOR_ID, SparkLowLevel.MotorType.kBrushless);
 
   private final RelativeEncoder leaderEncoder = leader.getEncoder();
+  private final Encoder leaderExternalEncoder = new Encoder(5, 6);
+
+  /*
+  Encoder can take two ports, this gives the correct value in rotations for the elevator (when divided by -8192, which is how many ticks are in a rotation)
+  ClosedLoopConfig.FeedbackSensor.kAlternateOrExternalEncoder is what seems to be the correct thing to pass to the feedback sensor
+  Maybe using ExternalEncoderConfig will work but it doesn't seem to have a way of applying the correct encoder to it, there is also something called SparkFlexExternalEncoder, but it doesn't seem to work yet
+    */
 
   /** Follower * */
   protected final SparkFlex follower =
       new SparkFlex(ElevatorConstants.FOLLOWER_MOTOR_ID, SparkLowLevel.MotorType.kBrushless);
 
-  // TODO: add/handle limit switch
   private final DigitalInput upperLimitSwitch =
       new DigitalInput(ElevatorConstants.UPPER_LIMIT_SWITCH_DIO_PORT);
   private final DigitalInput lowerLimitSwitch =
       new DigitalInput(ElevatorConstants.LOWER_LIMIT_SWITCH_DIO_PORT);
 
   private final SparkClosedLoopController pidController;
-  private ElevatorFeedforward feedforward = new ElevatorFeedforward(0.1, 0.1, 0.1);
+  private ElevatorFeedforward feedforward = new ElevatorFeedforward(0, 0, 0);
 
   public ElevatorIOREV() {
     leader.configure(
@@ -51,27 +56,8 @@ public class ElevatorIOREV implements ElevatorIO {
         SparkBase.ResetMode.kResetSafeParameters,
         SparkBase.PersistMode.kPersistParameters);
 
+    leaderEncoder.setPosition(0);
     pidController = leader.getClosedLoopController();
-  }
-
-  @Override
-  public void updateInputs(ElevatorIOInputs inputs) {
-
-    inputs.leaderPosition =
-        Rotations.of(leader.getEncoder().getPosition()); // this is the encoder position
-    // rev does it have something like this? inputs.leaderRotorPosition = leader.get //
-    inputs.leaderVelocity =
-        RotationsPerSecond.of(
-            leader
-                .getEncoder()
-                .getVelocity()); // getVelocity returns RPMS so this is totally probably wrong
-
-    inputs.appliedVoltage = Volts.of(leader.getAppliedOutput());
-    inputs.leaderStatorCurrent = Amps.of(leader.getOutputCurrent());
-
-    inputs.followerStatorCurrent = Amps.of(follower.getOutputCurrent());
-    inputs.encoderPosition = Rotations.of(leader.getEncoder().getPosition());
-    inputs.encoderVelocity = RotationsPerSecond.of(leaderEncoder.getVelocity());
   }
 
   private SparkFlexConfig createSparkFlexConfig(boolean isFollower) {
@@ -82,25 +68,27 @@ public class ElevatorIOREV implements ElevatorIO {
     // NON maxmotion, (use profiledPidController from wpilib)
     // https://github.com/frc868/2025-Ri3D/blob/main/src/main/java/frc/robot/subsystems/Elevator.java
     var config = new SparkFlexConfig();
-
+    config.closedLoop.feedbackSensor(ClosedLoopConfig.FeedbackSensor.kPrimaryEncoder);
+    config.idleMode(SparkBaseConfig.IdleMode.kCoast);
+    config.inverted(true);
     config
-        .idleMode(SparkBaseConfig.IdleMode.kCoast)
         .encoder
-        .positionConversionFactor(
-            ElevatorConstants.rotationToMeters) // Converts Rotations to Meters
-        .velocityConversionFactor(ElevatorConstants.rpmToMps); // Converts RPM to MPS
+        .velocityConversionFactor((1.0 / GEAR_RATIO) / 60.0)
+        .positionConversionFactor(1.0 / GEAR_RATIO);
     config
         .closedLoop
-        .feedbackSensor(ClosedLoopConfig.FeedbackSensor.kPrimaryEncoder)
+        .feedbackSensor(ClosedLoopConfig.FeedbackSensor.kAlternateOrExternalEncoder)
         .p(ElevatorConstants.kP.get())
         .i(ElevatorConstants.kI.get())
         .d(ElevatorConstants.kD.get())
-        .outputRange(-0.5, 0.5)
+        .outputRange(-0.1, 0.1)
         .maxMotion
         .maxVelocity(ElevatorConstants.elevatorMaxVelocity)
         .maxAcceleration(ElevatorConstants.elevatorMaxAcceleration)
         .positionMode(MAXMotionConfig.MAXMotionPositionMode.kMAXMotionTrapezoidal)
         .allowedClosedLoopError(0.01);
+
+    config.externalEncoder.countsPerRevolution(-8192);
 
     if (isFollower) {
       config.follow(leader, true);
@@ -110,12 +98,44 @@ public class ElevatorIOREV implements ElevatorIO {
   }
 
   @Override
-  public void setDistance(Distance distance) {
+  public void updateInputs(ElevatorIOInputs inputs) {
+
+    double elevatorRot = leaderEncoder.getPosition();
+    // this is the encoder position
+    // rev does it have something like this? inputs.leaderRotorPosition = leader.get //
+    double elevatorVelRotPerSec = leaderEncoder.getVelocity();
+    // getVelocity returns RPMS so this is totally probably wrong
+
+    inputs.leaderPosition = Rotations.of(elevatorRot);
+    inputs.leaderVelocity = RotationsPerSecond.of(elevatorVelRotPerSec);
+
+    inputs.appliedVoltage = Volts.of(leader.getAppliedOutput());
+    inputs.leaderStatorCurrent = Amps.of(leader.getOutputCurrent());
+
+    inputs.followerStatorCurrent = Amps.of(follower.getOutputCurrent());
+    inputs.encoderPosition = Rotations.of(leader.getEncoder().getPosition());
+    inputs.encoderVelocity = RotationsPerSecond.of(leaderEncoder.getVelocity());
+
+    inputs.setpoint = setpoint;
+
+    inputs.dutyCycleEncoderPosition = Rotations.of(leaderExternalEncoder.get() / -8192.0);
+
+    inputs.lowerLimit = !lowerLimitSwitch.get();
+    inputs.upperLimit = !upperLimitSwitch.get();
+
+    if ((inputs.lowerLimit && inputs.leaderVelocity.magnitude() < 0)
+        || (inputs.upperLimit && inputs.leaderVelocity.magnitude() > 0)) {
+      stop();
+    }
+  }
+
+  @Override
+  public void setDistance(Angle distance) {
+    setpoint = distance.div(Math.PI);
     pidController.setReference(
-        Conversions.metersToRotations(distance, 1, elevatorRadius).in(Degrees),
-        SparkBase.ControlType.kPosition,
-        ClosedLoopSlot.kSlot0,
-        feedforward.calculate(leaderEncoder.getVelocity()));
+        distance.in(Rotations) / Math.PI, SparkBase.ControlType.kPosition, ClosedLoopSlot.kSlot0);
+
+    // feedforward.calculate(leaderEncoder.getVelocity()));
   }
 
   @Override
