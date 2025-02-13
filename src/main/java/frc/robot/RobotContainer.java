@@ -1,5 +1,7 @@
 package frc.robot;
 
+import static edu.wpi.first.units.Units.Degrees;
+
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 import com.ctre.phoenix6.swerve.SwerveRequest;
 import com.pathplanner.lib.auto.AutoBuilder;
@@ -15,6 +17,8 @@ import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 import frc.robot.commands.DriveCommands;
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.Climber.Climber;
+import frc.robot.subsystems.Climber.ClimberIOREV;
+import frc.robot.subsystems.Climber.ClimberIOSIM;
 import frc.robot.subsystems.arm.*;
 import frc.robot.subsystems.claw.Claw;
 import frc.robot.subsystems.claw.ClawIOREV;
@@ -56,7 +60,7 @@ public class RobotContainer {
   private final Elevator elevator;
   private final Arm arm;
   private final Claw claw;
-  private final Climber climber = null;
+  private final Climber climber;
 
   /* Setting up bindings for necessary control of the swerve drive platform */
   private final SwerveRequest.SwerveDriveBrake brake = new SwerveRequest.SwerveDriveBrake();
@@ -84,7 +88,7 @@ public class RobotContainer {
         elevator = new Elevator(new ElevatorIOREV() {});
         arm = new Arm(new ArmIOREV() {});
         claw = new Claw(new ClawIOREV() {});
-        // climber = new Climber(new ClimberIOREV() {});
+        climber = new Climber(new ClimberIOREV() {});
         break;
 
       case SIM:
@@ -121,7 +125,7 @@ public class RobotContainer {
         elevator = new Elevator(new ElevatorIOSIMREV());
         arm = new Arm(new ArmIOREVSIM());
         claw = new Claw(new ClawIOSIMREV());
-        // climber = new Climber(new ClimberIOSIM());
+        climber = new Climber(new ClimberIOSIM());
         break;
 
       default:
@@ -138,7 +142,7 @@ public class RobotContainer {
         elevator = new Elevator(new ElevatorIO() {});
         arm = new Arm(new ArmIOREV() {});
         claw = new Claw(new ClawIOREV() {});
-        // climber = new Climber(new ClimberIOREV() {});
+        climber = new Climber(new ClimberIOREV() {});
         break;
     }
 
@@ -256,18 +260,18 @@ public class RobotContainer {
     joystick.rightBumper().whileTrue(claw.intake());
     joystick.leftBumper().whileTrue(claw.extake());
 
-    testJoystick.a().onTrue(elevator.intake());
-    testJoystick.x().onTrue(elevator.L3());
-    testJoystick.y().onTrue(elevator.stopCommand());
-    testJoystick.b().onTrue(elevator.L4());
+    testJoystick.a().onTrue(arm.intake());
+    testJoystick.x().onTrue(arm.L1());
+    testJoystick.y().onTrue(arm.stopCommand());
+    testJoystick.b().onTrue(arm.L2());
 
     testJoystick.back().whileTrue(arm.runQStaticArmSysId(Direction.kForward));
     testJoystick.start().whileTrue(arm.runDynamicArmSysId(Direction.kForward));
 
     // testJoystick.back().onTrue(arm.reconfigPID());
 
-    //    testJoystick.leftBumper().onTrue(climber.climberOut(Degrees.of(45)));
-    //    testJoystick.rightBumper().onTrue(climber.climberOut(Degrees.of(90)));
+    testJoystick.leftBumper().onTrue(climber.climberStop());
+    testJoystick.rightBumper().onTrue(climber.climberOut(Degrees.of(60)));
 
     // joystick.a().onTrue(arm.L1());
     // joystick.b().onTrue(arm.L2());

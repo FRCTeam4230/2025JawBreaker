@@ -3,7 +3,6 @@ package frc.robot.subsystems.elevator;
 import static edu.wpi.first.units.Units.*;
 
 import com.revrobotics.RelativeEncoder;
-import com.revrobotics.sim.SparkFlexExternalEncoderSim;
 import com.revrobotics.spark.*;
 import com.revrobotics.spark.config.*;
 import edu.wpi.first.math.controller.ElevatorFeedforward;
@@ -30,10 +29,10 @@ public class ElevatorIOREV implements ElevatorIO {
   private final Encoder leaderExternalEncoder = new Encoder(5, 6);
 
   /*
- Encoder can take two ports, this gives the correct value in rotations for the elevator (when divided by -8192, which is how many ticks are in a rotation)
- ClosedLoopConfig.FeedbackSensor.kAlternateOrExternalEncoder is what seems to be the correct thing to pass to the feedback sensor
- Maybe using ExternalEncoderConfig will work but it doesn't seem to have a way of applying the correct encoder to it, there is also something called SparkFlexExternalEncoder, but it doesn't seem to work yet
-   */
+  Encoder can take two ports, this gives the correct value in rotations for the elevator (when divided by -8192, which is how many ticks are in a rotation)
+  ClosedLoopConfig.FeedbackSensor.kAlternateOrExternalEncoder is what seems to be the correct thing to pass to the feedback sensor
+  Maybe using ExternalEncoderConfig will work but it doesn't seem to have a way of applying the correct encoder to it, there is also something called SparkFlexExternalEncoder, but it doesn't seem to work yet
+    */
 
   /** Follower * */
   protected final SparkFlex follower =

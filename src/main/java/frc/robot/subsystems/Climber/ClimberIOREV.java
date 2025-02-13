@@ -9,6 +9,7 @@ import com.revrobotics.spark.SparkClosedLoopController;
 import com.revrobotics.spark.SparkFlex;
 import com.revrobotics.spark.SparkLowLevel;
 import com.revrobotics.spark.config.ClosedLoopConfig;
+import com.revrobotics.spark.config.SparkBaseConfig;
 import com.revrobotics.spark.config.SparkFlexConfig;
 import edu.wpi.first.units.measure.Angle;
 
@@ -27,7 +28,10 @@ public class ClimberIOREV implements ClimberIO {
     pidController = motor.getClosedLoopController();
 
     SparkFlexConfig motorConfig = new SparkFlexConfig();
+
     motorConfig
+        .idleMode(SparkBaseConfig.IdleMode.kBrake)
+        .inverted(true)
         .encoder
         .velocityConversionFactor((1.0 / GEAR_RATIO) / 60.0)
         .positionConversionFactor(1.0 / GEAR_RATIO);
@@ -62,5 +66,10 @@ public class ClimberIOREV implements ClimberIO {
   @Override
   public void setPosition(Angle angle) {
     pidController.setReference(angle.in(Rotations), SparkBase.ControlType.kPosition);
+  }
+
+  @Override
+  public void stop() {
+    motor.stopMotor();
   }
 }

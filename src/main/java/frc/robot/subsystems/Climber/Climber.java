@@ -31,4 +31,8 @@ public class Climber extends SubsystemBase {
   public final Command climberOut(Angle angle) {
     return Commands.runOnce(() -> setPosition(angle));
   }
+
+  public final Command climberStop() {
+    return Commands.runOnce(() -> stop());
+  }
 }

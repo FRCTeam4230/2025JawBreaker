@@ -38,7 +38,6 @@ import edu.wpi.first.wpilibj.RobotController;
  */
 public class ArmIOREV implements ArmIO {
   /** The gear ratio between motor and arm (for converting motor rotations to arm angle) */
-
   /** Leader motor controller (CAN ID 20) */
   public final SparkFlex leader = new SparkFlex(ArmConstants.MOTOR_ID, MotorType.kBrushless);
 
