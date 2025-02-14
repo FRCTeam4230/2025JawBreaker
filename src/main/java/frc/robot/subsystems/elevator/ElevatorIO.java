@@ -40,15 +40,24 @@ public interface ElevatorIO {
     public Current leaderSupplyCurrent = Amps.of(0);
     public Current followerSupplyCurrent = Amps.of(0);
 
+    public boolean lowerLimit = false;
+    public boolean upperLimit = false;
+
     public Distance elevatorDistance = Inches.of(0);
+
+    public Angle setpoint;
+
+    public Angle dutyCycleEncoderPosition = Rotations.of(0);
   }
 
   /** Updates the set of loggable inputs. */
   default void updateInputs(ElevatorIOInputs inputs) {}
 
   /** Run closed loop at the specified velocity. */
-  default void setDistance(Distance distance) {}
+  default void setDistance(Angle distance) {}
 
   /** Stop in open loop. */
   default void stop() {}
+
+  default void setVoltage(Voltage voltage) {}
 }

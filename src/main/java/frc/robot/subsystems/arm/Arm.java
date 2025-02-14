@@ -8,13 +8,16 @@ package frc.robot.subsystems.arm;
 
 import static edu.wpi.first.units.Units.*;
 
+import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.Alert.AlertType;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SelectCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import java.util.Map;
 import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
@@ -26,8 +29,11 @@ import org.littletonrobotics.junction.Logger;
  */
 public class Arm extends SubsystemBase {
   // Hardware interface and inputs
-  private final ArmIO io;
+  private ArmIO io = null;
   private final ArmIOInputsAutoLogged inputs;
+
+  public final PIDController pidController =
+      new PIDController(ArmConstants.kP.get(), ArmConstants.kI.get(), ArmConstants.kD.get());
 
   // Current arm position mode
   private ArmMode currentMode = ArmMode.INTAKE;
@@ -47,6 +53,12 @@ public class Arm extends SubsystemBase {
   public Arm(ArmIO io) {
     this.io = io;
     this.inputs = new ArmIOInputsAutoLogged();
+    SmartDashboard.putData(this);
+
+    // TODO
+    //      if(inputs.motorPosition.gt(Rotations.of(0))){
+    //
+    //      }
   }
 
   @Override
@@ -54,6 +66,7 @@ public class Arm extends SubsystemBase {
     // Update and log inputs from hardware
     io.updateInputs(inputs);
     Logger.processInputs("Arm", inputs);
+    // updateControlConstants();
 
     // Update motor connection status alerts
     motorMotorAlert.set(!inputs.motorConnected);
@@ -66,7 +79,7 @@ public class Arm extends SubsystemBase {
    * @param position The target angle position
    */
   private void setPosition(Angle position) {
-    io.setPosition(Radians.of(position.in(Radians)));
+    io.setPosition(position);
   }
 
   /** Stops the arm motors. */
@@ -87,11 +100,11 @@ public class Arm extends SubsystemBase {
   /** Enumeration of available arm positions with their corresponding target angles. */
   private enum ArmMode {
     STOP(Degrees.of(0)), // Stop the arm
-    INTAKE(Degrees.of(0)), // Arm tucked in
-    L1(Degrees.of(90)), //  Position for scoring in L1
-    L2(Degrees.of(135)), //  Position for scoring in L2
-    L3(Degrees.of(135)), // Position for scoring in L3
-    L4(Degrees.of(180)); // Position for scoring in L4
+    INTAKE(Degrees.of(-90)), // Arm tucked in
+    L1(Degrees.of(0)), //  Position for scoring in L1
+    L2(Degrees.of(11)), //  Position for scoring in L2
+    L3(Degrees.of(45)), // Position for scoring in L3
+    L4(Degrees.of(90)); // Position for scoring in L4
 
     private final Angle targetAngle;
     private final Angle angleTolerance;
@@ -102,7 +115,7 @@ public class Arm extends SubsystemBase {
     }
 
     ArmMode(Angle targetAngle) {
-      this(targetAngle, Degrees.of(2)); // 2 degree default tolerance
+      this(targetAngle, Rotations.of(Degrees.of(2).in(Rotations))); // 2 degree default tolerance
     }
   }
 
@@ -235,5 +248,22 @@ public class Arm extends SubsystemBase {
    */
   public final Command stopCommand() {
     return setPositionCommand(ArmMode.STOP);
+  }
+
+  private SysIdRoutine armSysIdRoutine =
+      new SysIdRoutine(
+          new SysIdRoutine.Config(
+              Volts.of(0.2).per(Second),
+              Volts.of(0.9),
+              null,
+              state -> Logger.recordOutput("Arm/SysIdArm_State", state.toString())),
+          new SysIdRoutine.Mechanism((voltage) -> io.setVoltage(voltage), null, this));
+
+  public Command runQStaticArmSysId(SysIdRoutine.Direction direction) {
+    return armSysIdRoutine.quasistatic(direction);
+  }
+
+  public Command runDynamicArmSysId(SysIdRoutine.Direction direction) {
+    return armSysIdRoutine.dynamic(direction);
   }
 }

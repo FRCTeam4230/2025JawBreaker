@@ -1,5 +1,7 @@
 package frc.robot;
 
+import static edu.wpi.first.units.Units.Volts;
+
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 import com.ctre.phoenix6.swerve.SwerveRequest;
 import com.pathplanner.lib.auto.AutoBuilder;
@@ -14,6 +16,9 @@ import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 import frc.robot.commands.DriveCommands;
 import frc.robot.generated.TunerConstants;
+import frc.robot.subsystems.Climber.Climber;
+import frc.robot.subsystems.Climber.ClimberIOREV;
+import frc.robot.subsystems.Climber.ClimberIOSIM;
 import frc.robot.subsystems.arm.*;
 import frc.robot.subsystems.claw.Claw;
 import frc.robot.subsystems.claw.ClawIOREV;
@@ -36,6 +41,7 @@ import frc.robot.utils.TunableController.TunableControllerType;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
 public class RobotContainer {
+
   private LinearVelocity MaxSpeed = TunerConstants.kSpeedAt12Volts;
   private final TunableController joystick =
       new TunableController(0).withControllerType(TunableControllerType.QUADRATIC);
@@ -55,12 +61,14 @@ public class RobotContainer {
   private final Elevator elevator;
   private final Arm arm;
   private final Claw claw;
+  private final Climber climber;
 
   /* Setting up bindings for necessary control of the swerve drive platform */
   private final SwerveRequest.SwerveDriveBrake brake = new SwerveRequest.SwerveDriveBrake();
   private final SwerveRequest.PointWheelsAt point = new SwerveRequest.PointWheelsAt();
 
   public RobotContainer() {
+
     DriveIOCTRE currentDriveTrain = TunerConstants.createDrivetrain();
     switch (Constants.currentMode) {
       case REAL:
@@ -82,6 +90,7 @@ public class RobotContainer {
         elevator = new Elevator(new ElevatorIOREV() {});
         arm = new Arm(new ArmIOREV() {});
         claw = new Claw(new ClawIOREV() {});
+        climber = new Climber(new ClimberIOREV() {});
         break;
 
       case SIM:
@@ -116,8 +125,9 @@ public class RobotContainer {
                 drivetrain::getVisionParameters));
 
         elevator = new Elevator(new ElevatorIOSIMREV());
-        arm = new Arm(new ArmIOSIM());
-        claw = new Claw(new ClawIOSIMREV()); // change to IOSIM
+        arm = new Arm(new ArmIOREVSIM());
+        claw = new Claw(new ClawIOSIMREV());
+        climber = new Climber(new ClimberIOSIM());
         break;
 
       default:
@@ -133,7 +143,8 @@ public class RobotContainer {
 
         elevator = new Elevator(new ElevatorIO() {});
         arm = new Arm(new ArmIOREV() {});
-        claw = new Claw(new ClawIOREV());
+        claw = new Claw(new ClawIOREV() {});
+        climber = new Climber(new ClimberIOREV() {});
         break;
     }
 
@@ -167,16 +178,16 @@ public class RobotContainer {
                 drive
                     .withVelocityX(
                         MaxSpeed.times(
-                            -joystick
-                                .customLeft()
+                            joystick
+                                .customRight()
                                 .getY())) // Drive forward with negative Y (forward)
                     .withVelocityY(
                         MaxSpeed.times(
-                            -joystick.customLeft().getX())) // Drive left with negative X (left)
+                            joystick.customRight().getX())) // Drive left with negative X (left)
                     .withRotationalRate(
                         Constants.MaxAngularRate.times(
-                            -joystick
-                                .customRight()
+                            joystick
+                                .customLeft()
                                 .getX())))); // Drive counterclockwise with negative X (left)
 
     // joystick.a().onTrue(Commands.runOnce(() -> drivetrain.resetPose(Pose2d.kZero)));
@@ -248,15 +259,19 @@ public class RobotContainer {
     joystick.start().and(joystick.y()).whileTrue(drivetrain.sysIdQuasistatic(Direction.kForward));
     joystick.start().and(joystick.x()).whileTrue(drivetrain.sysIdQuasistatic(Direction.kReverse));
 
-    joystick.rightBumper().whileTrue(claw.intake());
+    joystick.rightBumper().whileTrue(claw.intake().onlyWhile(() -> !claw.hasCoral()));
     joystick.leftBumper().whileTrue(claw.extake());
 
     testJoystick.a().onTrue(arm.intake());
-    testJoystick.x().onTrue(arm.stopCommand());
-    testJoystick.y().onTrue(arm.L1());
+    testJoystick.x().onTrue(arm.L1());
+    testJoystick.y().onTrue(arm.stopCommand());
     testJoystick.b().onTrue(arm.L2());
+    testJoystick.rightTrigger().onTrue(arm.L3());
 
-    testJoystick.back().onTrue(arm.reconfigPID());
+    // testJoystick.back().onTrue(arm.reconfigPID());
+
+    testJoystick.leftBumper().whileTrue(climber.climberOut(Volts.of(-4)));
+    testJoystick.rightBumper().whileTrue(climber.climberOut(Volts.of(4)));
 
     // joystick.a().onTrue(arm.L1());
     // joystick.b().onTrue(arm.L2());

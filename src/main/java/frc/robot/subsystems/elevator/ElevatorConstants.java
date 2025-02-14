@@ -14,12 +14,6 @@ public class ElevatorConstants {
   public static final int LEADER_MOTOR_ENCODER = 4; //
   public static final int FOLLOWER_MOTOR_ID = 31;
 
-  // Converts Rotations to Meters
-  public static final double rotationToMeters = 1.0;
-
-  // Converts RPM to MPS
-  public static final double rpmToMps = 1.0;
-
   public static final double elevatorMaxVelocity = 10.0;
   public static final double elevatorMaxAcceleration = 3.0;
 
