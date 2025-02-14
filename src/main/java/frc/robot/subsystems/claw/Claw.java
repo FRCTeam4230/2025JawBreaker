@@ -71,8 +71,8 @@ public class Claw extends SubsystemBase {
   }
 
   private enum ClawMode {
-    INTAKE(Volts.of(ClawConstants.INTAKE_VOLTAGE.get()).times(-1)),
-    EXTAKE(Volts.of(ClawConstants.INTAKE_VOLTAGE.get())),
+    INTAKE(Volts.of(ClawConstants.INTAKE_VOLTAGE.get())),
+    EXTAKE(Volts.of(ClawConstants.INTAKE_VOLTAGE.get()).times(-1)),
     OFF(Volts.of(0)),
     HOLD(Volts.of(ClawConstants.HOLD_VOLTAGE.get()));
 
@@ -93,7 +93,7 @@ public class Claw extends SubsystemBase {
               ClawMode.OFF,
               Commands.runOnce(this::stop),
               ClawMode.INTAKE,
-              setVoltsCommand(Claw.ClawMode.INTAKE),
+              createVoltsCommand(Claw.ClawMode.INTAKE),
               ClawMode.EXTAKE,
               createVoltsCommand(ClawMode.EXTAKE),
               ClawMode.HOLD,
@@ -120,18 +120,25 @@ public class Claw extends SubsystemBase {
   }
 
   public Command off() {
-    return createVoltsCommand(ClawMode.OFF);
+    return setVoltsCommand(ClawMode.OFF);
   }
 
   public Command intake() {
-    return createVoltsCommand(ClawMode.INTAKE).until(io::hasCoral).andThen(hold());
+    return Commands.startEnd(
+        () -> setVoltsCommand(ClawMode.INTAKE), () -> setVoltsCommand(ClawMode.HOLD));
+    // could use startEnd to stop it
   }
 
   public Command extake() {
-    return createVoltsCommand(ClawMode.EXTAKE);
+    return Commands.startEnd(
+        () -> setVoltsCommand(ClawMode.EXTAKE), () -> setVoltsCommand(ClawMode.OFF));
   }
 
   public Command hold() {
-    return createVoltsCommand(ClawMode.HOLD);
+    return setVoltsCommand(ClawMode.HOLD);
+  }
+
+  public boolean hasCoral() {
+    return io.hasCoral();
   }
 }

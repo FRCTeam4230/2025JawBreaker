@@ -16,9 +16,6 @@ import static edu.wpi.first.units.Units.*;
 import edu.wpi.first.units.measure.*;
 import org.littletonrobotics.junction.AutoLog;
 
-import java.util.function.BooleanSupplier;
-
-
 public interface ClawIO {
   @AutoLog
   class ClawIOInputs {
@@ -36,7 +33,6 @@ public interface ClawIO {
     public Current supplyCurrent = Amps.of(0);
 
     public Temperature motorTempCelsius = Celsius.of(0);
-
   }
 
   public default void setVolts(Voltage voltage) {}
@@ -44,8 +40,10 @@ public interface ClawIO {
   /** Updates the set of loggable inputs. */
   public default void updateInputs(ClawIOInputs inputs) {}
 
-  public default boolean hasCoral() {return false;}
+  public default boolean hasCoral() {
+    return false;
+  }
 
-    /** Stop in open loop. */
+  /** Stop in open loop. */
   public default void stop() {}
 }

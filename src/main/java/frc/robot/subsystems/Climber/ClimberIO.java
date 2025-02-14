@@ -32,6 +32,5 @@ public interface ClimberIO {
 
   default void setPosition(Voltage volts) {}
 
-
   default void stop() {}
 }

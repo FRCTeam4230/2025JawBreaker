@@ -41,6 +41,7 @@ import frc.robot.utils.TunableController.TunableControllerType;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
 public class RobotContainer {
+
   private LinearVelocity MaxSpeed = TunerConstants.kSpeedAt12Volts;
   private final TunableController joystick =
       new TunableController(0).withControllerType(TunableControllerType.QUADRATIC);
@@ -67,6 +68,7 @@ public class RobotContainer {
   private final SwerveRequest.PointWheelsAt point = new SwerveRequest.PointWheelsAt();
 
   public RobotContainer() {
+
     DriveIOCTRE currentDriveTrain = TunerConstants.createDrivetrain();
     switch (Constants.currentMode) {
       case REAL:
@@ -257,7 +259,7 @@ public class RobotContainer {
     joystick.start().and(joystick.y()).whileTrue(drivetrain.sysIdQuasistatic(Direction.kForward));
     joystick.start().and(joystick.x()).whileTrue(drivetrain.sysIdQuasistatic(Direction.kReverse));
 
-    joystick.rightBumper().whileTrue(claw.intake());
+    joystick.rightBumper().whileTrue(claw.intake().until(claw::hasCoral));
     joystick.leftBumper().whileTrue(claw.extake());
 
     testJoystick.a().onTrue(arm.intake());

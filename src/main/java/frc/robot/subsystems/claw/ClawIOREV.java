@@ -11,8 +11,6 @@ import com.revrobotics.spark.config.SparkMaxConfig;
 import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.wpilibj.I2C;
 
-import java.util.function.BooleanSupplier;
-
 public class ClawIOREV implements ClawIO {
   protected final SparkMax motor =
       new SparkMax(ClawConstants.clawMotorID, SparkLowLevel.MotorType.kBrushless);
