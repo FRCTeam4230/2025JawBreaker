@@ -264,9 +264,7 @@ public class RobotContainer {
     testJoystick.x().onTrue(arm.L1());
     testJoystick.y().onTrue(arm.stopCommand());
     testJoystick.b().onTrue(arm.L2());
-
-    testJoystick.back().whileTrue(arm.runQStaticArmSysId(Direction.kForward));
-    testJoystick.start().whileTrue(arm.runDynamicArmSysId(Direction.kForward));
+    testJoystick.rightTrigger().onTrue(arm.L3());
 
     // testJoystick.back().onTrue(arm.reconfigPID());
 
