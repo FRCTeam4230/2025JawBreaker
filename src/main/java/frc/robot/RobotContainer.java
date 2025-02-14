@@ -259,7 +259,7 @@ public class RobotContainer {
     joystick.start().and(joystick.y()).whileTrue(drivetrain.sysIdQuasistatic(Direction.kForward));
     joystick.start().and(joystick.x()).whileTrue(drivetrain.sysIdQuasistatic(Direction.kReverse));
 
-    joystick.rightBumper().whileTrue(claw.intake().until(claw::hasCoral));
+    joystick.rightBumper().whileTrue(claw.intake().onlyWhile(() -> !claw.hasCoral()));
     joystick.leftBumper().whileTrue(claw.extake());
 
     testJoystick.a().onTrue(arm.intake());

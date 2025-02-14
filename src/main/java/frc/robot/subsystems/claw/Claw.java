@@ -18,9 +18,7 @@ import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.Alert.AlertType;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
-import edu.wpi.first.wpilibj2.command.SelectCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import java.util.Map;
 import org.littletonrobotics.junction.Logger;
 
 /**
@@ -36,7 +34,7 @@ public class Claw extends SubsystemBase {
   // Alerts for motor connection status
   private final Alert motorAlert = new Alert("Claw motor isn't connected", AlertType.kError);
   private final Alert encoderAlert = new Alert("Claw encoder isn't connected", AlertType.kError);
-  private ClawMode currentMode = ClawMode.OFF;
+  //  private ClawMode currentMode = ClawMode.OFF;
 
   public Claw(ClawIO io) {
     this.io = io;
@@ -62,81 +60,78 @@ public class Claw extends SubsystemBase {
     io.stop();
   }
 
-  private void setClawMode(ClawMode mode) {
-    if (currentMode != mode) {
-      currentCommand.cancel();
-      currentMode = mode;
-      currentCommand.schedule();
-    }
-  }
-
-  private enum ClawMode {
-    INTAKE(Volts.of(ClawConstants.INTAKE_VOLTAGE.get())),
-    EXTAKE(Volts.of(ClawConstants.INTAKE_VOLTAGE.get()).times(-1)),
-    OFF(Volts.of(0)),
-    HOLD(Volts.of(ClawConstants.HOLD_VOLTAGE.get()));
-
-    private final Voltage volts;
-
-    ClawMode(Voltage volts) {
-      this.volts = volts;
-    }
-  }
-
-  public ClawMode getMode() {
-    return currentMode;
-  }
-
-  private final Command currentCommand =
-      new SelectCommand<>(
-          Map.of(
-              ClawMode.OFF,
-              Commands.runOnce(this::stop),
-              ClawMode.INTAKE,
-              createVoltsCommand(Claw.ClawMode.INTAKE),
-              ClawMode.EXTAKE,
-              createVoltsCommand(ClawMode.EXTAKE),
-              ClawMode.HOLD,
-              createVoltsCommand(Claw.ClawMode.HOLD)),
-          this::getMode);
-
-  private Command createVoltsCommand(ClawMode mode) {
-    return Commands.runOnce(() -> setVolts(mode.volts));
-  }
-
-  //  public Command intake() {
-  //    return Commands.startEnd(
-  //        () -> io.setVolts(Volts.of(ClawConstants.INTAKE_VOLTAGE.get()).times(-1)), () ->
-  // io.stop());
+  //  private void setClawMode(ClawMode mode) {
+  //    if (currentMode != mode) {
+  //      currentCommand.cancel();
+  //      currentMode = mode;
+  //      currentCommand.schedule();
+  //    }
   //  }
   //
-  //  public Command extake() {
-  //    return Commands.startEnd(
-  //        () -> io.setVolts(Volts.of(ClawConstants.INTAKE_VOLTAGE.get())), () -> io.stop());
+  //  private enum ClawMode {
+  //    INTAKE(Volts.of(ClawConstants.INTAKE_VOLTAGE.get())),
+  //    EXTAKE(Volts.of(ClawConstants.INTAKE_VOLTAGE.get()).times(-1)),
+  //    OFF(Volts.of(0)),
+  //    HOLD(Volts.of(ClawConstants.HOLD_VOLTAGE.get()));
+  //
+  //    private final Voltage volts;
+  //
+  //    ClawMode(Voltage volts) {
+  //      this.volts = volts;
+  //    }
   //  }
-
-  private Command setVoltsCommand(ClawMode mode) {
-    return Commands.runOnce(() -> setClawMode(mode));
-  }
-
-  public Command off() {
-    return setVoltsCommand(ClawMode.OFF);
-  }
+  //
+  //  public ClawMode getMode() {
+  //    return currentMode;
+  //  }
+  //
+  //  private final Command currentCommand =
+  //      new SelectCommand<>(
+  //          Map.of(
+  //              ClawMode.OFF,
+  //              Commands.runOnce(this::stop),
+  //              ClawMode.INTAKE,
+  //              createVoltsCommand(Claw.ClawMode.INTAKE),
+  //              ClawMode.EXTAKE,
+  //              createVoltsCommand(ClawMode.EXTAKE),
+  //              ClawMode.HOLD,
+  //              createVoltsCommand(Claw.ClawMode.HOLD)),
+  //          this::getMode);
+  //
+  //  private Command createVoltsCommand(ClawMode mode) {
+  //    return Commands.runOnce(() -> setVolts(mode.volts));
+  //  }
 
   public Command intake() {
     return Commands.startEnd(
-        () -> setVoltsCommand(ClawMode.INTAKE), () -> setVoltsCommand(ClawMode.HOLD));
-    // could use startEnd to stop it
+        () -> io.setVolts(Volts.of(ClawConstants.INTAKE_VOLTAGE.get())), () -> io.stop());
   }
 
   public Command extake() {
     return Commands.startEnd(
-        () -> setVoltsCommand(ClawMode.EXTAKE), () -> setVoltsCommand(ClawMode.OFF));
+        () -> io.setVolts(Volts.of(ClawConstants.INTAKE_VOLTAGE.get()).times(-0.2)),
+        () -> io.stop());
   }
 
-  public Command hold() {
-    return setVoltsCommand(ClawMode.HOLD);
-  }
+  //  private Command setVoltsCommand(ClawMode mode) {
+  //    return Commands.runOnce(() -> setClawMode(mode));
+  //  }
+  //
+  //  public Command off() {
+  //    return setVoltsCommand(ClawMode.OFF);
+  //  }
+  //
+  //  public Command intake() {
+  //    return setVoltsCommand(ClawMode.INTAKE);
+  //  }
+  //
+  //  public Command extake() {
+  //    return Commands.startEnd(() -> setVoltsCommand(ClawMode.EXTAKE), () -> off());
+  //  }
+  //
+  //  public Command hold() {
+  //    return setVoltsCommand(ClawMode.HOLD);
+  //  }
 
   public boolean hasCoral() {
     return io.hasCoral();
