@@ -16,23 +16,27 @@ import static edu.wpi.first.units.Units.*;
 import edu.wpi.first.units.measure.*;
 import org.littletonrobotics.junction.AutoLog;
 
+import java.util.function.BooleanSupplier;
+
+
 public interface ClawIO {
   @AutoLog
   class ClawIOInputs {
     public boolean leaderConnected = false;
     public boolean encoderConnected = false;
-    public boolean hasCoral = false;
+    public boolean proximitySensor = false;
 
     public boolean lowerLimit = false;
     public boolean upperLimit = false;
 
     public AngularVelocity motorVelocity = RotationsPerSecond.of(0);
-    public Distance proximity = Centimeters.of(0);
+    public int proximity = 0;
 
     public Voltage appliedVoltage = Volts.of(0.0);
     public Current supplyCurrent = Amps.of(0);
 
     public Temperature motorTempCelsius = Celsius.of(0);
+
   }
 
   public default void setVolts(Voltage voltage) {}
@@ -40,6 +44,8 @@ public interface ClawIO {
   /** Updates the set of loggable inputs. */
   public default void updateInputs(ClawIOInputs inputs) {}
 
-  /** Stop in open loop. */
+  public default boolean hasCoral() {return false;}
+
+    /** Stop in open loop. */
   public default void stop() {}
 }

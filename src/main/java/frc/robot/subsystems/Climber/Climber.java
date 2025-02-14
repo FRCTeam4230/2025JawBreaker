@@ -1,6 +1,6 @@
 package frc.robot.subsystems.Climber;
 
-import edu.wpi.first.units.measure.Angle;
+import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -20,16 +20,16 @@ public class Climber extends SubsystemBase {
     io.updateInputs(inputs);
   }
 
-  public void setPosition(Angle angle) {
-    io.setPosition(angle);
+  public void setPosition(Voltage volts) {
+    io.setPosition(volts);
   }
 
   public void stop() {
     io.stop();
   }
 
-  public final Command climberOut(Angle angle) {
-    return Commands.runOnce(() -> setPosition(angle));
+  public final Command climberOut(Voltage volts) {
+    return Commands.startEnd(() -> setPosition(volts), () -> stop());
   }
 
   public final Command climberStop() {

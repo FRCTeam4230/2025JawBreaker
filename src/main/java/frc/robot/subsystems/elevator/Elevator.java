@@ -112,7 +112,7 @@ public class Elevator extends SubsystemBase {
     }
 
     ElevatorMode(Angle targetDistance) {
-      this(targetDistance, Rotations.of(0.2)); // 2 inch default tolerance
+      this(targetDistance, Rotations.of(0.02));
     }
   }
 
