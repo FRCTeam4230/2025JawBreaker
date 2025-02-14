@@ -4,7 +4,6 @@ import static edu.wpi.first.units.Units.*;
 import static frc.robot.subsystems.arm.ArmConstants.GEAR_RATIO;
 
 import com.revrobotics.RelativeEncoder;
-import com.revrobotics.spark.SparkBase;
 import com.revrobotics.spark.SparkClosedLoopController;
 import com.revrobotics.spark.SparkFlex;
 import com.revrobotics.spark.SparkLowLevel;
@@ -12,10 +11,11 @@ import com.revrobotics.spark.config.ClosedLoopConfig;
 import com.revrobotics.spark.config.SparkBaseConfig;
 import com.revrobotics.spark.config.SparkFlexConfig;
 import edu.wpi.first.units.measure.Angle;
+import edu.wpi.first.units.measure.Voltage;
 
 public class ClimberIOREV implements ClimberIO {
   private Angle setpoint;
-  protected static final double GEAR_RATIO = 12.0;
+  protected static final double GEAR_RATIO = 125.0;
 
   protected final SparkFlex motor =
       new SparkFlex(ClimberConstants.MOTOR_ID, SparkLowLevel.MotorType.kBrushless);
@@ -64,8 +64,9 @@ public class ClimberIOREV implements ClimberIO {
   }
 
   @Override
-  public void setPosition(Angle angle) {
-    pidController.setReference(angle.in(Rotations), SparkBase.ControlType.kPosition);
+  public void setPosition(Voltage volts) {
+    //    pidController.setReference(angle.in(Rotations), SparkBase.ControlType.kPosition);
+    motor.setVoltage(volts);
   }
 
   @Override

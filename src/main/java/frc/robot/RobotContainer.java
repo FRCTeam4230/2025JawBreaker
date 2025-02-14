@@ -1,6 +1,6 @@
 package frc.robot;
 
-import static edu.wpi.first.units.Units.Degrees;
+import static edu.wpi.first.units.Units.Volts;
 
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 import com.ctre.phoenix6.swerve.SwerveRequest;
@@ -176,16 +176,16 @@ public class RobotContainer {
                 drive
                     .withVelocityX(
                         MaxSpeed.times(
-                            -joystick
-                                .customLeft()
+                            joystick
+                                .customRight()
                                 .getY())) // Drive forward with negative Y (forward)
                     .withVelocityY(
                         MaxSpeed.times(
-                            -joystick.customLeft().getX())) // Drive left with negative X (left)
+                            joystick.customRight().getX())) // Drive left with negative X (left)
                     .withRotationalRate(
                         Constants.MaxAngularRate.times(
-                            -joystick
-                                .customRight()
+                            joystick
+                                .customLeft()
                                 .getX())))); // Drive counterclockwise with negative X (left)
 
     // joystick.a().onTrue(Commands.runOnce(() -> drivetrain.resetPose(Pose2d.kZero)));
@@ -264,14 +264,12 @@ public class RobotContainer {
     testJoystick.x().onTrue(arm.L1());
     testJoystick.y().onTrue(arm.stopCommand());
     testJoystick.b().onTrue(arm.L2());
-
-    testJoystick.back().whileTrue(arm.runQStaticArmSysId(Direction.kForward));
-    testJoystick.start().whileTrue(arm.runDynamicArmSysId(Direction.kForward));
+    testJoystick.rightTrigger().onTrue(arm.L3());
 
     // testJoystick.back().onTrue(arm.reconfigPID());
 
-    testJoystick.leftBumper().onTrue(climber.climberStop());
-    testJoystick.rightBumper().onTrue(climber.climberOut(Degrees.of(60)));
+    testJoystick.leftBumper().whileTrue(climber.climberOut(Volts.of(-4)));
+    testJoystick.rightBumper().whileTrue(climber.climberOut(Volts.of(4)));
 
     // joystick.a().onTrue(arm.L1());
     // joystick.b().onTrue(arm.L2());

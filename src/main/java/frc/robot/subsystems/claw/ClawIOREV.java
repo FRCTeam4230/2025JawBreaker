@@ -11,6 +11,8 @@ import com.revrobotics.spark.config.SparkMaxConfig;
 import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.wpilibj.I2C;
 
+import java.util.function.BooleanSupplier;
+
 public class ClawIOREV implements ClawIO {
   protected final SparkMax motor =
       new SparkMax(ClawConstants.clawMotorID, SparkLowLevel.MotorType.kBrushless);
@@ -41,8 +43,9 @@ public class ClawIOREV implements ClawIO {
     motor.setVoltage(voltage);
   }
 
+  @Override
   public boolean hasCoral() {
-    return colorSensorV3.getProximity() > 1;
+    return colorSensorV3.getProximity() > 1800;
   }
 
   public void stop() {
@@ -50,7 +53,8 @@ public class ClawIOREV implements ClawIO {
   }
 
   public void updateInputs(ClawIOInputs inputs) {
-    inputs.proximity = Centimeters.of(colorSensorV3.getProximity());
+    inputs.proximity = colorSensorV3.getProximity();
+    inputs.proximitySensor = hasCoral();
     inputs.motorVelocity = RotationsPerSecond.of(motor.getEncoder().getVelocity());
     inputs.appliedVoltage = Volts.of(motor.getBusVoltage());
     inputs.supplyCurrent = Amps.of(motor.getOutputCurrent());

@@ -100,11 +100,11 @@ public class Arm extends SubsystemBase {
   /** Enumeration of available arm positions with their corresponding target angles. */
   private enum ArmMode {
     STOP(Degrees.of(0)), // Stop the arm
-    INTAKE(Degrees.of(0)), // Arm tucked in
-    L1(Degrees.of(90)), //  Position for scoring in L1
-    L2(Degrees.of(135)), //  Position for scoring in L2
-    L3(Degrees.of(135)), // Position for scoring in L3
-    L4(Degrees.of(180)); // Position for scoring in L4
+    INTAKE(Degrees.of(-90)), // Arm tucked in
+    L1(Degrees.of(0)), //  Position for scoring in L1
+    L2(Degrees.of(11)), //  Position for scoring in L2
+    L3(Degrees.of(45)), // Position for scoring in L3
+    L4(Degrees.of(90)); // Position for scoring in L4
 
     private final Angle targetAngle;
     private final Angle angleTolerance;
@@ -115,7 +115,7 @@ public class Arm extends SubsystemBase {
     }
 
     ArmMode(Angle targetAngle) {
-      this(targetAngle, Degrees.of(2)); // 2 degree default tolerance
+      this(targetAngle, Rotations.of(Degrees.of(2).in(Rotations))); // 2 degree default tolerance
     }
   }
 
@@ -253,8 +253,8 @@ public class Arm extends SubsystemBase {
   private SysIdRoutine armSysIdRoutine =
       new SysIdRoutine(
           new SysIdRoutine.Config(
-              null,
-              Volts.of(1),
+              Volts.of(0.2).per(Second),
+              Volts.of(0.9),
               null,
               state -> Logger.recordOutput("Arm/SysIdArm_State", state.toString())),
           new SysIdRoutine.Mechanism((voltage) -> io.setVoltage(voltage), null, this));

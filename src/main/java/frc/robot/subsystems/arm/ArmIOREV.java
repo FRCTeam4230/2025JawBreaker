@@ -6,10 +6,7 @@
 
 package frc.robot.subsystems.arm;
 
-import static edu.wpi.first.units.Units.Amps;
-import static edu.wpi.first.units.Units.Rotations;
-import static edu.wpi.first.units.Units.RotationsPerSecond;
-import static edu.wpi.first.units.Units.Volts;
+import static edu.wpi.first.units.Units.*;
 import static frc.robot.subsystems.arm.ArmConstants.GEAR_RATIO;
 
 import com.revrobotics.RelativeEncoder;
@@ -52,7 +49,9 @@ public class ArmIOREV implements ArmIO {
   public final RelativeEncoder leaderEncoder = leader.getEncoder();
 
   private SparkClosedLoopController closedLoopController = leader.getClosedLoopController();
-  private ArmFeedforward feedforward = new ArmFeedforward(0, 0, 0);
+  private ArmFeedforward feedforward = new ArmFeedforward(0, 0.52, 0);
+  // (leader.getAppliedOutput() * RobotController.getBatteryVoltage()) /
+  // Math.cos(Rotations.of(leaderEncoder.getPosition()).in(Degrees))
 
   private Angle setpoint;
   /**
@@ -80,6 +79,8 @@ public class ArmIOREV implements ArmIO {
         .d(ArmConstants.kD.get());
 
     leader.configure(leaderConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+
+    leaderEncoder.setPosition(Degrees.of((-90)).in(Rotations));
   }
 
   /**
@@ -127,6 +128,8 @@ public class ArmIOREV implements ArmIO {
     if ((inputs.lowerLimit && inputs.motorVelocity.magnitude() < 0)
         || (inputs.upperLimit && inputs.motorVelocity.magnitude() > 0)) {
       stop();
+
+      // Angle error = inputs.setpoint.minus(inputs.motorPosition);
     }
   }
 
@@ -141,6 +144,7 @@ public class ArmIOREV implements ArmIO {
   public void setPosition(Angle angle) {
     // The setpoint is in rotations.
     closedLoopController.setReference(angle.in(Rotations), ControlType.kPosition);
+    feedforward.calculate(angle.in(Radians), 1);
     this.setpoint = angle;
   }
 

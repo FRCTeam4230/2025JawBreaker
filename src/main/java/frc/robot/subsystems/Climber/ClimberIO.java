@@ -30,7 +30,8 @@ public interface ClimberIO {
 
   default void updateInputs(ClimberIOInputs inputs) {}
 
-  default void setPosition(Angle angle) {}
+  default void setPosition(Voltage volts) {}
+
 
   default void stop() {}
 }
