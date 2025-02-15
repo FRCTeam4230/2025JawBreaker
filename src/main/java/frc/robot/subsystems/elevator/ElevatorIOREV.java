@@ -90,7 +90,7 @@ public class ElevatorIOREV implements ElevatorIO {
     config.limitSwitch
         .forwardLimitSwitchEnabled(true)
         .reverseLimitSwitchEnabled(true);
-    
+
     if (isFollower) {
       config.follow(leader, true);
     }
