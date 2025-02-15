@@ -76,8 +76,7 @@ public class ElevatorIOREV implements ElevatorIO {
         .positionConversionFactor(1.0 / GEAR_RATIO)
         .inverted(true);
         //.zeroOffset() TODO: get the offset and set it!
-    config
-        .closedLoop
+    config.closedLoop
         .feedbackSensor(ClosedLoopConfig.FeedbackSensor.kAlternateOrExternalEncoder)
         .p(ElevatorConstants.kP.get())
         .i(ElevatorConstants.kI.get())
@@ -91,8 +90,7 @@ public class ElevatorIOREV implements ElevatorIO {
     config.limitSwitch
         .forwardLimitSwitchEnabled(true)
         .reverseLimitSwitchEnabled(true);
-
-
+    
     if (isFollower) {
       config.follow(leader, true);
     }
