@@ -68,7 +68,6 @@ public class ElevatorIOREV implements ElevatorIO {
     // NON maxmotion, (use profiledPidController from wpilib)
     // https://github.com/frc868/2025-Ri3D/blob/main/src/main/java/frc/robot/subsystems/Elevator.java
     var config = new SparkFlexConfig();
-    config.closedLoop.feedbackSensor(ClosedLoopConfig.FeedbackSensor.kPrimaryEncoder);
     config.idleMode(SparkBaseConfig.IdleMode.kCoast);
     config.inverted(true);
     config
@@ -89,9 +88,10 @@ public class ElevatorIOREV implements ElevatorIO {
         .maxAcceleration(ElevatorConstants.elevatorMaxAcceleration)
         .positionMode(MAXMotionConfig.MAXMotionPositionMode.kMAXMotionTrapezoidal)
         .allowedClosedLoopError(0.01);
+    config.limitSwitch
+        .forwardLimitSwitchEnabled(true)
+        .reverseLimitSwitchEnabled(true);
 
-    //config.externalEncoder.inverted((true));
-    //config.absoluteEncoder.countsPerRevolution(-8192);
 
     if (isFollower) {
       config.follow(leader, true);
@@ -102,8 +102,6 @@ public class ElevatorIOREV implements ElevatorIO {
 
   @Override
   public void updateInputs(ElevatorIOInputs inputs) {
-
-    leader.getAbsoluteEncoder().getPosition();
 
     double elevatorRot = leaderEncoder.getPosition();
     // this is the encoder position
@@ -118,15 +116,18 @@ public class ElevatorIOREV implements ElevatorIO {
     inputs.leaderStatorCurrent = Amps.of(leader.getOutputCurrent());
 
     inputs.followerStatorCurrent = Amps.of(follower.getOutputCurrent());
-    inputs.encoderPosition = Rotations.of(leader.getEncoder().getPosition());
-    inputs.encoderVelocity = RotationsPerSecond.of(leaderEncoder.getVelocity());
 
+    //inputs.encoderPosition = Rotations.of(leader.getEncoder().getPosition());
+    //inputs.encoderVelocity = RotationsPerSecond.of(leaderEncoder.getVelocity());
+    inputs.encoderPosition = inputs.leaderPosition;
+    inputs.encoderVelocity = inputs.leaderVelocity;
     inputs.setpoint = setpoint;
 
-    inputs.dutyCycleEncoderPosition = Rotations.of(leaderExternalEncoder.get() / -8192.0);
+    inputs.dutyCycleEncoderPosition = Rotations.of(leaderEncoder.getPosition() / -8192.0); //TODO: what is this?
 
-    inputs.lowerLimit = !lowerLimitSwitch.get();
-    inputs.upperLimit = !upperLimitSwitch.get();
+    inputs.lowerLimit = leader.getForwardLimitSwitch().isPressed();
+    inputs.upperLimit = leader.getReverseLimitSwitch().isPressed();
+
 
     if ((inputs.lowerLimit && inputs.leaderVelocity.magnitude() < 0)
         || (inputs.upperLimit && inputs.leaderVelocity.magnitude() > 0)) {
@@ -138,7 +139,7 @@ public class ElevatorIOREV implements ElevatorIO {
   public void setDistance(Angle distance) {
     setpoint = distance.div(Math.PI);
     pidController.setReference(
-        distance.in(Rotations) / Math.PI, SparkBase.ControlType.kPosition, ClosedLoopSlot.kSlot0);
+        distance.in(Rotations) / Math.PI, SparkBase.ControlType.kMAXMotionPositionControl, ClosedLoopSlot.kSlot0);
 
     // feedforward.calculate(leaderEncoder.getVelocity()));
   }
