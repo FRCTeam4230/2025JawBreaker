@@ -17,13 +17,18 @@ import com.revrobotics.spark.SparkClosedLoopController;
 import com.revrobotics.spark.SparkFlex;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.config.ClosedLoopConfig.FeedbackSensor;
+import com.revrobotics.spark.config.EncoderConfig;
+import com.revrobotics.spark.config.ExternalEncoderConfig;
 import com.revrobotics.spark.config.SparkBaseConfig;
 import com.revrobotics.spark.config.SparkFlexConfig;
 import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.wpilibj.DigitalInput;
+import edu.wpi.first.wpilibj.DutyCycleEncoder;
+import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.RobotController;
+
 
 /**
  * REV-based implementation of the ArmIO interface. This class uses two SparkFlex motor controllers
@@ -37,7 +42,6 @@ public class ArmIOREV implements ArmIO {
   /** The gear ratio between motor and arm (for converting motor rotations to arm angle) */
   /** Leader motor controller (CAN ID 20) */
   public final SparkFlex leader = new SparkFlex(ArmConstants.MOTOR_ID, MotorType.kBrushless);
-
   private final DigitalInput upperLimitSwitch =
       new DigitalInput(ArmConstants.UPPER_LIMIT_SWITCH_DIO_PORT);
   private final DigitalInput lowerLimitSwitch =
@@ -46,8 +50,7 @@ public class ArmIOREV implements ArmIO {
    * The SparkMax’s built–in relative encoder is used to determine the leader’s position. (An
    * absolute encoder could be used if available.)
    */
-  public final RelativeEncoder leaderEncoder = leader.getEncoder();
-
+  public final RelativeEncoder leaderEncoder = leader.getExternalEncoder();
   private SparkClosedLoopController closedLoopController = leader.getClosedLoopController();
   private ArmFeedforward feedforward = new ArmFeedforward(0, 0.52, 0);
   // (leader.getAppliedOutput() * RobotController.getBatteryVoltage()) /
@@ -62,18 +65,22 @@ public class ArmIOREV implements ArmIO {
    * and applies example PID gains.
    */
   public ArmIOREV() {
+
     // Set both motors to coast mode
     SparkFlexConfig leaderConfig = new SparkFlexConfig();
     leaderConfig.idleMode(SparkBaseConfig.IdleMode.kBrake);
+//    leaderConfig
+//        .encoder
+//            .countsPerRevolution(8192)
+//        .velocityConversionFactor((1.0 / GEAR_RATIO) / 60.0) // Converts RPM to rotations per second
+//        .positionConversionFactor(1.0 / GEAR_RATIO); // Converts motor rotations to arm rotations
+    leaderConfig.externalEncoder.countsPerRevolution(8192);
+
     leaderConfig
-        .inverted(true)
-        .encoder
-        .velocityConversionFactor((1.0 / GEAR_RATIO) / 60.0) // Converts RPM to rotations per second
-        .positionConversionFactor(1.0 / GEAR_RATIO); // Converts motor rotations to arm rotations
-    leaderConfig
+            .inverted(true)
         .closedLoop
         .outputRange(-1, 1)
-        .feedbackSensor(FeedbackSensor.kPrimaryEncoder)
+        .feedbackSensor(FeedbackSensor.kAlternateOrExternalEncoder)
         .p(ArmConstants.kP.get())
         .i(ArmConstants.kI.get())
         .d(ArmConstants.kD.get());
