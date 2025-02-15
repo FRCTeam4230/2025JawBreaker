@@ -2,6 +2,7 @@ package frc.robot.subsystems.elevator;
 
 import static edu.wpi.first.units.Units.*;
 
+import com.revrobotics.AbsoluteEncoder;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.spark.*;
 import com.revrobotics.spark.config.*;
@@ -24,9 +25,9 @@ public class ElevatorIOREV implements ElevatorIO {
   /** Leader motor controller * */
   protected final SparkFlex leader =
       new SparkFlex(ElevatorConstants.LEADER_MOTOR_ID, SparkLowLevel.MotorType.kBrushless);
+  private final AbsoluteEncoder leaderEncoder = leader.getAbsoluteEncoder();
 
-  private final RelativeEncoder leaderEncoder = leader.getEncoder();
-  private final Encoder leaderExternalEncoder = new Encoder(5, 6);
+  //private final Encoder leaderExternalEncoder = new Encoder(5, 6);
 
   /*
   Encoder can take two ports, this gives the correct value in rotations for the elevator (when divided by -8192, which is how many ticks are in a rotation)
@@ -38,10 +39,10 @@ public class ElevatorIOREV implements ElevatorIO {
   protected final SparkFlex follower =
       new SparkFlex(ElevatorConstants.FOLLOWER_MOTOR_ID, SparkLowLevel.MotorType.kBrushless);
 
-  private final DigitalInput upperLimitSwitch =
-      new DigitalInput(ElevatorConstants.UPPER_LIMIT_SWITCH_DIO_PORT);
-  private final DigitalInput lowerLimitSwitch =
-      new DigitalInput(ElevatorConstants.LOWER_LIMIT_SWITCH_DIO_PORT);
+//  private final DigitalInput upperLimitSwitch =
+//      new DigitalInput(ElevatorConstants.UPPER_LIMIT_SWITCH_DIO_PORT);
+//  private final DigitalInput lowerLimitSwitch =
+//      new DigitalInput(ElevatorConstants.LOWER_LIMIT_SWITCH_DIO_PORT);
 
   private final SparkClosedLoopController pidController;
   private ElevatorFeedforward feedforward = new ElevatorFeedforward(0, 0, 0);
@@ -56,7 +57,6 @@ public class ElevatorIOREV implements ElevatorIO {
         SparkBase.ResetMode.kResetSafeParameters,
         SparkBase.PersistMode.kPersistParameters);
 
-    leaderEncoder.setPosition(0);
     pidController = leader.getClosedLoopController();
   }
 
@@ -72,12 +72,14 @@ public class ElevatorIOREV implements ElevatorIO {
     config.idleMode(SparkBaseConfig.IdleMode.kCoast);
     config.inverted(true);
     config
-        .encoder
+        .absoluteEncoder
         .velocityConversionFactor((1.0 / GEAR_RATIO) / 60.0)
-        .positionConversionFactor(1.0 / GEAR_RATIO);
+        .positionConversionFactor(1.0 / GEAR_RATIO)
+        .inverted(true);
+        //.zeroOffset() TODO: get the offset and set it!
     config
         .closedLoop
-        .feedbackSensor(ClosedLoopConfig.FeedbackSensor.kAlternateOrExternalEncoder)
+        .feedbackSensor(ClosedLoopConfig.FeedbackSensor.kAbsoluteEncoder)
         .p(ElevatorConstants.kP.get())
         .i(ElevatorConstants.kI.get())
         .d(ElevatorConstants.kD.get())
@@ -88,7 +90,8 @@ public class ElevatorIOREV implements ElevatorIO {
         .positionMode(MAXMotionConfig.MAXMotionPositionMode.kMAXMotionTrapezoidal)
         .allowedClosedLoopError(0.01);
 
-    config.externalEncoder.countsPerRevolution(-8192);
+    //config.externalEncoder.inverted((true));
+    //config.absoluteEncoder.countsPerRevolution(-8192);
 
     if (isFollower) {
       config.follow(leader, true);
@@ -99,6 +102,8 @@ public class ElevatorIOREV implements ElevatorIO {
 
   @Override
   public void updateInputs(ElevatorIOInputs inputs) {
+
+    leader.getAbsoluteEncoder().getPosition();
 
     double elevatorRot = leaderEncoder.getPosition();
     // this is the encoder position
