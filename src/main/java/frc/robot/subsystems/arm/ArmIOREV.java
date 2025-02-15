@@ -9,6 +9,7 @@ package frc.robot.subsystems.arm;
 import static edu.wpi.first.units.Units.*;
 
 import com.revrobotics.RelativeEncoder;
+import com.revrobotics.spark.ClosedLoopSlot;
 import com.revrobotics.spark.SparkBase.ControlType;
 import com.revrobotics.spark.SparkBase.PersistMode;
 import com.revrobotics.spark.SparkBase.ResetMode;
@@ -23,7 +24,6 @@ import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.RobotController;
-import org.littletonrobotics.junction.console.RIOConsoleSource;
 
 /**
  * REV-based implementation of the ArmIO interface. This class uses two SparkFlex motor controllers
@@ -48,8 +48,8 @@ public class ArmIOREV implements ArmIO {
    */
   public final RelativeEncoder leaderEncoder = leader.getExternalEncoder();
 
-  private SparkClosedLoopController closedLoopController = leader.getClosedLoopController();
-  private ArmFeedforward feedforward = new ArmFeedforward(0, 0.52, 0);
+  private final SparkClosedLoopController closedLoopController = leader.getClosedLoopController();
+  private final ArmFeedforward feedforward = new ArmFeedforward(0, 0.2, 0);
   // (leader.getAppliedOutput() * RobotController.getBatteryVoltage()) /
   // Math.cos(Rotations.of(leaderEncoder.getPosition()).in(Degrees))
 
@@ -63,12 +63,10 @@ public class ArmIOREV implements ArmIO {
    */
   public ArmIOREV() {
 
-    // Set both motors to coast mode
     SparkFlexConfig leaderConfig = new SparkFlexConfig();
     leaderConfig.idleMode(SparkBaseConfig.IdleMode.kBrake);
     //    leaderConfig
     //        .encoder
-    //            .countsPerRevolution(8192)
     //        .velocityConversionFactor((1.0 / GEAR_RATIO) / 60.0) // Converts RPM to rotations per
     // second
     //        .positionConversionFactor(1.0 / GEAR_RATIO); // Converts motor rotations to arm
@@ -106,10 +104,12 @@ public class ArmIOREV implements ArmIO {
     double armRot = leaderEncoder.getPosition();
     double armVelRotPerSec = leaderEncoder.getVelocity();
 
-    inputs.motorPosition = Rotations.of(armRot);
+    inputs.encoderPosition = Rotations.of(armRot);
     // For the motor’s rotor position we reconstruct the raw (pre–conversion) value.
-    inputs.motorVelocity = RotationsPerSecond.of(armVelRotPerSec);
+    inputs.encoderVelocity = RotationsPerSecond.of(armVelRotPerSec);
 
+    inputs.motorPosition = Rotations.of(leader.getEncoder().getPosition());
+    inputs.motorVelocity = RotationsPerSecond.of(leader.getEncoder().getVelocity());
     // The applied voltage is the output percentage multiplied by the current battery voltage.
     inputs.appliedVoltage =
         Volts.of(leader.getAppliedOutput() * RobotController.getBatteryVoltage());
@@ -161,6 +161,10 @@ public class ArmIOREV implements ArmIO {
   @Override
   public void stop() {
     leader.stopMotor();
+  }
+
+  public void resetPos() {
+    closedLoopController.setReference(0, ControlType.kPosition, ClosedLoopSlot.kSlot3);
   }
 
   @Override

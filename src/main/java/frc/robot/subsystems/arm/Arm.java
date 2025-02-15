@@ -59,6 +59,7 @@ public class Arm extends SubsystemBase {
     //      if(inputs.motorPosition.gt(Rotations.of(0))){
     //
     //      }
+
   }
 
   @Override
@@ -100,11 +101,11 @@ public class Arm extends SubsystemBase {
   /** Enumeration of available arm positions with their corresponding target angles. */
   private enum ArmMode {
     STOP(Degrees.of(0)), // Stop the arm
-    INTAKE(Degrees.of(-90)), // Arm tucked in
-    L1(Degrees.of(0)), //  Position for scoring in L1
-    L2(Degrees.of(11)), //  Position for scoring in L2
+    INTAKE(Degrees.of(-88)), // Arm tucked in
+    L1(Degrees.of(16)), //  Position for scoring in L1
+    L2(Degrees.of(55)), //  Position for scoring in L2
     L3(Degrees.of(45)), // Position for scoring in L3
-    L4(Degrees.of(90)); // Position for scoring in L4
+    L4(Degrees.of(-60)); // Position for scoring in L4
 
     private final Angle targetAngle;
     private final Angle angleTolerance;

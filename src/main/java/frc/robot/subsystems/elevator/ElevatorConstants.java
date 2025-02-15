@@ -17,7 +17,7 @@ public class ElevatorConstants {
   public static final double elevatorMaxVelocity = 10.0;
   public static final double elevatorMaxAcceleration = 3.0;
 
-  public static final LoggedTunableNumber kP = tunableTable.makeField("kP", 0.1);
+  public static final LoggedTunableNumber kP = tunableTable.makeField("kP", 0.5);
   public static final LoggedTunableNumber kI = tunableTable.makeField("kI", 0.0);
   public static final LoggedTunableNumber kD = tunableTable.makeField("kD", 0.0);
 }

@@ -43,7 +43,7 @@ public class ClawIOREV implements ClawIO {
 
   @Override
   public boolean hasCoral() {
-    return colorSensorV3.getProximity() > 1800;
+    return colorSensorV3.getProximity() > 1500;
   }
 
   public void stop() {

@@ -67,7 +67,7 @@ public class ElevatorIOREV implements ElevatorIO {
     // https://github.com/frc868/2025-Ri3D/blob/main/src/main/java/frc/robot/subsystems/Elevator.java
     var config = new SparkFlexConfig();
     config.closedLoop.feedbackSensor(ClosedLoopConfig.FeedbackSensor.kPrimaryEncoder);
-    config.idleMode(SparkBaseConfig.IdleMode.kCoast);
+    config.idleMode(SparkBaseConfig.IdleMode.kBrake);
     config.inverted(true);
     config
         .encoder
@@ -79,7 +79,7 @@ public class ElevatorIOREV implements ElevatorIO {
         .p(ElevatorConstants.kP.get())
         .i(ElevatorConstants.kI.get())
         .d(ElevatorConstants.kD.get())
-        .outputRange(-0.1, 0.1)
+        .outputRange(-0.5, 0.5)
         .maxMotion
         .maxVelocity(ElevatorConstants.elevatorMaxVelocity)
         .maxAcceleration(ElevatorConstants.elevatorMaxAcceleration)
@@ -119,9 +119,13 @@ public class ElevatorIOREV implements ElevatorIO {
     inputs.lowerLimit = !lowerLimitSwitch.get();
     inputs.upperLimit = !upperLimitSwitch.get();
 
-    if ((inputs.lowerLimit && inputs.leaderVelocity.magnitude() < 0)
-        || (inputs.upperLimit && inputs.leaderVelocity.magnitude() > 0)) {
+    if (inputs.lowerLimit && inputs.leaderVelocity.magnitude() < 0) {
       stop();
+    }
+    if (inputs.upperLimit && inputs.leaderVelocity.magnitude() > 0) {
+      pidController.setReference(
+          inputs.leaderPosition.minus(Rotations.of(0.1)).in(Rotations),
+          SparkBase.ControlType.kPosition);
     }
   }
 
