@@ -25,7 +25,7 @@ public class ElevatorIOREV implements ElevatorIO {
   /** Leader motor controller * */
   protected final SparkFlex leader =
       new SparkFlex(ElevatorConstants.LEADER_MOTOR_ID, SparkLowLevel.MotorType.kBrushless);
-  private final AbsoluteEncoder leaderEncoder = leader.getAbsoluteEncoder();
+  private final RelativeEncoder leaderEncoder = leader.getExternalEncoder();
 
   //private final Encoder leaderExternalEncoder = new Encoder(5, 6);
 
@@ -78,7 +78,7 @@ public class ElevatorIOREV implements ElevatorIO {
         //.zeroOffset() TODO: get the offset and set it!
     config
         .closedLoop
-        .feedbackSensor(ClosedLoopConfig.FeedbackSensor.kAbsoluteEncoder)
+        .feedbackSensor(ClosedLoopConfig.FeedbackSensor.kAlternateOrExternalEncoder)
         .p(ElevatorConstants.kP.get())
         .i(ElevatorConstants.kI.get())
         .d(ElevatorConstants.kD.get())
