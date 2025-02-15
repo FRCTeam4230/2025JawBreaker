@@ -8,7 +8,6 @@ import com.revrobotics.spark.config.*;
 import edu.wpi.first.math.controller.ElevatorFeedforward;
 import edu.wpi.first.units.measure.*;
 import edu.wpi.first.wpilibj.DigitalInput;
-import edu.wpi.first.wpilibj.Encoder;
 
 public class ElevatorIOREV implements ElevatorIO {
   /** The gear ratio between the motor and the elevator mechanism */
@@ -26,7 +25,6 @@ public class ElevatorIOREV implements ElevatorIO {
       new SparkFlex(ElevatorConstants.LEADER_MOTOR_ID, SparkLowLevel.MotorType.kBrushless);
 
   private final RelativeEncoder leaderEncoder = leader.getEncoder();
-  private final Encoder leaderExternalEncoder = new Encoder(5, 6);
 
   /*
   Encoder can take two ports, this gives the correct value in rotations for the elevator (when divided by -8192, which is how many ticks are in a rotation)
@@ -77,7 +75,7 @@ public class ElevatorIOREV implements ElevatorIO {
         .positionConversionFactor(1.0 / GEAR_RATIO);
     config
         .closedLoop
-        .feedbackSensor(ClosedLoopConfig.FeedbackSensor.kAlternateOrExternalEncoder)
+        .feedbackSensor(ClosedLoopConfig.FeedbackSensor.kPrimaryEncoder)
         .p(ElevatorConstants.kP.get())
         .i(ElevatorConstants.kI.get())
         .d(ElevatorConstants.kD.get())
@@ -117,8 +115,6 @@ public class ElevatorIOREV implements ElevatorIO {
     inputs.encoderVelocity = RotationsPerSecond.of(leaderEncoder.getVelocity());
 
     inputs.setpoint = setpoint;
-
-    inputs.dutyCycleEncoderPosition = Rotations.of(leaderExternalEncoder.get() / -8192.0);
 
     inputs.lowerLimit = !lowerLimitSwitch.get();
     inputs.upperLimit = !upperLimitSwitch.get();
