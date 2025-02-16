@@ -1,5 +1,8 @@
 package frc.robot;
 
+import static edu.wpi.first.units.Units.Volts;
+import static frc.robot.Constants.MaxAngularRate;
+
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 import com.ctre.phoenix6.swerve.SwerveRequest;
 import com.pathplanner.lib.auto.AutoBuilder;
@@ -35,8 +38,6 @@ import frc.robot.utils.TunableController;
 import frc.robot.utils.TunableController.TunableControllerType;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
-import static edu.wpi.first.units.Units.Volts;
-
 public class RobotContainer {
 
   private LinearVelocity MaxSpeed = TunerConstants.kSpeedAt12Volts;
@@ -51,8 +52,8 @@ public class RobotContainer {
   // CTRE Default Drive Request
   private final SwerveRequest.FieldCentric drive =
       new SwerveRequest.FieldCentric()
-          .withDeadband(MaxSpeed.times(0.1))
-          .withRotationalDeadband(Constants.MaxAngularRate.times(0.1)) // Add a 10% deadband
+          .withDeadband(MaxSpeed.times(0.05))
+          .withRotationalDeadband(MaxAngularRate.times(0.05)) // Add a 10% deadband
           .withDriveRequestType(DriveRequestType.OpenLoopVoltage);
 
   private final Elevator elevator;
@@ -182,7 +183,7 @@ public class RobotContainer {
                         MaxSpeed.times(
                             joystick.customRight().getX())) // Drive left with negative X (left)
                     .withRotationalRate(
-                        Constants.MaxAngularRate.times(
+                        MaxAngularRate.times(
                             -joystick
                                 .customLeft()
                                 .getX())))); // Drive counterclockwise with negative X (left)
@@ -204,8 +205,8 @@ public class RobotContainer {
                 drivetrain.getChassisSpeeds(),
                 drivetrain.getModuleStates(),
                 drivetrain::getRotation)
-            .withDeadband(MaxSpeed.times(0.1))
-            .withRotationalDeadband(Constants.MaxAngularRate.times(0.1))
+            .withDeadband(MaxSpeed.times(0.05))
+            .withRotationalDeadband(MaxAngularRate.times(0.05))
             .withDriveRequestType(DriveRequestType.OpenLoopVoltage);
     //    joystick
     //        .x()
@@ -228,9 +229,9 @@ public class RobotContainer {
     ProfiledFieldCentricFacingAngle driveFacingAngle =
         new ProfiledFieldCentricFacingAngle(
                 new TrapezoidProfile.Constraints(
-                    Constants.MaxAngularRate.baseUnitMagnitude(),
-                    Constants.MaxAngularRate.div(0.25).baseUnitMagnitude()))
-            .withDeadband(MaxSpeed.times(0.1))
+                    MaxAngularRate.baseUnitMagnitude(),
+                    MaxAngularRate.div(0.25).baseUnitMagnitude()))
+            .withDeadband(MaxSpeed.times(0.05))
             .withDriveRequestType(DriveRequestType.OpenLoopVoltage);
     // Set PID for ProfiledFieldCentricFacingAngle
     driveFacingAngle.HeadingController.setPID(7, 0, 0);
@@ -262,8 +263,8 @@ public class RobotContainer {
     //
     // joystick.start().and(joystick.x()).whileTrue(drivetrain.sysIdQuasistatic(Direction.kReverse));
 
-        joystick.leftTrigger().whileTrue(climber.climberOut(Volts.of(-12)));
-        joystick.rightTrigger().whileTrue(climber.climberOut(Volts.of(8)));
+    joystick.leftTrigger().whileTrue(climber.climberOut(Volts.of(-12)));
+    joystick.rightTrigger().whileTrue(climber.climberOut(Volts.of(8)));
 
     joystick.rightBumper().whileTrue(claw.intake().onlyWhile(() -> !claw.hasCoral()));
     joystick.leftBumper().whileTrue(claw.extake());
@@ -271,7 +272,7 @@ public class RobotContainer {
     joystick.a().onTrue(arm.intake());
     joystick.x().onTrue(arm.L1());
     joystick.y().onTrue(arm.L2());
-    joystick.b().onTrue(elevator.stopCommand().andThen(arm.stopCommand()));
+    joystick.b().onTrue(arm.stopCommand().andThen(elevator.stopCommand()));
 
     joystick.povDown().onTrue(arm.intake().andThen(elevator.intake()));
 
@@ -280,15 +281,10 @@ public class RobotContainer {
 
     joystick.povRight().onTrue(arm.intake().andThen(elevator.L2()));
 
-
-
-
     // reset the field-centric heading on left bumper press
     // joystick.leftBumper().onTrue(drivetrain.runOnce(drivetrain::seedFieldCentric));
 
-        // testJoystick.back().onTrue(arm.reconfigPID());
-
-
+    // testJoystick.back().onTrue(arm.reconfigPID());
 
   }
 
