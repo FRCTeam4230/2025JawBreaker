@@ -8,7 +8,6 @@ import com.revrobotics.spark.config.*;
 import edu.wpi.first.math.controller.ElevatorFeedforward;
 import edu.wpi.first.units.measure.*;
 import edu.wpi.first.wpilibj.DigitalInput;
-import edu.wpi.first.wpilibj.Encoder;
 
 public class ElevatorIOREV implements ElevatorIO {
   /** The gear ratio between the motor and the elevator mechanism */
@@ -26,7 +25,6 @@ public class ElevatorIOREV implements ElevatorIO {
       new SparkFlex(ElevatorConstants.LEADER_MOTOR_ID, SparkLowLevel.MotorType.kBrushless);
 
   private final RelativeEncoder leaderEncoder = leader.getEncoder();
-  private final Encoder leaderExternalEncoder = new Encoder(5, 6);
 
   /*
   Encoder can take two ports, this gives the correct value in rotations for the elevator (when divided by -8192, which is how many ticks are in a rotation)
@@ -69,7 +67,7 @@ public class ElevatorIOREV implements ElevatorIO {
     // https://github.com/frc868/2025-Ri3D/blob/main/src/main/java/frc/robot/subsystems/Elevator.java
     var config = new SparkFlexConfig();
     config.closedLoop.feedbackSensor(ClosedLoopConfig.FeedbackSensor.kPrimaryEncoder);
-    config.idleMode(SparkBaseConfig.IdleMode.kCoast);
+    config.idleMode(SparkBaseConfig.IdleMode.kBrake);
     config.inverted(true);
     config
         .encoder
@@ -77,11 +75,11 @@ public class ElevatorIOREV implements ElevatorIO {
         .positionConversionFactor(1.0 / GEAR_RATIO);
     config
         .closedLoop
-        .feedbackSensor(ClosedLoopConfig.FeedbackSensor.kAlternateOrExternalEncoder)
+        .feedbackSensor(ClosedLoopConfig.FeedbackSensor.kPrimaryEncoder)
         .p(ElevatorConstants.kP.get())
         .i(ElevatorConstants.kI.get())
         .d(ElevatorConstants.kD.get())
-        .outputRange(-0.1, 0.1)
+        .outputRange(-0.5, 0.5)
         .maxMotion
         .maxVelocity(ElevatorConstants.elevatorMaxVelocity)
         .maxAcceleration(ElevatorConstants.elevatorMaxAcceleration)
@@ -118,14 +116,16 @@ public class ElevatorIOREV implements ElevatorIO {
 
     inputs.setpoint = setpoint;
 
-    inputs.dutyCycleEncoderPosition = Rotations.of(leaderExternalEncoder.get() / -8192.0);
-
     inputs.lowerLimit = !lowerLimitSwitch.get();
     inputs.upperLimit = !upperLimitSwitch.get();
 
-    if ((inputs.lowerLimit && inputs.leaderVelocity.magnitude() < 0)
-        || (inputs.upperLimit && inputs.leaderVelocity.magnitude() > 0)) {
+    if (inputs.lowerLimit && inputs.leaderVelocity.magnitude() < 0) {
       stop();
+    }
+    if (inputs.upperLimit && inputs.leaderVelocity.magnitude() > 0) {
+      pidController.setReference(
+          inputs.leaderPosition.minus(Rotations.of(0.1)).in(Rotations),
+          SparkBase.ControlType.kPosition);
     }
   }
 

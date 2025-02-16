@@ -89,13 +89,13 @@ public class Elevator extends SubsystemBase {
   }
 
   /** Enumeration of available elevator distances with their corresponding target angles. */
-  private enum ElevatorMode {
+  public enum ElevatorMode {
     STOP(Rotations.of(0)), // Stop the elevator
     INTAKE(Rotations.of(0)), // Elevator tucked in
-    L1(Rotations.of(0)), // Position for scoring in L1
-    L2(Rotations.of(0)), // Position for scoring in L2
-    L3(Rotations.of(3.53)), // Position for scoring in L3
-    L4(Rotations.of(23)); // Position for scoring in L4
+    L1(Rotations.of(0.2)), // Position for scoring in L1
+    L2(Rotations.of(1.25)), // Position for scoring in L2
+    L3(Rotations.of(5)), // Position for scoring in L3
+    L4(Rotations.of(20)); // Position for scoring in L4
 
     private final Angle targetDistance;
     private final Angle distanceTolerance;
