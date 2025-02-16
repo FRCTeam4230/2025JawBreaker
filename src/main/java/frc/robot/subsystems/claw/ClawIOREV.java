@@ -51,8 +51,8 @@ public class ClawIOREV implements ClawIO {
   }
 
   public void updateInputs(ClawIOInputs inputs) {
-    inputs.proximity = colorSensorV3.getProximity();
-    inputs.proximitySensor = hasCoral();
+    //    inputs.proximity = colorSensorV3.getProximity();
+    //    inputs.proximitySensor = hasCoral();
     inputs.motorVelocity = RotationsPerSecond.of(motor.getEncoder().getVelocity());
     inputs.appliedVoltage = Volts.of(motor.getBusVoltage());
     inputs.supplyCurrent = Amps.of(motor.getOutputCurrent());

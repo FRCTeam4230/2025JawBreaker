@@ -78,11 +78,11 @@ public class RobotContainer {
         new Vision(
             drivetrain::addVisionData,
             new VisionIOLimelight("limelight-bl", drivetrain::getVisionParameters),
-        new VisionIOLimelight("limelight-fr", drivetrain::getVisionParameters));
+            new VisionIOLimelight("limelight-fr", drivetrain::getVisionParameters));
+
         /*
         new VisionIOLimelight("limelight-bl", drivetrain::getVisionParameters),
         new VisionIOLimelight("limelight-br", drivetrain::getVisionParameters));*/
-
 
         elevator = new Elevator(new ElevatorIOREV() {});
         arm = new Arm(new ArmIOREV() {});
@@ -268,13 +268,16 @@ public class RobotContainer {
     joystick.leftTrigger().whileTrue(climber.climberOut(Volts.of(-12)));
     joystick.rightTrigger().whileTrue(climber.climberOut(Volts.of(8)));
 
-    joystick.rightBumper().whileTrue(claw.intake().onlyWhile(() -> !claw.hasCoral()));
+    // joystick.rightBumper().onTrue(claw.intake().onlyWhile(() -> !claw.hasCoral()));
+    joystick.rightBumper().whileTrue(claw.intake());
     joystick.leftBumper().whileTrue(claw.extake());
 
-    joystick.a().onTrue(arm.intake());
     joystick.x().onTrue(arm.L1());
     joystick.y().onTrue(arm.L2());
-    joystick.b().onTrue(elevator.stopCommand().andThen(arm.stopCommand()));
+    joystick.b().onTrue(scoreCommands.stopAll());
+
+    //     joystick.a().onTrue(scoreCommands.extakeCoral().until(() ->
+    //     !claw.hasCoral()).andThen(scoreCommands.intakeCoral())));
 
     joystick.povDown().onTrue(scoreCommands.intakeCoral());
 
