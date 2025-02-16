@@ -74,16 +74,13 @@ public class RobotContainer {
 
         new Vision(
             drivetrain::addVisionData,
-            new VisionIOLimelight("limelight-fl", drivetrain::getVisionParameters));
-        /*new VisionIOLimelight("limelight-fr", drivetrain::getVisionParameters),
+            new VisionIOLimelight("limelight-bl", drivetrain::getVisionParameters),
+        new VisionIOLimelight("limelight-fr", drivetrain::getVisionParameters));
+        /*
         new VisionIOLimelight("limelight-bl", drivetrain::getVisionParameters),
         new VisionIOLimelight("limelight-br", drivetrain::getVisionParameters));*/
 
-        // flywheel = new Flywheel(new FlywheelIOCTRE()); // Disabled to prevent robot movement if
-        // deployed to a real robot
-        // flywheel = new Flywheel(new FlywheelIO() {});
-        // elevator = new Elevator(new ElevatorIOCTRE()); // Disabled to prevent robot movement if
-        // deployed to a real robot
+
         elevator = new Elevator(new ElevatorIOREV() {});
         arm = new Arm(new ArmIOREV() {});
         claw = new Claw(new ClawIOREV() {});
