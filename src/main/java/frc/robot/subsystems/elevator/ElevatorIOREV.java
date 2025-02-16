@@ -8,6 +8,8 @@ import com.revrobotics.spark.config.*;
 import edu.wpi.first.math.controller.ElevatorFeedforward;
 import edu.wpi.first.units.measure.*;
 import edu.wpi.first.wpilibj.DigitalInput;
+import edu.wpi.first.wpilibj.DutyCycleEncoder;
+import edu.wpi.first.wpilibj.Encoder;
 
 public class ElevatorIOREV implements ElevatorIO {
   /** The gear ratio between the motor and the elevator mechanism */
@@ -18,6 +20,7 @@ public class ElevatorIOREV implements ElevatorIO {
    */
   protected final Distance elevatorRadius = Inches.of((1 + 7.0 / 8.0) / 2);
 
+
   private Angle setpoint;
 
   /** Leader motor controller * */
@@ -25,6 +28,9 @@ public class ElevatorIOREV implements ElevatorIO {
       new SparkFlex(ElevatorConstants.LEADER_MOTOR_ID, SparkLowLevel.MotorType.kBrushless);
 
   private final RelativeEncoder leaderEncoder = leader.getEncoder();
+
+
+  private final Encoder leaderExternalEncoder = new Encoder(5, 6);
 
   /*
   Encoder can take two ports, this gives the correct value in rotations for the elevator (when divided by -8192, which is how many ticks are in a rotation)
@@ -56,6 +62,7 @@ public class ElevatorIOREV implements ElevatorIO {
 
     leaderEncoder.setPosition(0);
     pidController = leader.getClosedLoopController();
+
   }
 
   private SparkFlexConfig createSparkFlexConfig(boolean isFollower) {
@@ -66,6 +73,7 @@ public class ElevatorIOREV implements ElevatorIO {
     // NON maxmotion, (use profiledPidController from wpilib)
     // https://github.com/frc868/2025-Ri3D/blob/main/src/main/java/frc/robot/subsystems/Elevator.java
     var config = new SparkFlexConfig();
+
     config.closedLoop.feedbackSensor(ClosedLoopConfig.FeedbackSensor.kPrimaryEncoder);
     config.idleMode(SparkBaseConfig.IdleMode.kBrake);
     config.inverted(true);
@@ -113,6 +121,8 @@ public class ElevatorIOREV implements ElevatorIO {
     inputs.followerStatorCurrent = Amps.of(follower.getOutputCurrent());
     inputs.encoderPosition = Rotations.of(leader.getEncoder().getPosition());
     inputs.encoderVelocity = RotationsPerSecond.of(leaderEncoder.getVelocity());
+
+    inputs.dutyCycleEncoderPosition = Rotations.of(leaderExternalEncoder.get() / -8192.0);
 
     inputs.setpoint = setpoint;
 

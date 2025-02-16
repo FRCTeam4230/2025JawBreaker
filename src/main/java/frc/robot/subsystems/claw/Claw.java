@@ -107,6 +107,7 @@ public class Claw extends SubsystemBase {
         () -> io.setVolts(Volts.of(ClawConstants.INTAKE_VOLTAGE.get())),
         () -> io.setVolts(Volts.of(0.05)));
   }
+  //TODO: smart current limit for motor, set hold mode to only enable when proximity gets too far
 
   public Command extake() {
     return Commands.startEnd(
