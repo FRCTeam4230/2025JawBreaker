@@ -35,6 +35,8 @@ import frc.robot.utils.TunableController;
 import frc.robot.utils.TunableController.TunableControllerType;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
+import static edu.wpi.first.units.Units.Volts;
+
 public class RobotContainer {
 
   private LinearVelocity MaxSpeed = TunerConstants.kSpeedAt12Volts;
@@ -260,10 +262,8 @@ public class RobotContainer {
     //
     // joystick.start().and(joystick.x()).whileTrue(drivetrain.sysIdQuasistatic(Direction.kReverse));
 
-    //    joystick
-    //        .leftBumper()
-    //        .whileTrue(climber.climberOut(Volts.of(-12)));
-    //    joystick.rightBumper().whileTrue(climber.climberOut(Volts.of(8)));
+        joystick.leftTrigger().whileTrue(climber.climberOut(Volts.of(-12)));
+        joystick.rightTrigger().whileTrue(climber.climberOut(Volts.of(8)));
 
     joystick.rightBumper().whileTrue(claw.intake().onlyWhile(() -> !claw.hasCoral()));
     joystick.leftBumper().whileTrue(claw.extake());
@@ -272,45 +272,23 @@ public class RobotContainer {
     joystick.x().onTrue(arm.L1());
     joystick.y().onTrue(arm.L2());
     joystick.b().onTrue(elevator.stopCommand().andThen(arm.stopCommand()));
+
     joystick.povDown().onTrue(arm.intake().andThen(elevator.intake()));
 
     joystick.povLeft().onTrue(arm.L2().andThen(elevator.L3()));
     joystick.povUp().onTrue(arm.L2().andThen(elevator.L4()));
 
     joystick.povRight().onTrue(arm.intake().andThen(elevator.L2()));
-    //    joystick.povDown().onTrue(elevator.intake());
-    //    joystick.povLeft().onTrue(elevator.L3());
-    //    joystick.povUp().onTrue(elevator.L4());
 
-    /*
 
-        testJoystick.a().onTrue(arm.intake());
-        // testJoystick.povRight().onTrue(arm.intake().alongWith(elevator.intake()));
 
-        testJoystick.x().onTrue(arm.L1());
-        // testJoystick.povDown().onTrue(arm.L1().alongWith(elevator.L1()));
-
-        testJoystick.b().onTrue(arm.L2());
-        // testJoystick.povLeft().onTrue(arm.L2().alongWith(elevator.L2()));
-
-        testJoystick.rightTrigger().onTrue(arm.L4());
-        // testJoystick.povUp().onTrue(arm.L3().alongWith(elevator.L3()));
-
-        testJoystick.y().onTrue(arm.stopCommand().alongWith(elevator.stopCommand()));
-
-        // testJoystick.back().onTrue(arm.reconfigPID());
-    */
-    // joystick.a().onTrue(arm.L1());
-    // joystick.b().onTrue(arm.L2());
-    // joystick.x().onTrue(arm.stopCommand());
-    // joystick.y().onTrue(arm.L4());
 
     // reset the field-centric heading on left bumper press
     // joystick.leftBumper().onTrue(drivetrain.runOnce(drivetrain::seedFieldCentric));
-    //    joystick.a().onTrue(elevator.L1());
-    //    joystick.b().onTrue(elevator.L2());
-    //    joystick.x().onTrue(elevator.L3());
-    //    joystick.y().onTrue(elevator.L4());
+
+        // testJoystick.back().onTrue(arm.reconfigPID());
+
+
 
   }
 
