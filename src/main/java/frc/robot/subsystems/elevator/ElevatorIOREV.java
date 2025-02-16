@@ -8,7 +8,6 @@ import com.revrobotics.spark.config.*;
 import edu.wpi.first.math.controller.ElevatorFeedforward;
 import edu.wpi.first.units.measure.*;
 import edu.wpi.first.wpilibj.DigitalInput;
-import edu.wpi.first.wpilibj.DutyCycleEncoder;
 import edu.wpi.first.wpilibj.Encoder;
 
 public class ElevatorIOREV implements ElevatorIO {
@@ -20,7 +19,6 @@ public class ElevatorIOREV implements ElevatorIO {
    */
   protected final Distance elevatorRadius = Inches.of((1 + 7.0 / 8.0) / 2);
 
-
   private Angle setpoint;
 
   /** Leader motor controller * */
@@ -28,7 +26,6 @@ public class ElevatorIOREV implements ElevatorIO {
       new SparkFlex(ElevatorConstants.LEADER_MOTOR_ID, SparkLowLevel.MotorType.kBrushless);
 
   private final RelativeEncoder leaderEncoder = leader.getEncoder();
-
 
   private final Encoder leaderExternalEncoder = new Encoder(5, 6);
 
@@ -62,7 +59,6 @@ public class ElevatorIOREV implements ElevatorIO {
 
     leaderEncoder.setPosition(0);
     pidController = leader.getClosedLoopController();
-
   }
 
   private SparkFlexConfig createSparkFlexConfig(boolean isFollower) {

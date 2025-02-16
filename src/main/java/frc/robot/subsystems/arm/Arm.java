@@ -180,7 +180,7 @@ public class Arm extends SubsystemBase {
   @AutoLogOutput
   public boolean isAtTarget() {
     if (currentMode == ArmMode.STOP) return true;
-    return getPosition().isNear(currentMode.targetAngle, currentMode.angleTolerance);
+    return getPosition().isNear(currentMode.targetAngle, Rotations.of(0.29));
   }
 
   /**

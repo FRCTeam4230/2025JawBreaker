@@ -1,5 +1,7 @@
 package frc.robot;
 
+import static edu.wpi.first.units.Units.Volts;
+
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 import com.ctre.phoenix6.swerve.SwerveRequest;
 import com.pathplanner.lib.auto.AutoBuilder;
@@ -10,6 +12,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.commands.DriveCommands;
+import frc.robot.commands.ScoringCommands;
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.Climber.Climber;
 import frc.robot.subsystems.Climber.ClimberIOREV;
@@ -35,8 +38,6 @@ import frc.robot.utils.TunableController;
 import frc.robot.utils.TunableController.TunableControllerType;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
-import static edu.wpi.first.units.Units.Volts;
-
 public class RobotContainer {
 
   private LinearVelocity MaxSpeed = TunerConstants.kSpeedAt12Volts;
@@ -59,6 +60,8 @@ public class RobotContainer {
   private final Arm arm;
   private final Claw claw;
   private final Climber climber;
+
+  private final ScoringCommands scoreCommands;
 
   /* Setting up bindings for necessary control of the swerve drive platform */
   private final SwerveRequest.SwerveDriveBrake brake = new SwerveRequest.SwerveDriveBrake();
@@ -125,6 +128,7 @@ public class RobotContainer {
         arm = new Arm(new ArmIOREVSIM());
         claw = new Claw(new ClawIOSIMREV());
         climber = new Climber(new ClimberIOSIM());
+
         break;
 
       default:
@@ -162,6 +166,8 @@ public class RobotContainer {
     autoChooser.addOption(
         "Drive Wheel Radius Characterization",
         DriveCommands.wheelRadiusCharacterization(drivetrain));
+    scoreCommands = new ScoringCommands(elevator, arm, claw);
+
     configureBindings();
   }
 
@@ -262,8 +268,8 @@ public class RobotContainer {
     //
     // joystick.start().and(joystick.x()).whileTrue(drivetrain.sysIdQuasistatic(Direction.kReverse));
 
-        joystick.leftTrigger().whileTrue(climber.climberOut(Volts.of(-12)));
-        joystick.rightTrigger().whileTrue(climber.climberOut(Volts.of(8)));
+    joystick.leftTrigger().whileTrue(climber.climberOut(Volts.of(-12)));
+    joystick.rightTrigger().whileTrue(climber.climberOut(Volts.of(8)));
 
     joystick.rightBumper().whileTrue(claw.intake().onlyWhile(() -> !claw.hasCoral()));
     joystick.leftBumper().whileTrue(claw.extake());
@@ -273,22 +279,19 @@ public class RobotContainer {
     joystick.y().onTrue(arm.L2());
     joystick.b().onTrue(elevator.stopCommand().andThen(arm.stopCommand()));
 
-    joystick.povDown().onTrue(arm.intake().andThen(elevator.intake()));
+    joystick.povDown().onTrue(scoreCommands.intakeCoral());
 
-    joystick.povLeft().onTrue(arm.L2().andThen(elevator.L3()));
-    joystick.povUp().onTrue(arm.L2().andThen(elevator.L4()));
+    joystick.povLeft().onTrue(scoreCommands.midLevel());
+    joystick.povUp().onTrue(scoreCommands.topLevel());
 
-    joystick.povRight().onTrue(arm.intake().andThen(elevator.L2()));
-
-
-
+    joystick
+        .povRight()
+        .onTrue(arm.intake().andThen(Commands.waitSeconds(0.25)).andThen(elevator.L2()));
 
     // reset the field-centric heading on left bumper press
     // joystick.leftBumper().onTrue(drivetrain.runOnce(drivetrain::seedFieldCentric));
 
-        // testJoystick.back().onTrue(arm.reconfigPID());
-
-
+    // testJoystick.back().onTrue(arm.reconfigPID());
 
   }
 
