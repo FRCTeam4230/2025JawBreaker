@@ -1,6 +1,7 @@
 package frc.robot;
 
-import static edu.wpi.first.units.Units.*;
+import static edu.wpi.first.units.Units.Volts;
+import static frc.robot.Constants.MaxAngularRate;
 
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 import com.ctre.phoenix6.swerve.SwerveRequest;
@@ -57,8 +58,8 @@ public class RobotContainer {
   // CTRE Default Drive Request
   private final SwerveRequest.FieldCentric drive =
       new SwerveRequest.FieldCentric()
-          .withDeadband(MaxSpeed.times(0.1))
-          .withRotationalDeadband(Constants.MaxAngularRate.times(0.1)) // Add a 10% deadband
+          .withDeadband(MaxSpeed.times(0.05))
+          .withRotationalDeadband(MaxAngularRate.times(0.05)) // Add a 10% deadband
           .withDriveRequestType(DriveRequestType.OpenLoopVoltage);
 
   private final Elevator elevator;
@@ -190,7 +191,7 @@ public class RobotContainer {
                         MaxSpeed.times(
                             joystick.customRight().getX())) // Drive left with negative X (left)
                     .withRotationalRate(
-                        Constants.MaxAngularRate.times(
+                        MaxAngularRate.times(
                             -joystick
                                 .customLeft()
                                 .getX())))); // Drive counterclockwise with negative X (left)
@@ -212,8 +213,8 @@ public class RobotContainer {
                 drivetrain.getChassisSpeeds(),
                 drivetrain.getModuleStates(),
                 drivetrain::getRotation)
-            .withDeadband(MaxSpeed.times(0.1))
-            .withRotationalDeadband(Constants.MaxAngularRate.times(0.1))
+            .withDeadband(MaxSpeed.times(0.05))
+            .withRotationalDeadband(MaxAngularRate.times(0.05))
             .withDriveRequestType(DriveRequestType.OpenLoopVoltage);
     //    joystick
     //        .x()
@@ -236,9 +237,9 @@ public class RobotContainer {
     ProfiledFieldCentricFacingAngle driveFacingAngle =
         new ProfiledFieldCentricFacingAngle(
                 new TrapezoidProfile.Constraints(
-                    Constants.MaxAngularRate.baseUnitMagnitude(),
-                    Constants.MaxAngularRate.div(0.25).baseUnitMagnitude()))
-            .withDeadband(MaxSpeed.times(0.1))
+                    MaxAngularRate.baseUnitMagnitude(),
+                    MaxAngularRate.div(0.25).baseUnitMagnitude()))
+            .withDeadband(MaxSpeed.times(0.05))
             .withDriveRequestType(DriveRequestType.OpenLoopVoltage);
     // Set PID for ProfiledFieldCentricFacingAngle
     driveFacingAngle.HeadingController.setPID(7, 0, 0);

@@ -71,6 +71,8 @@ public class ArmIOREV implements ArmIO {
     // second
     //        .positionConversionFactor(1.0 / GEAR_RATIO); // Converts motor rotations to arm
     // rotations
+    leaderConfig.limitSwitch.forwardLimitSwitchEnabled(false).reverseLimitSwitchEnabled(false);
+
     leaderConfig.externalEncoder.countsPerRevolution(8192);
     leaderConfig.externalEncoder.inverted(true);
     leaderConfig
@@ -125,18 +127,13 @@ public class ArmIOREV implements ArmIO {
     inputs.armAngle = Rotations.of(armRot);
     inputs.setpoint = setpoint;
 
-    inputs.lowerLimit = !lowerLimitSwitch.get();
-    inputs.upperLimit = !upperLimitSwitch.get();
+    inputs.lowerLimit = leader.getForwardLimitSwitch().isPressed();
+    inputs.upperLimit = leader.getReverseLimitSwitch().isPressed();
 
-    //    if (inputs.lowerLimit) {
-    //      leaderEncoder.setPosition(0);
-    //    }
+    // This is because the limit switches are wired backwards as of now
     if ((inputs.lowerLimit && inputs.motorVelocity.magnitude() < 0)
         || (inputs.upperLimit && inputs.motorVelocity.magnitude() > 0)) {
       stop();
-
-      System.out.println(
-          "Feedback sensor: " + leader.configAccessor.closedLoop.getFeedbackSensor());
 
       // Angle error = inputs.setpoint.minus(inputs.motorPosition);
     }
