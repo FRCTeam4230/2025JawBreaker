@@ -1,7 +1,7 @@
 package frc.robot.subsystems.claw;
 
-import frc.robot.util.LoggedTunableNumber;
-import frc.robot.util.TunableNumberWrapper;
+import frc.robot.utils.LoggedTunableNumber;
+import frc.robot.utils.TunableNumberWrapper;
 import java.lang.invoke.MethodHandles;
 
 public class ClawConstants {
