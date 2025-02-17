@@ -8,7 +8,7 @@ public class ClawConstants {
   private static final TunableNumberWrapper tunableTable =
       new TunableNumberWrapper(MethodHandles.lookup().lookupClass()); // not tuned yet
   public static final int clawMotorID = 33;
-  public static final int beamBreakDIOPort = 9;
+  public static final int beamBreakDIOPort = 7;
 
   public static final LoggedTunableNumber INTAKE_VOLTAGE =
       tunableTable.makeField("intake volts", 6);
