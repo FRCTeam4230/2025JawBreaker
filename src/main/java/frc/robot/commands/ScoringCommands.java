@@ -8,9 +8,9 @@ import frc.robot.subsystems.elevator.*;
 
 public class ScoringCommands extends Command {
 
-  Elevator elevator;
-  Arm arm;
-  Claw claw;
+  private final Elevator elevator;
+  private final Arm arm;
+  private final Claw claw;
 
   public ScoringCommands(Elevator elevator, Arm arm, Claw claw) {
     this.elevator = elevator;
