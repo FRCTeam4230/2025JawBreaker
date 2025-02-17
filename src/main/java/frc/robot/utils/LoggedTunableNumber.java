@@ -8,10 +8,11 @@
 package frc.robot.utils;
 
 import frc.robot.Constants;
+import org.littletonrobotics.junction.networktables.LoggedNetworkNumber;
+
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Supplier;
-import org.littletonrobotics.junction.networktables.LoggedDashboardNumber;
 
 /**
  * Class for a tunable number. Gets value from dashboard in tuning mode, returns default if not or
@@ -22,7 +23,7 @@ public class LoggedTunableNumber {
 
   private final String key;
   private double defaultValue = -1.0;
-  private LoggedDashboardNumber dashboardNumber;
+  private LoggedNetworkNumber dashboardNumber;
   private Map<Integer, Double> lastHasChangedValues = new HashMap<>();
 
   /**
@@ -52,10 +53,10 @@ public class LoggedTunableNumber {
    * @param defaultValue The default value
    */
   public void initDefault(double defaultValue) {
-    if (hasDefault.get()) {
+    if (Boolean.TRUE.equals(hasDefault.get())) {
       this.defaultValue = defaultValue;
       if (Constants.tuningMode) {
-        dashboardNumber = new LoggedDashboardNumber(key, defaultValue);
+        dashboardNumber = new LoggedNetworkNumber(key, defaultValue);
       }
     }
   }
