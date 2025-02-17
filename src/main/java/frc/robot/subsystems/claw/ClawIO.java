@@ -13,7 +13,10 @@ package frc.robot.subsystems.claw;
 
 import static edu.wpi.first.units.Units.*;
 
-import edu.wpi.first.units.measure.*;
+import edu.wpi.first.units.measure.AngularVelocity;
+import edu.wpi.first.units.measure.Current;
+import edu.wpi.first.units.measure.Temperature;
+import edu.wpi.first.units.measure.Voltage;
 import org.littletonrobotics.junction.AutoLog;
 
 public interface ClawIO {
@@ -21,13 +24,10 @@ public interface ClawIO {
   class ClawIOInputs {
     public boolean leaderConnected = false;
     public boolean encoderConnected = false;
-    public boolean proximitySensor = false;
 
-    public boolean lowerLimit = false;
-    public boolean upperLimit = false;
+    public boolean beamBreakTriggered = false;
 
     public AngularVelocity motorVelocity = RotationsPerSecond.of(0);
-    public int proximity = 0;
 
     public Voltage appliedVoltage = Volts.of(0.0);
     public Current supplyCurrent = Amps.of(0);
@@ -39,10 +39,6 @@ public interface ClawIO {
 
   /** Updates the set of loggable inputs. */
   public default void updateInputs(ClawIOInputs inputs) {}
-
-  public default boolean hasCoral() {
-    return false;
-  }
 
   /** Stop in open loop. */
   public default void stop() {}

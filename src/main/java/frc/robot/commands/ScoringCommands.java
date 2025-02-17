@@ -31,12 +31,8 @@ public class ScoringCommands extends Command {
   }
 
   public Command intakeCoral() {
-    return Commands.sequence(arm.intake(), Commands.waitSeconds(0.25), elevator.intake());
+    return Commands.sequence(arm.intake(), Commands.waitUntil(arm::isParked), elevator.intake());
   }
-
-  //  public Command extakeCoral() {
-  //    return Commands.sequence(intakeCoral(), claw.extake().onlyWhile(() -> claw.hasCoral()));
-  //  }
 
   public Command stopAll() {
     return Commands.sequence(claw.stopClaw(), arm.stopCommand(), elevator.stopCommand());
