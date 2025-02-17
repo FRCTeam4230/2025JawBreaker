@@ -11,14 +11,14 @@
 
 package frc.robot.subsystems.claw;
 
-import static edu.wpi.first.units.Units.*;
-
 import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.Alert.AlertType;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import org.littletonrobotics.junction.Logger;
+
+import static edu.wpi.first.units.Units.*;
 
 /**
  * The Arm subsystem controls a dual-motor arm mechanism for game piece manipulation. It supports
@@ -51,10 +51,12 @@ public class Claw extends SubsystemBase {
     encoderAlert.set(!inputs.encoderConnected);
   }
 
+  public Command hold(){
+    return Commands.run(() -> io.setVolts(Volts.of(0.5)), this);
+  }
+
   public Command intake() {
-    return Commands.startEnd(
-        () -> io.setVolts(Volts.of(ClawConstants.INTAKE_VOLTAGE.get())),
-        () -> io.setVolts(Volts.of(0.5)));
+    return  Commands.run(() -> io.setVolts(Volts.of(ClawConstants.INTAKE_VOLTAGE.get())),this);
   }
   // TODO: smart current limit for motor, set hold mode to only enable when proximity gets too far
 
