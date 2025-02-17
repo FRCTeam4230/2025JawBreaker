@@ -1,7 +1,7 @@
 package frc.robot;
 
-import static edu.wpi.first.units.Units.Volts;
-import static frc.robot.Constants.MaxAngularRate;
+import static edu.wpi.first.units.Units.*;
+import static frc.robot.Constants.*;
 
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 import com.ctre.phoenix6.swerve.SwerveRequest;
@@ -49,6 +49,7 @@ public class RobotContainer {
   private LinearVelocity MaxSpeed = TunerConstants.kSpeedAt12Volts;
   private final TunableController joystick =
       new TunableController(0).withControllerType(TunableControllerType.QUADRATIC);
+
   private final TunableController testJoystick =
       new TunableController(1).withControllerType(TunableControllerType.QUADRATIC);
 
@@ -216,6 +217,7 @@ public class RobotContainer {
             .withDeadband(MaxSpeed.times(0.05))
             .withRotationalDeadband(MaxAngularRate.times(0.05))
             .withDriveRequestType(DriveRequestType.OpenLoopVoltage);
+
     //    joystick
     //        .x()
     //        .whileTrue(

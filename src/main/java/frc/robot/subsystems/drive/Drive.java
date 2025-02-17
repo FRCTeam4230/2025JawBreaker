@@ -387,6 +387,42 @@ public class Drive extends SubsystemBase {
     }
   }
 
+  private void alignToScore() {
+    Pose2d targetPose =
+        this.getClosestBranch(false, false); // THESE ARE INTENTS that are passed to getClosesBranch
+
+    double rotTarget = targetPose.getRotation().getDegrees();
+    double rotSpeed = this.getRotControl(rotTarget, inputs.gyroYaw[0].getDegrees());
+    // xPower = xPower * 0.5 + this.getAlignX(targetPose.getTranslation());
+    var xPower = this.getAlignX(targetPose.getTranslation());
+    // yPower = yPower * 0.5 + this.getAlignY(targetPose.getTranslation());
+    var yPower = this.getAlignY(targetPose.getTranslation());
+
+    // this.swerveSignal = swerveHelper.setDrive(xPower, yPower, rotSpeed, getGyroAngle());
+  }
+
+  /**
+   * automatically creates a rotational joystick value to rotate the robot towards a specific target
+   *
+   * @param i_target target direction for the robot to face, field centric, bearing degrees
+   * @param i_gyro the gyro value, field centric, in bearing degrees
+   * @return double that indicates what the rotational joystick value should be
+   */
+  private double getRotControl(double i_target, double i_gyro) {
+    var rotDelta = i_target - i_gyro;
+    var rotPID = 0.0;
+    if (rotDelta > 180) {
+      rotPID = (rotDelta - 360) / 180;
+    } else if (Math.abs(rotDelta) <= 180.0) {
+      rotPID = rotDelta / 180.0;
+    } else {
+      rotPID = (rotDelta + 360) / 180;
+    }
+    return Math.signum(rotPID)
+        * Math.min(
+            Math.abs(rotPID * DriveConstants.PID_ROTATION), 1.0 / DriveConstants.ROTATION_SPEED);
+  }
+
   public Pose2d getClosestBranch(boolean right, boolean topTriangle) {
     if (right) {
       if (topTriangle) {
