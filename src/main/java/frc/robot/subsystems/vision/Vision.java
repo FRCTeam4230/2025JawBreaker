@@ -18,6 +18,7 @@ import frc.robot.subsystems.vision.VisionUtil.VisionMode;
 import frc.robot.utils.FieldConstants;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.List;
 import org.littletonrobotics.junction.Logger;
 
@@ -196,16 +197,13 @@ public class Vision extends SubsystemBase {
   /** Sorts vision measurements by timestamp. */
   private List<VisionMeasurement> sortMeasurements(List<VisionMeasurement> measurements) {
     return measurements.stream()
-        .sorted(
-            (vm1, vm2) ->
-                Double.compare(
-                    vm1.poseEstimate().timestampSeconds(), vm2.poseEstimate().timestampSeconds()))
+        .sorted(Comparator.comparingDouble(vm -> vm.poseEstimate().timestampSeconds()))
         .toList();
   }
 
   /** Functional interface for consuming processed vision measurements. */
   @FunctionalInterface
-  public static interface VisionConsumer {
+  public interface VisionConsumer {
     void accept(List<VisionMeasurement> visionMeasurements);
   }
 }

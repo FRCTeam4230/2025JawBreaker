@@ -1,7 +1,6 @@
-package frc.robot.subsystems.Climber;
+package frc.robot.subsystems.climber;
 
 import static edu.wpi.first.units.Units.*;
-import static frc.robot.subsystems.arm.ArmConstants.GEAR_RATIO;
 
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.spark.SparkClosedLoopController;

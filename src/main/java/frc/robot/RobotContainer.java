@@ -1,11 +1,12 @@
 package frc.robot;
 
-import static edu.wpi.first.units.Units.Volts;
-
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 import com.ctre.phoenix6.swerve.SwerveRequest;
 import com.pathplanner.lib.auto.AutoBuilder;
-import edu.wpi.first.math.geometry.*;
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation3d;
+import edu.wpi.first.math.geometry.Transform3d;
+import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.units.measure.LinearVelocity;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -14,13 +15,15 @@ import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.commands.DriveCommands;
 import frc.robot.commands.ScoringCommands;
 import frc.robot.generated.TunerConstants;
-import frc.robot.subsystems.Climber.Climber;
-import frc.robot.subsystems.Climber.ClimberIOREV;
-import frc.robot.subsystems.Climber.ClimberIOSIM;
-import frc.robot.subsystems.arm.*;
+import frc.robot.subsystems.arm.Arm;
+import frc.robot.subsystems.arm.ArmIOREV;
+import frc.robot.subsystems.arm.ArmIOREVSIM;
 import frc.robot.subsystems.claw.Claw;
 import frc.robot.subsystems.claw.ClawIOREV;
 import frc.robot.subsystems.claw.ClawIOSIMREV;
+import frc.robot.subsystems.climber.Climber;
+import frc.robot.subsystems.climber.ClimberIOREV;
+import frc.robot.subsystems.climber.ClimberIOSIM;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.drive.DriveIO;
 import frc.robot.subsystems.drive.DriveIOCTRE;
@@ -37,6 +40,8 @@ import frc.robot.subsystems.vision.VisionIOPhotonVisionSIM;
 import frc.robot.utils.TunableController;
 import frc.robot.utils.TunableController.TunableControllerType;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
+
+import static edu.wpi.first.units.Units.*;
 
 public class RobotContainer {
 

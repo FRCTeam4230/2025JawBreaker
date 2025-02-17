@@ -16,6 +16,7 @@ import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
@@ -34,6 +35,7 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.Constants;
 import frc.robot.Constants.Mode;
+import frc.robot.subsystems.vision.VisionConsts;
 import frc.robot.subsystems.vision.VisionUtil.VisionMeasurement;
 import frc.robot.utils.ArrayBuilder;
 import java.util.List;
@@ -383,5 +385,64 @@ public class Drive extends SubsystemBase {
       currentPositions[moduleIndex].distanceMeters = inputs.drivePositions[moduleIndex][timeIndex];
       currentPositions[moduleIndex].angle = inputs.steerPositions[moduleIndex][timeIndex];
     }
+  }
+
+  public Pose2d getClosestBranch(boolean right, boolean topTriangle) {
+    if (right) {
+      if (topTriangle) {
+        return getPose().nearest(VisionConsts.rightTopBranches);
+      } else {
+        return getPose().nearest(VisionConsts.rightBottomBranches);
+      }
+    } else {
+      if (topTriangle) {
+        return getPose().nearest(VisionConsts.leftTopBranches);
+      } else {
+        return getPose().nearest(VisionConsts.leftBottomBranches);
+      }
+    }
+  }
+
+  /**
+   * Gets closest coral station to robot to determine what direction to lock heading
+   *
+   * @return boolean true for right, false for left
+   */
+  public boolean isClosestStationRight() {
+    return !(getPose().getY() > VisionConsts.halfwayAcrossFieldY);
+  }
+
+  /**
+   * Driver Station relative
+   *
+   * @param target // Target coordinate (m) to align with proportional control loop
+   * @return // Control value for X power for aligning robot to certain target
+   */
+  public double getAlignX(Translation2d target) {
+    return DriveConstants.ALIGN_P * -(target.getY() - getPose().getY());
+  }
+
+  /**
+   * Driver Station relative
+   *
+   * @param target // Target coordinate (m) to align with proportional control loop
+   * @return // Control value for X power for aligning robot to certain target
+   */
+  public double getAlignY(Translation2d target) {
+    return DriveConstants.ALIGN_P * (target.getX() - getPose().getX());
+  }
+
+  public double distanceToTarget(Translation2d target) {
+    return Math.hypot(getPose().getX() - target.getX(), getPose().getY() - target.getY());
+  }
+
+  /**
+   * @param target Target coordinate (m)
+   * @return Controller bearing degrees (aka what to plug into rotTarget)
+   */
+  public double turnToTarget(Translation2d target) {
+    double offsetX = target.getX() - getPose().getX();
+    double offsetY = target.getY() - getPose().getY();
+    return (360 - Math.toDegrees(Math.atan2(offsetY, offsetX)) % 360);
   }
 }

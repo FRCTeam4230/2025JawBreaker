@@ -12,7 +12,7 @@ import org.littletonrobotics.junction.AutoLog;
 
 public interface VisionIO {
   @AutoLog
-  public static class VisionIOInputs {
+  class VisionIOInputs {
     boolean connected = false;
     PoseEstimate poseEstimateMT1 = new PoseEstimate();
     PoseEstimate poseEstimateMT2 = new PoseEstimate();
