@@ -93,6 +93,7 @@ public class Elevator extends SubsystemBase {
   public enum ElevatorMode {
     STOP(Rotations.of(0)), // Stop the elevator
     INTAKE(Rotations.of(0)), // Elevator tucked in
+    PARKED(Rotations.of(0.1)),
     L1(Rotations.of(0.2)), // Position for scoring in L1
     L2(Rotations.of(1.25)), // Position for scoring in L2
     L3(Rotations.of(5)), // Position for scoring in L3
@@ -226,6 +227,13 @@ public class Elevator extends SubsystemBase {
    */
   public final Command intake() {
     return setPositionCommand(ElevatorMode.INTAKE);
+  }
+
+  /**
+   * @return Command to park the elevator
+   */
+  public final Command park() {
+    return setPositionCommand(ElevatorMode.PARKED);
   }
 
   /**
