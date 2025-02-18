@@ -28,11 +28,11 @@ public class CounterWeight extends SubsystemBase {
     io.stop();
   }
 
-  public final Command climberOut(Voltage volts) {
+  public final Command counterWeightOut(Voltage volts) {
     return Commands.startEnd(() -> setPosition(volts), () -> stop());
   }
 
-  public final Command climberStop() {
+  public final Command counterWeightStop() {
     return Commands.runOnce(() -> stop());
   }
 }
