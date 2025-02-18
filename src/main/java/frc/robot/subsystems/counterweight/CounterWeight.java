@@ -1,18 +1,18 @@
-package frc.robot.subsystems.climber;
+package frc.robot.subsystems.counterweight;
 
 import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
-public class Climber extends SubsystemBase {
+public class CounterWeight extends SubsystemBase {
 
-  private final ClimberIO io;
-  private final ClimberIOInputsAutoLogged inputs;
+  private final CounterWeightIO io;
+  private final CounterWeightIOInputsAutoLogged inputs;
 
-  public Climber(ClimberIO io) {
+  public CounterWeight(CounterWeightIO io) {
     this.io = io;
-    this.inputs = new ClimberIOInputsAutoLogged();
+    this.inputs = new CounterWeightIOInputsAutoLogged();
   }
 
   @Override

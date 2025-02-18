@@ -1,7 +1,6 @@
-package frc.robot.subsystems.climber;
+package frc.robot.subsystems.counterweight;
 
 import static edu.wpi.first.units.Units.*;
-import static frc.robot.subsystems.climber.ClimberConstants.*;
 
 import com.revrobotics.sim.SparkFlexSim;
 import edu.wpi.first.math.numbers.N1;
@@ -16,7 +15,7 @@ import edu.wpi.first.units.measure.Mass;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.simulation.SingleJointedArmSim;
 
-public class ClimberIOSIM extends ClimberIOREV {
+public class CounterWeightIOSIM extends CounterWeightIOREV {
 
   private final SparkFlexSim motorSim;
   DCMotor dcMotor = DCMotor.getNeoVortex(1);
@@ -26,7 +25,7 @@ public class ClimberIOSIM extends ClimberIOREV {
   Mass armMass = Pounds.of(2.6);
   double armMOI = SingleJointedArmSim.estimateMOI(armLength.in(Meters), armMass.in(Kilograms));
 
-  public ClimberIOSIM() {
+  public CounterWeightIOSIM() {
 
     motorSim = new SparkFlexSim(motor, dcMotor);
 
@@ -49,7 +48,7 @@ public class ClimberIOSIM extends ClimberIOREV {
   }
 
   @Override
-  public void updateInputs(ClimberIOInputs inputs) {
+  public void updateInputs(CounterWeightIOInputs inputs) {
     super.updateInputs(inputs);
 
     armSim.setInputVoltage(motorSim.getAppliedOutput() * RobotController.getBatteryVoltage());
