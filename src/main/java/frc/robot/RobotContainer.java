@@ -309,7 +309,7 @@ public class RobotContainer {
     /**** COUNTER WEIGHT TEST ********/
     joystick
         .leftBumper()
-        .whileTrue(counterWeight.counterWeightOut(Volts.of(4))); // TODO: CONSTANTS and change this.
+        .whileTrue(counterWeight.counterWeightOut()); // TODO: CONSTANTS and change this.
   }
 
   public Command getAutonomousCommand() {
