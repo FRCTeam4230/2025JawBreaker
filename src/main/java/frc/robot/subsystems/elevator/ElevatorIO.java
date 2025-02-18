@@ -6,10 +6,10 @@
 
 package frc.robot.subsystems.elevator;
 
+import static edu.wpi.first.units.Units.*;
+
 import edu.wpi.first.units.measure.*;
 import org.littletonrobotics.junction.AutoLog;
-
-import static edu.wpi.first.units.Units.*;
 
 public interface ElevatorIO {
   @AutoLog
@@ -18,7 +18,6 @@ public interface ElevatorIO {
     public boolean followerConnected = false;
     public boolean encoderConnected = false;
     public boolean beamBreakTriggered = false;
-
 
     public Angle leaderPosition = Rotations.of(0);
     public Angle leaderRotorPosition = Rotations.of(0);

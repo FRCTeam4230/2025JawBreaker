@@ -51,12 +51,12 @@ public class Claw extends SubsystemBase {
     encoderAlert.set(!inputs.encoderConnected);
   }
 
-  public Command hold(){
+  public Command hold() {
     return Commands.run(() -> io.setVolts(Volts.of(0.5)), this);
   }
 
   public Command intake() {
-    return  Commands.run(() -> io.setVolts(Volts.of(ClawConstants.INTAKE_VOLTAGE.get())),this);
+    return Commands.run(() -> io.setVolts(Volts.of(ClawConstants.INTAKE_VOLTAGE.get())), this);
   }
   // TODO: smart current limit for motor, set hold mode to only enable when proximity gets too far
 
@@ -72,5 +72,9 @@ public class Claw extends SubsystemBase {
 
   public boolean hasCoral() {
     return inputs.beamBreakTriggered;
+  }
+
+  public boolean doesNotHaveCoral(){
+    return !inputs.beamBreakTriggered;
   }
 }

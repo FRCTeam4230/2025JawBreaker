@@ -4,7 +4,9 @@
 // license that can be found in the LICENSE file at
 // the root directory of this project.
 
- package frc.robot.subsystems.elevator;
+package frc.robot.subsystems.elevator;
+
+import static edu.wpi.first.units.Units.*;
 
 import com.ctre.phoenix6.BaseStatusSignal;
 import com.ctre.phoenix6.StatusCode;
@@ -19,16 +21,12 @@ import edu.wpi.first.math.filter.Debouncer;
 import edu.wpi.first.units.measure.*;
 import frc.robot.utils.Conversions;
 
-import static edu.wpi.first.units.Units.*;
-
 /**
- * CTRE-based implementation of the ElevatorIO interface for controlling an elevator mechanism.
- This
- * implementation uses TalonFX motors and a CANcoder for position feedback. The elevator consists
- of
+ * CTRE-based implementation of the ElevatorIO interface for controlling an elevator mechanism. This
+ * implementation uses TalonFX motors and a CANcoder for position feedback. The elevator consists of
  * a leader motor, a follower motor, and an encoder for precise positioning.
  */
- public class ElevatorIOCTRE implements ElevatorIO {
+public class ElevatorIOCTRE implements ElevatorIO {
   /** The gear ratio between the motor and the elevator mechanism */
   public static final double GEAR_RATIO = 2.0;
 
@@ -65,8 +63,7 @@ import static edu.wpi.first.units.Units.*;
   protected final Distance elevatorRadius = Inches.of(2);
 
   /**
-   * Constructs a new ElevatorIOCTRE instance and initializes all hardware components. This
- includes
+   * Constructs a new ElevatorIOCTRE instance and initializes all hardware components. This includes
    * configuring both motors, setting up the follower relationship, and optimizing CAN bus
    * utilization for all devices.
    */
@@ -100,8 +97,7 @@ import static edu.wpi.first.units.Units.*;
   }
 
   /**
-   * Creates the motor configuration with appropriate settings. Sets up neutral mode, PID gains,
- and
+   * Creates the motor configuration with appropriate settings. Sets up neutral mode, PID gains, and
    * feedback device configuration.
    *
    * @return The configured TalonFXConfiguration object
@@ -178,8 +174,7 @@ import static edu.wpi.first.units.Units.*;
   }
 
   /**
-   * Sets the desired distance for the elevator to move to. Converts the desired linear distance
- to
+   * Sets the desired distance for the elevator to move to. Converts the desired linear distance to
    * encoder rotations and applies position control.
    *
    * @param distance The target distance for the elevator
@@ -198,4 +193,4 @@ import static edu.wpi.first.units.Units.*;
   public void stop() {
     leader.stopMotor();
   }
- }
+}

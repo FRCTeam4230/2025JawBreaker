@@ -1,5 +1,7 @@
 package frc.robot.subsystems.elevator;
 
+import static edu.wpi.first.units.Units.*;
+
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.spark.*;
 import com.revrobotics.spark.config.ClosedLoopConfig;
@@ -11,8 +13,6 @@ import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.Encoder;
-
-import static edu.wpi.first.units.Units.*;
 
 public class ElevatorIOREV implements ElevatorIO {
   /** The gear ratio between the motor and the elevator mechanism */
@@ -33,8 +33,8 @@ public class ElevatorIOREV implements ElevatorIO {
 
   private final Encoder leaderExternalEncoder = new Encoder(5, 6);
 
-  protected final DigitalInput beamBreakSensor = new DigitalInput(ElevatorConstants.beamBreakDIOPort);
-
+  protected final DigitalInput beamBreakSensor =
+      new DigitalInput(ElevatorConstants.beamBreakDIOPort);
 
   /*
   Encoder can take two ports, this gives the correct value in rotations for the elevator (when divided by -8192, which is how many ticks are in a rotation)
