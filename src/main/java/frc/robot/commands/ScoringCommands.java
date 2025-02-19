@@ -34,7 +34,7 @@ public class ScoringCommands extends Command {
     return Commands.sequence(
         Commands.waitUntil(claw::doesNotHaveCoral),
         arm.intake(),
-        Commands.waitUntil(arm::isParked),
+        // Commands.waitUntil(arm::isParked),
         elevator.park(),
         Commands.waitUntil(elevator::hasCoral),
         elevator.intake(),

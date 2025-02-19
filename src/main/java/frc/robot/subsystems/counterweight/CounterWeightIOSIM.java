@@ -1,5 +1,7 @@
 package frc.robot.subsystems.counterweight;
 
+import static edu.wpi.first.units.Units.*;
+
 import com.revrobotics.sim.SparkMaxSim;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N2;
@@ -12,8 +14,6 @@ import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.units.measure.Mass;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.simulation.SingleJointedArmSim;
-
-import static edu.wpi.first.units.Units.*;
 
 public class CounterWeightIOSIM extends CounterWeightIOREV {
 
