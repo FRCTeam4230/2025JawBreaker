@@ -8,11 +8,10 @@
 package frc.robot.utils;
 
 import frc.robot.Constants;
-import org.littletonrobotics.junction.networktables.LoggedNetworkNumber;
-
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Supplier;
+import org.littletonrobotics.junction.networktables.LoggedNetworkNumber;
 
 /**
  * Class for a tunable number. Gets value from dashboard in tuning mode, returns default if not or

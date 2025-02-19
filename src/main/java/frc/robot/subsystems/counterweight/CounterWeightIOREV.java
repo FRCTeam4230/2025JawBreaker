@@ -1,4 +1,4 @@
-package frc.robot.subsystems.climber;
+package frc.robot.subsystems.counterweight;
 
 import static edu.wpi.first.units.Units.*;
 
@@ -12,25 +12,24 @@ import com.revrobotics.spark.config.SparkFlexConfig;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.Voltage;
 
-public class ClimberIOREV implements ClimberIO {
+public class CounterWeightIOREV implements CounterWeightIO {
   private Angle setpoint;
   protected static final double GEAR_RATIO = 125.0;
 
   protected final SparkFlex motor =
-      new SparkFlex(ClimberConstants.MOTOR_ID, SparkLowLevel.MotorType.kBrushless);
+      new SparkFlex(CounterWeightConstants.MOTOR_ID, SparkLowLevel.MotorType.kBrushless);
 
   protected final RelativeEncoder encoder = motor.getEncoder();
 
   private final SparkClosedLoopController pidController;
 
-  public ClimberIOREV() {
+  public CounterWeightIOREV() {
     pidController = motor.getClosedLoopController();
 
     SparkFlexConfig motorConfig = new SparkFlexConfig();
 
     motorConfig
         .idleMode(SparkBaseConfig.IdleMode.kBrake)
-        .inverted(true)
         .encoder
         .velocityConversionFactor((1.0 / GEAR_RATIO) / 60.0)
         .positionConversionFactor(1.0 / GEAR_RATIO);
@@ -38,9 +37,9 @@ public class ClimberIOREV implements ClimberIO {
         .closedLoop
         .outputRange(-0.5, 0.5)
         .feedbackSensor(ClosedLoopConfig.FeedbackSensor.kPrimaryEncoder)
-        .p(ClimberConstants.kP.get())
-        .i(ClimberConstants.kI.get())
-        .d(ClimberConstants.kD.get());
+        .p(CounterWeightConstants.kP.get())
+        .i(CounterWeightConstants.kI.get())
+        .d(CounterWeightConstants.kD.get());
 
     motor.configure(
         motorConfig,
@@ -49,7 +48,7 @@ public class ClimberIOREV implements ClimberIO {
   }
 
   @Override
-  public void updateInputs(ClimberIOInputs inputs) {
+  public void updateInputs(CounterWeightIOInputs inputs) {
     inputs.motorConnected = true;
     inputs.encoderConnected = true;
 

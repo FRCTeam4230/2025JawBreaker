@@ -1,7 +1,7 @@
 package frc.robot;
 
-import static edu.wpi.first.units.Units.Volts;
-import static frc.robot.Constants.MaxAngularRate;
+import static edu.wpi.first.units.Units.*;
+import static frc.robot.Constants.*;
 
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 import com.ctre.phoenix6.swerve.SwerveRequest;
@@ -27,6 +27,9 @@ import frc.robot.subsystems.claw.ClawIOSIMREV;
 import frc.robot.subsystems.climber.Climber;
 import frc.robot.subsystems.climber.ClimberIOREV;
 import frc.robot.subsystems.climber.ClimberIOSIM;
+import frc.robot.subsystems.counterweight.CounterWeight;
+import frc.robot.subsystems.counterweight.CounterWeightIOREV;
+import frc.robot.subsystems.counterweight.CounterWeightIOSIM;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.drive.DriveIO;
 import frc.robot.subsystems.drive.DriveIOCTRE;
@@ -66,6 +69,7 @@ public class RobotContainer {
   private final Arm arm;
   private final Claw claw;
   private final Climber climber;
+  private final CounterWeight counterWeight;
 
   private final ScoringCommands scoreCommands;
 
@@ -94,6 +98,7 @@ public class RobotContainer {
         arm = new Arm(new ArmIOREV() {});
         claw = new Claw(new ClawIOREV() {});
         climber = new Climber(new ClimberIOREV() {});
+        counterWeight = new CounterWeight(new CounterWeightIOREV());
         break;
 
       case SIM:
@@ -131,6 +136,7 @@ public class RobotContainer {
         arm = new Arm(new ArmIOREVSIM());
         claw = new Claw(new ClawIOSIMREV());
         climber = new Climber(new ClimberIOSIM());
+        counterWeight = new CounterWeight(new CounterWeightIOSIM());
 
         break;
 
@@ -149,6 +155,7 @@ public class RobotContainer {
         arm = new Arm(new ArmIOREV() {});
         claw = new Claw(new ClawIOREV() {});
         climber = new Climber(new ClimberIOREV() {});
+        counterWeight = new CounterWeight(new CounterWeightIOREV());
         break;
     }
 
@@ -275,12 +282,12 @@ public class RobotContainer {
     joystick.rightTrigger().whileTrue(climber.climberOut(Volts.of(8)));
 
     // joystick.rightBumper().onTrue(claw.intake().onlyWhile(() -> !claw.hasCoral()));
-    joystick.rightBumper().whileTrue(claw.intake());
-    joystick.leftBumper().whileTrue(claw.extake());
+    //    joystick.rightBumper().whileTrue(claw.intake());
+    //    joystick.leftBumper().whileTrue(claw.extake());
 
     joystick.x().onTrue(arm.L1());
     joystick.y().onTrue(arm.L2());
-    joystick.b().onTrue(scoreCommands.stopAll());
+    joystick.b().onTrue(scoreCommands.stopAll().andThen(counterWeight.counterWeightStop()));
 
     //     joystick.a().onTrue(scoreCommands.extakeCoral().until(() ->
     //     !claw.hasCoral()).andThen(scoreCommands.intakeCoral())));
@@ -299,6 +306,11 @@ public class RobotContainer {
 
     // testJoystick.back().onTrue(arm.reconfigPID());
 
+    /**** COUNTER WEIGHT TEST ********/
+    joystick
+        .rightBumper()
+        .whileTrue(counterWeight.counterWeightOut()); // TODO: CONSTANTS and change this.
+    joystick.leftBumper().whileTrue(counterWeight.counterWeightIn());
   }
 
   public Command getAutonomousCommand() {

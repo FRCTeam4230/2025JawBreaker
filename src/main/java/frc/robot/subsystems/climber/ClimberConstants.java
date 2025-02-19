@@ -9,6 +9,7 @@ public class ClimberConstants {
       new TunableNumberWrapper(MethodHandles.lookup().lookupClass());
 
   public static final int MOTOR_ID = 35;
+  protected static final double GEAR_RATIO = 405.0;
 
   public static final LoggedTunableNumber kP = tunableTable.makeField("kP", 0.3);
   public static final LoggedTunableNumber kI = tunableTable.makeField("kI", 0.0);

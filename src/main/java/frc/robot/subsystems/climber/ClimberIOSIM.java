@@ -1,6 +1,7 @@
 package frc.robot.subsystems.climber;
 
 import static edu.wpi.first.units.Units.*;
+import static frc.robot.subsystems.climber.ClimberConstants.*;
 
 import com.revrobotics.sim.SparkFlexSim;
 import edu.wpi.first.math.numbers.N1;
