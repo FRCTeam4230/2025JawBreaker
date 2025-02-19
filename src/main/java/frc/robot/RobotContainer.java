@@ -1,5 +1,8 @@
 package frc.robot;
 
+import static edu.wpi.first.units.Units.*;
+import static frc.robot.Constants.*;
+
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 import com.ctre.phoenix6.swerve.SwerveRequest;
 import com.pathplanner.lib.auto.AutoBuilder;
@@ -43,9 +46,6 @@ import frc.robot.subsystems.vision.VisionIOPhotonVisionSIM;
 import frc.robot.utils.TunableController;
 import frc.robot.utils.TunableController.TunableControllerType;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
-
-import static edu.wpi.first.units.Units.*;
-import static frc.robot.Constants.*;
 
 public class RobotContainer {
 
@@ -282,12 +282,12 @@ public class RobotContainer {
     joystick.rightTrigger().whileTrue(climber.climberOut(Volts.of(8)));
 
     // joystick.rightBumper().onTrue(claw.intake().onlyWhile(() -> !claw.hasCoral()));
-    joystick.rightBumper().whileTrue(claw.intake());
-    joystick.leftBumper().whileTrue(claw.extake());
+    //    joystick.rightBumper().whileTrue(claw.intake());
+    //    joystick.leftBumper().whileTrue(claw.extake());
 
     joystick.x().onTrue(arm.L1());
     joystick.y().onTrue(arm.L2());
-    joystick.b().onTrue(scoreCommands.stopAll());
+    joystick.b().onTrue(scoreCommands.stopAll().andThen(counterWeight.counterWeightStop()));
 
     //     joystick.a().onTrue(scoreCommands.extakeCoral().until(() ->
     //     !claw.hasCoral()).andThen(scoreCommands.intakeCoral())));
@@ -308,8 +308,9 @@ public class RobotContainer {
 
     /**** COUNTER WEIGHT TEST ********/
     joystick
-        .leftBumper()
+        .rightBumper()
         .whileTrue(counterWeight.counterWeightOut()); // TODO: CONSTANTS and change this.
+    joystick.leftBumper().whileTrue(counterWeight.counterWeightIn());
   }
 
   public Command getAutonomousCommand() {
