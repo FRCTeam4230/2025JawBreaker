@@ -172,6 +172,7 @@ public class Arm extends SubsystemBase {
         .withName("Move to " + mode.toString());
   }
 
+
   /**
    * Checks if the arm is at its target position.
    *
@@ -250,6 +251,8 @@ public class Arm extends SubsystemBase {
   public final Command stopCommand() {
     return setPositionCommand(ArmMode.STOP);
   }
+
+
 
   private SysIdRoutine armSysIdRoutine =
       new SysIdRoutine(
