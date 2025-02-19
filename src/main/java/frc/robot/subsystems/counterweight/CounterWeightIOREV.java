@@ -6,6 +6,7 @@ import com.revrobotics.RelativeEncoder;
 import com.revrobotics.spark.SparkClosedLoopController;
 import com.revrobotics.spark.SparkFlex;
 import com.revrobotics.spark.SparkLowLevel;
+import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.config.ClosedLoopConfig;
 import com.revrobotics.spark.config.SparkBaseConfig;
 import com.revrobotics.spark.config.SparkFlexConfig;
@@ -16,8 +17,8 @@ public class CounterWeightIOREV implements CounterWeightIO {
   private Angle setpoint;
   protected static final double GEAR_RATIO = 125.0;
 
-  protected final SparkFlex motor =
-      new SparkFlex(CounterWeightConstants.MOTOR_ID, SparkLowLevel.MotorType.kBrushless);
+  protected final SparkMax motor =
+      new SparkMax(CounterWeightConstants.MOTOR_ID, SparkLowLevel.MotorType.kBrushless);
 
   protected final RelativeEncoder encoder = motor.getEncoder();
 

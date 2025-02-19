@@ -1,8 +1,6 @@
 package frc.robot.subsystems.counterweight;
 
-import static edu.wpi.first.units.Units.*;
-
-import com.revrobotics.sim.SparkFlexSim;
+import com.revrobotics.sim.SparkMaxSim;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N2;
 import edu.wpi.first.math.system.LinearSystem;
@@ -15,9 +13,11 @@ import edu.wpi.first.units.measure.Mass;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.simulation.SingleJointedArmSim;
 
+import static edu.wpi.first.units.Units.*;
+
 public class CounterWeightIOSIM extends CounterWeightIOREV {
 
-  private final SparkFlexSim motorSim;
+  private final SparkMaxSim motorSim;
   DCMotor dcMotor = DCMotor.getNeoVortex(1);
 
   private final SingleJointedArmSim armSim;
@@ -27,7 +27,7 @@ public class CounterWeightIOSIM extends CounterWeightIOREV {
 
   public CounterWeightIOSIM() {
 
-    motorSim = new SparkFlexSim(motor, dcMotor);
+    motorSim = new SparkMaxSim(motor, dcMotor);
 
     LinearSystem<N2, N1, N2> linearSystem =
         LinearSystemId.createSingleJointedArmSystem(dcMotor, armMOI, GEAR_RATIO);

@@ -1,11 +1,11 @@
 package frc.robot.subsystems.counterweight;
 
+import static edu.wpi.first.units.Units.*;
+
 import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-
-import static edu.wpi.first.units.Units.*;
 
 /** //TODO CDhange this subsystem to use a pid to drive the counterwewight out to it's end point. */
 public class CounterWeight extends SubsystemBase {
