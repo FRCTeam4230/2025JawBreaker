@@ -1,7 +1,5 @@
 package frc.robot.subsystems.climber;
 
-import static edu.wpi.first.units.Units.*;
-
 import com.revrobotics.sim.SparkFlexSim;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N2;
@@ -14,6 +12,9 @@ import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.units.measure.Mass;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.simulation.SingleJointedArmSim;
+
+import static edu.wpi.first.units.Units.*;
+import static frc.robot.subsystems.climber.ClimberConstants.*;
 
 public class ClimberIOSIM extends ClimberIOREV {
 

@@ -8,11 +8,11 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 public class Climber extends SubsystemBase {
 
   private final ClimberIO io;
-  private final ClimberIO.ClimberIOInputs inputs;
+  private final ClimberIOInputsAutoLogged inputs;
 
   public Climber(ClimberIO io) {
     this.io = io;
-    this.inputs = new ClimberIO.ClimberIOInputs();
+    this.inputs = new ClimberIOInputsAutoLogged();
   }
 
   @Override
