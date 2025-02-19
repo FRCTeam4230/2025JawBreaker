@@ -6,7 +6,6 @@ import static frc.robot.Constants.*;
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 import com.ctre.phoenix6.swerve.SwerveRequest;
 import com.pathplanner.lib.auto.AutoBuilder;
-import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation3d;
@@ -204,7 +203,8 @@ public class RobotContainer {
                                 .customLeft()
                                 .getX())))); // Drive counterclockwise with negative X (left)
 
-    joystick.back().onTrue(Commands.runOnce(() -> drivetrain.resetPose(Pose2d.kZero)));
+    // joystick.back().onTrue(Commands.runOnce(() -> drivetrain.resetPose(Pose2d.kZero))); //TODO:
+    // TURN BACK ON THIS RECENTERS THE ROBOT
     //    joystick
     //        .b()
     //        .whileTrue(
@@ -273,9 +273,15 @@ public class RobotContainer {
 
     // Run SysId routines when holding back/start and X/Y.
     // Note that each routine should be run exactly once in a single log.
-    //    joystick.back().and(joystick.y()).whileTrue(drivetrain.sysIdDynamic(Direction.kForward));
-    //    joystick.back().and(joystick.x()).whileTrue(drivetrain.sysIdDynamic(Direction.kReverse));
-    //
+    joystick
+        .back()
+        .and(joystick.y())
+        .whileTrue(drivetrain.sysIdDynamic(SysIdRoutine.Direction.kForward));
+    joystick
+        .back()
+        .and(joystick.x())
+        .whileTrue(drivetrain.sysIdDynamic(SysIdRoutine.Direction.kReverse));
+
     joystick
         .start()
         .and(joystick.y())
@@ -286,7 +292,9 @@ public class RobotContainer {
         .and(joystick.x())
         .whileTrue(drivetrain.sysIdQuasistatic(SysIdRoutine.Direction.kReverse));
 
-    arm.setDefaultCommand(arm.intake());
+    //    Command armDefaultCommand = arm.intake();
+    //    armDefaultCommand.addRequirements(arm);
+    //    arm.setDefaultCommand(armDefaultCommand);
 
     joystick.leftTrigger().whileTrue(climber.climberOut(Volts.of(-12)));
     joystick.rightTrigger().whileTrue(climber.climberOut(Volts.of(8)));
@@ -295,12 +303,9 @@ public class RobotContainer {
     joystick.rightBumper().whileTrue(claw.intake());
     joystick.leftBumper().whileTrue(claw.extake());
 
-    joystick.x().onTrue(arm.L1());
-    joystick.y().onTrue(arm.L2());
-    joystick.b().onTrue(scoreCommands.stopAll().andThen(counterWeight.counterWeightStop()));
-
-    //     joystick.a().onTrue(scoreCommands.extakeCoral().until(() ->
-    //     !claw.hasCoral()).andThen(scoreCommands.intakeCoral())));
+    //    joystick.x().onTrue(arm.L1());
+    //    joystick.y().onTrue(arm.L2());
+    //    joystick.b().onTrue(scoreCommands.stopAll().andThen(counterWeight.counterWeightStop()));
 
     joystick.povDown().onTrue(scoreCommands.intakeCoral());
 
