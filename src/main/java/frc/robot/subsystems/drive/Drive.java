@@ -30,11 +30,11 @@ import edu.wpi.first.wpilibj.Alert.AlertType;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.Constants;
 import frc.robot.Constants.Mode;
+import frc.robot.subsystems.DefaultCurrentCommandLoggableSubsystem;
 import frc.robot.subsystems.vision.VisionConsts;
 import frc.robot.subsystems.vision.VisionUtil.VisionMeasurement;
 import frc.robot.utils.ArrayBuilder;
@@ -47,7 +47,7 @@ import org.littletonrobotics.junction.Logger;
  * Class that extends the Phoenix 6 SwerveDrivetrain class and implements Subsystem so it can easily
  * be used in command-based projects.
  */
-public class Drive extends SubsystemBase {
+public class Drive extends DefaultCurrentCommandLoggableSubsystem {
   private final DriveIO io;
   private final DriveIOInputsAutoLogged inputs;
   private final ModuleIOInputsAutoLogged[] modules = ArrayBuilder.buildModuleAutoLogged();
@@ -223,6 +223,8 @@ public class Drive extends SubsystemBase {
      * Otherwise, only check and apply the operator perspective if the DS is disabled.
      * This ensures driving behavior doesn't change until an explicit disable event occurs during testing.
      */
+
+    super.periodic(); // LOG commands
 
     io.updateInputs(inputs);
     Logger.processInputs("Drive", inputs);

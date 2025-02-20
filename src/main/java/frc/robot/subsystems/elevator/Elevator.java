@@ -15,8 +15,8 @@ import edu.wpi.first.wpilibj.Alert.AlertType;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SelectCommand;
-import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
+import frc.robot.subsystems.DefaultCurrentCommandLoggableSubsystem;
 import java.util.Map;
 import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
@@ -26,7 +26,7 @@ import org.littletonrobotics.junction.Logger;
  * supports multiple distances for different game actions and provides both open-loop and
  * closed-loop control options.
  */
-public class Elevator extends SubsystemBase {
+public class Elevator extends DefaultCurrentCommandLoggableSubsystem {
   // Hardware interface and inputs
   private ElevatorIO io = null;
   private final ElevatorIOInputsAutoLogged inputs;
@@ -54,6 +54,7 @@ public class Elevator extends SubsystemBase {
 
   @Override
   public void periodic() {
+    super.periodic(); // LOG commands
     // Update and log inputs from hardware
     io.updateInputs(inputs);
     Logger.processInputs("Elevator", inputs);

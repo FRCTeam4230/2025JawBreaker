@@ -11,23 +11,21 @@
 
 package frc.robot.subsystems.claw;
 
+import static edu.wpi.first.units.Units.*;
+
 import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.Alert.AlertType;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
-import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.subsystems.DefaultCurrentCommandLoggableSubsystem;
 import org.littletonrobotics.junction.Logger;
-
-import java.util.stream.Collectors;
-
-import static edu.wpi.first.units.Units.*;
 
 /**
  * The Arm subsystem controls a dual-motor arm mechanism for game piece manipulation. It supports
  * multiple positions for different game actions and provides both open-loop and closed-loop control
  * options.
  */
-public class Claw extends SubsystemBase {
+public class Claw extends DefaultCurrentCommandLoggableSubsystem {
   // Hardware interface and inputs
   private final ClawIO io;
   private final ClawIOInputsAutoLogged inputs;
@@ -44,21 +42,10 @@ public class Claw extends SubsystemBase {
 
   @Override
   public void periodic() {
+    super.periodic(); // LOG commands
+
     // Update and log inputs from hardware
     io.updateInputs(inputs);
-    Logger.recordOutput("Claw/Current Command", getCurrentCommand().getName());
-    Logger.recordOutput(
-        "Claw/Current Command Requirements",
-        getCurrentCommand().getRequirements().stream()
-            .map(Object::toString)
-            .collect(Collectors.joining(",")));
-
-    Logger.recordOutput("Claw/Default Command", getDefaultCommand().getName());
-    Logger.recordOutput(
-        "Claw/Default Command Requirements",
-        getDefaultCommand().getRequirements().stream()
-            .map(Object::toString)
-            .collect(Collectors.joining(",")));
 
     Logger.processInputs("Claw", inputs);
     // Update motor connection status alerts
