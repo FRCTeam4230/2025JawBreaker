@@ -18,6 +18,8 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import org.littletonrobotics.junction.Logger;
 
+import java.util.stream.Collectors;
+
 import static edu.wpi.first.units.Units.*;
 
 /**
@@ -38,15 +40,25 @@ public class Claw extends SubsystemBase {
   public Claw(ClawIO io) {
     this.io = io;
     this.inputs = new ClawIOInputsAutoLogged();
-
   }
 
   @Override
   public void periodic() {
     // Update and log inputs from hardware
     io.updateInputs(inputs);
-    inputs.currentComamnd = getCurrentCommand();
-    inputs.defaultCommand = getDefaultCommand();
+    Logger.recordOutput("Claw/Current Command", getCurrentCommand().getName());
+    Logger.recordOutput(
+        "Claw/Current Command Requirements",
+        getCurrentCommand().getRequirements().stream()
+            .map(Object::toString)
+            .collect(Collectors.joining(",")));
+
+    Logger.recordOutput("Claw/Default Command", getDefaultCommand().getName());
+    Logger.recordOutput(
+        "Claw/Default Command Requirements",
+        getDefaultCommand().getRequirements().stream()
+            .map(Object::toString)
+            .collect(Collectors.joining(",")));
 
     Logger.processInputs("Claw", inputs);
     // Update motor connection status alerts

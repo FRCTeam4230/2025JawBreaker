@@ -11,14 +11,13 @@
 
 package frc.robot.subsystems.claw;
 
+import static edu.wpi.first.units.Units.*;
+
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Current;
 import edu.wpi.first.units.measure.Temperature;
 import edu.wpi.first.units.measure.Voltage;
-import edu.wpi.first.wpilibj2.command.Command;
 import org.littletonrobotics.junction.AutoLog;
-
-import static edu.wpi.first.units.Units.*;
 
 public interface ClawIO {
   @AutoLog
@@ -34,8 +33,6 @@ public interface ClawIO {
     public Current supplyCurrent = Amps.of(0);
 
     public Temperature motorTempCelsius = Celsius.of(0);
-    public Command currentComamnd;
-    public Command defaultCommand;
   }
 
   public default void setVolts(Voltage voltage) {}
