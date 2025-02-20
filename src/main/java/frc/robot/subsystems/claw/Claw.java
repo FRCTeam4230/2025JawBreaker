@@ -11,14 +11,14 @@
 
 package frc.robot.subsystems.claw;
 
-import static edu.wpi.first.units.Units.*;
-
 import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.Alert.AlertType;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import org.littletonrobotics.junction.Logger;
+
+import static edu.wpi.first.units.Units.*;
 
 /**
  * The Arm subsystem controls a dual-motor arm mechanism for game piece manipulation. It supports
@@ -38,14 +38,17 @@ public class Claw extends SubsystemBase {
   public Claw(ClawIO io) {
     this.io = io;
     this.inputs = new ClawIOInputsAutoLogged();
+
   }
 
   @Override
   public void periodic() {
     // Update and log inputs from hardware
     io.updateInputs(inputs);
-    Logger.processInputs("Claw", inputs);
+    inputs.currentComamnd = getCurrentCommand();
+    inputs.defaultCommand = getDefaultCommand();
 
+    Logger.processInputs("Claw", inputs);
     // Update motor connection status alerts
     motorAlert.set(!inputs.leaderConnected);
     encoderAlert.set(!inputs.encoderConnected);
