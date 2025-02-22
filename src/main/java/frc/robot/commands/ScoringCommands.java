@@ -24,15 +24,15 @@ public class ScoringCommands {
   }
 
   public Command bottomLevel() {
-    return Commands.runOnce(() -> arm.L1());
+    return Commands.runOnce(() -> arm.L1()).withName("bottomLevel");
   }
 
   public Command midLevel() {
-    return Commands.sequence(arm.L2(), elevator.L3());
+    return Commands.sequence(arm.L2(), elevator.L3()).withName("midLevel");
   }
 
   public Command topLevel() {
-    return Commands.sequence(arm.L2(), elevator.L4());
+    return Commands.sequence(arm.L2(), elevator.L4()).withName("topLevel");
   }
 
   public Command intakeCoral() {
@@ -40,7 +40,7 @@ public class ScoringCommands {
         // Still would want to wait for elevator to have game
         Commands.waitUntil(elevatorHasGamePiece::getAsBoolean),
         claw.intake().until(claw::hasCoral),
-        claw.hold());
+        claw.hold()).withName("intake");
   }
 
   private Trigger elevatorHasGamePiece() {
@@ -56,6 +56,6 @@ public class ScoringCommands {
   }
 
   public Command stopAll() {
-    return Commands.sequence(claw.stopClaw(), arm.stopCommand(), elevator.stopCommand());
+    return Commands.sequence(claw.stopClaw(), arm.stopCommand(), elevator.stopCommand()).withName("stopAll");
   }
 }
