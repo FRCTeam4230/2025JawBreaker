@@ -18,7 +18,6 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.subsystems.DefaultCurrentCommandLoggableSubsystem;
 import java.util.Map;
-import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
 
 /**
@@ -255,13 +254,17 @@ public class Elevator extends DefaultCurrentCommandLoggableSubsystem {
    *
    * @return true if at target height, false otherwise
    */
-  @AutoLogOutput
+  // @AutoLogOutput
   public Trigger isAtTarget() {
-    return new Trigger(
-        () ->
-            inputs.encoderPosition.isNear(
-                inputs.setpoint,
-                currentMode.distanceTolerance)); // getHeight().isNear(getTargetHeight(),
+    //    return new Trigger(
+    //        () ->
+    //            ofNullable(inputs.encoderPosition)
+    //                .ifPresentOrElse(
+    //                    val  -> val.isNear(
+    //                inputs.setpoint,
+    //                currentMode.distanceTolerance) false); //
+    // getHeight().isNear(getTargetHeight(),
     // currentPosition.heightTolerance()));
+    return new Trigger(() -> false);
   }
 }

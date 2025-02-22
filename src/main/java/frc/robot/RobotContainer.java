@@ -1,5 +1,7 @@
 package frc.robot;
 
+import static frc.robot.Constants.*;
+
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 import com.ctre.phoenix6.swerve.SwerveRequest;
 import com.pathplanner.lib.auto.AutoBuilder;
@@ -47,8 +49,6 @@ import frc.robot.subsystems.vision.VisionIOPhotonVisionSIM;
 import frc.robot.utils.TunableController;
 import frc.robot.utils.TunableController.TunableControllerType;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
-
-import static frc.robot.Constants.*;
 
 public class RobotContainer {
 
@@ -440,7 +440,6 @@ public class RobotContainer {
 
     // New Command when driver clicks intak
     controlScheme.getIntake().onTrue(scoreCommands.intakeCoral());
-
   }
 
   public void setupNamedCommands() {
@@ -465,9 +464,7 @@ public class RobotContainer {
     //        Commands.waitUntil(superstructure.isAtTarget())
     //            .andThen(new WaitCommand(0.5))
     //            .andThen(coralWrist.gamePieceUnloaded()));
-    NamedCommands.registerCommand(
-        "Intake",
-        scoreCommands.intakeCoral());
+    NamedCommands.registerCommand("Intake", scoreCommands.intakeCoral());
   }
 
   public Command getAutonomousCommand() {
