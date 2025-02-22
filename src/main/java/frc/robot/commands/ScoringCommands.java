@@ -39,6 +39,8 @@ public class ScoringCommands {
     return Commands.sequence(
         // Still would want to wait for elevator to have game
         Commands.waitUntil(elevatorHasGamePiece::getAsBoolean),
+        arm.intake(),
+        elevator.intake(),
         claw.intake().until(claw::hasCoral),
         claw.hold());
   }

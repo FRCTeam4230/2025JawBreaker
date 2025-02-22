@@ -1,7 +1,10 @@
 package frc.robot;
 
+<<<<<<< Updated upstream
 import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.Rotations;
+=======
+>>>>>>> Stashed changes
 import static frc.robot.Constants.*;
 
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
@@ -453,7 +456,11 @@ public class RobotContainer {
                         () -> arm.getPosition() == Rotations.of(Degrees.of(-90).in(Rotations))))
                 .andThen(arm.park()));
 
+<<<<<<< Updated upstream
     // New Command when driver clicks intake
+=======
+    // New Command when driver clicks intak
+>>>>>>> Stashed changes
     controlScheme.getIntake().onTrue(scoreCommands.intakeCoral());
   }
 

@@ -8,7 +8,10 @@ package frc.robot.subsystems.arm;
 
 import static edu.wpi.first.units.Units.*;
 
+<<<<<<< Updated upstream
 import com.revrobotics.AbsoluteEncoder;
+=======
+>>>>>>> Stashed changes
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.spark.ClosedLoopSlot;
 import com.revrobotics.spark.SparkBase.ControlType;
@@ -25,7 +28,10 @@ import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.RobotController;
+<<<<<<< Updated upstream
 import edu.wpi.first.wpilibj2.command.Commands;
+=======
+>>>>>>> Stashed changes
 
 /**
  * REV-based implementation of the ArmIO interface. This class uses two SparkFlex motor controllers

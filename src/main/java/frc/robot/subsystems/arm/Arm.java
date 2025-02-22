@@ -248,10 +248,13 @@ public class Arm extends DefaultCurrentCommandLoggableSubsystem {
     return setPositionCommand(ArmMode.INTAKE);
   }
 
+<<<<<<< Updated upstream
   public Command resetEncoder() {
     return Commands.runOnce(io::resetEncoder);
   }
 
+=======
+>>>>>>> Stashed changes
   public Command reconfigPID() {
     return Commands.runOnce(io::reconfigurePID);
   }
