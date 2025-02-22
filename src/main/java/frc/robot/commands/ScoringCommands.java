@@ -7,7 +7,7 @@ import frc.robot.subsystems.arm.Arm;
 import frc.robot.subsystems.claw.Claw;
 import frc.robot.subsystems.elevator.Elevator;
 
-public class ScoringCommands extends Command {
+public class ScoringCommands {
 
   private final Elevator elevator;
   private final Arm arm;

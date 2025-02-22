@@ -1,7 +1,5 @@
 package frc.robot;
 
-import static frc.robot.Constants.*;
-
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 import com.ctre.phoenix6.swerve.SwerveRequest;
 import com.pathplanner.lib.auto.AutoBuilder;
@@ -49,6 +47,8 @@ import frc.robot.subsystems.vision.VisionIOPhotonVisionSIM;
 import frc.robot.utils.TunableController;
 import frc.robot.utils.TunableController.TunableControllerType;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
+
+import static frc.robot.Constants.*;
 
 public class RobotContainer {
 
@@ -331,9 +331,115 @@ public class RobotContainer {
     //        .whileTrue(counterWeight.counterWeightOut()); // TODO: CONSTANTS and change this.
     //    joystick.leftBumper().whileTrue(counterWeight.counterWeightIn());
 
+    /****** ASSISTED DRIVE **** /
+     *
+     */
+    // reset the field-centric heading on left bumper press
+    // joystick.leftBumper().onTrue(drivetrain.runOnce(drivetrain::seedFieldCentric));
+    // controlScheme.getL1().onTrue(superstructure.CORAL_PLACE_L1());
+    // controlScheme.getL2().onTrue(superstructure.CORAL_PLACE_L2());
+    // controlScheme.getL3().onTrue(superstructure.CORAL_PLACE_L3());
+    // controlScheme.getL4().onTrue(superstructure.CORAL_PLACE_L4());
 
+    /*
+      controlScheme
+          .getL4()
+          .onTrue(
+              Commands.runOnce(
+                  () -> SmartController.targetReefHeight = FieldConstants.ReefHeight.L4));
+      controlScheme
+          .getL3()
+          .onTrue(
+              Commands.runOnce(
+                  () -> SmartController.targetReefHeight = FieldConstants.ReefHeight.L3));
+      controlScheme
+          .getL2()
+          .onTrue(
+              Commands.runOnce(
+                  () -> SmartController.targetReefHeight = FieldConstants.ReefHeight.L2));
+      controlScheme
+          .getL1()
+          .onTrue(
+              Commands.runOnce(
+                  () -> SmartController.targetReefHeight = FieldConstants.ReefHeight.L1));
+
+      coralWrist.hasGamePiece().onFalse(superstructure.INTAKE()).onTrue(coralWrist.FRONT());
+
+      coralWrist
+          .hasGamePiece()
+          .and(() -> SmartController.targetReefHeight == FieldConstants.ReefHeight.L2)
+          .onTrue(superstructure.TRANSIT());
+      coralWrist
+          .hasGamePiece()
+          .and(() -> SmartController.targetReefHeight != FieldConstants.ReefHeight.L2)
+          .onTrue(superstructure.CORAL_PLACE_L3());
+
+      controlScheme.setLoadGamePiece().onTrue(coralWrist.gamePieceLoaded());
+      controlScheme.setUnloadGamePiece().onTrue(coralWrist.gamePieceUnloaded());
+
+      controlScheme
+          .driveToCoralStation()
+          .whileTrue(
+              Commands.run(
+                  () ->
+                      DriveCommands.driveToPointMA(
+                          FieldConstants.CoralStation.leftCenterFace.transformBy(
+                              new Transform2d(
+                                  new Translation2d(Constants.robotScoringOffset, Inches.of(1.8)),
+                                  Rotation2d.kZero)),
+                          drivetrain,
+                          true),
+                  drivetrain));
+
+      Trigger autoReefHeight =
+          new Trigger(
+              () ->
+                  drivetrain.getPose().getTranslation().getDistance(FieldConstants.Reef.center)
+                      < 3.0);
+
+      autoReefHeight.whileTrue(
+          Commands.runOnce(
+              () -> {
+                switch (SmartController.targetReefHeight) {
+                  case L1:
+                    superstructure.CORAL_PLACE_L1().schedule();
+                    break;
+                  case L2:
+                    superstructure.CORAL_PLACE_L2().schedule();
+                    break;
+                  case L3:
+                    superstructure.CORAL_PLACE_L3().schedule();
+                    break;
+                  case L4:
+                    superstructure.CORAL_PLACE_L4().schedule();
+                    break;
+                  default:
+                    break;
+                }
+              }));
+
+      Pose3d reefBranch =
+          FieldConstants.Reef.branchPositions.get(4).get(FieldConstants.ReefHeight.L1);
+      controlScheme
+          .driveToReef()
+          .whileTrue(
+              Commands.run(
+                  () ->
+                      DriveCommands.driveToPointMA(
+                          reefBranch
+                              .toPose2d()
+                              .transformBy(
+                                  new Transform2d(
+                                      Inches.of(2.25).plus(Constants.robotScoringOffset),
+                                      Inches.of(1.8),
+                                      Rotation2d.k180deg)),
+                          drivetrain),
+                  drivetrain));
+    }
+    */
 
     // New Command when driver clicks intak
+    controlScheme.getIntake().onTrue(scoreCommands.intakeCoral());
 
   }
 
@@ -361,12 +467,7 @@ public class RobotContainer {
     //            .andThen(coralWrist.gamePieceUnloaded()));
     NamedCommands.registerCommand(
         "Intake",
-        Commands.waitUntil(elevator.isAtTarget())
-            .andThen(arm.intake())
-            .andThen(elevator.park())
-            .andThen(claw.intake())
-            .andThen(claw.hold()));
-    //   .andThen(coralWrist.gamePieceLoaded()));
+        scoreCommands.intakeCoral());
   }
 
   public Command getAutonomousCommand() {
