@@ -6,20 +6,21 @@
 
 package frc.robot.subsystems.elevator;
 
-import static edu.wpi.first.units.Units.*;
-
 import edu.wpi.first.units.measure.Angle;
-import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.Alert.AlertType;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SelectCommand;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.subsystems.DefaultCurrentCommandLoggableSubsystem;
-import java.util.Map;
 import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
+
+import java.util.Map;
+
+import static edu.wpi.first.units.Units.*;
 
 /**
  * The Elevator subsystem controls a dual-motor elevator mechanism for game piece manipulation. It
@@ -77,16 +78,6 @@ public class Elevator extends DefaultCurrentCommandLoggableSubsystem {
   /** Stops the elevator motors. */
   private void stop() {
     io.stop();
-  }
-
-  /**
-   * Returns the current distance of the elevator.
-   *
-   * @return The current angular distance
-   */
-  @AutoLogOutput
-  public Distance getPosition() {
-    return inputs.elevatorDistance;
   }
 
   /** Enumeration of available elevator distances with their corresponding target angles. */
@@ -258,5 +249,20 @@ public class Elevator extends DefaultCurrentCommandLoggableSubsystem {
 
   public final Command runDynamicElevatorSysId(SysIdRoutine.Direction direction) {
     return elevatorSysIdRoutine.dynamic(direction);
+  }
+
+  /**
+   * Checks if the elevator is at its target height.
+   *
+   * @return true if at target height, false otherwise
+   */
+  @AutoLogOutput
+  public Trigger isAtTarget() {
+    return new Trigger(
+        () ->
+            inputs.encoderPosition.isNear(
+                inputs.setpoint,
+                currentMode.distanceTolerance)); // getHeight().isNear(getTargetHeight(),
+    // currentPosition.heightTolerance()));
   }
 }

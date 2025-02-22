@@ -47,6 +47,9 @@ public class ClawIOREV implements ClawIO {
   public void updateInputs(ClawIOInputs inputs) {
     inputs.beamBreakTriggered = !beamBreakSensor.get();
 
+    inputs.leaderConnected = true;
+    inputs.encoderConnected = true;
+
     inputs.motorVelocity = RotationsPerSecond.of(motor.getEncoder().getVelocity());
     inputs.appliedVoltage = Volts.of(motor.getBusVoltage());
     inputs.supplyCurrent = Amps.of(motor.getOutputCurrent());

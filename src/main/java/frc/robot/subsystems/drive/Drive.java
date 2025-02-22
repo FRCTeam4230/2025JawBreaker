@@ -8,6 +8,7 @@ package frc.robot.subsystems.drive;
 
 import static edu.wpi.first.units.Units.*;
 
+import com.ctre.phoenix6.swerve.SwerveModule;
 import com.ctre.phoenix6.swerve.SwerveRequest;
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.config.PIDConstants;
@@ -34,7 +35,9 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.Constants;
 import frc.robot.Constants.Mode;
+import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.DefaultCurrentCommandLoggableSubsystem;
+import frc.robot.subsystems.drive.requests.SwerveSetpointGen;
 import frc.robot.subsystems.vision.VisionConsts;
 import frc.robot.subsystems.vision.VisionUtil.VisionMeasurement;
 import frc.robot.utils.ArrayBuilder;
@@ -89,6 +92,8 @@ public class Drive extends DefaultCurrentCommandLoggableSubsystem {
       new SwerveRequest.SysIdSwerveSteerGains();
   private final SwerveRequest.SysIdSwerveRotation m_rotationCharacterization =
       new SwerveRequest.SysIdSwerveRotation();
+
+  private SwerveSetpointGen setpointGen;
 
   /* SysId routine for characterizing translation. This is used to find PID gains for the drive motors. */
   private final SysIdRoutine m_sysIdRoutineTranslation =
@@ -146,6 +151,12 @@ public class Drive extends DefaultCurrentCommandLoggableSubsystem {
 
     this.io = io;
     inputs = new DriveIOInputsAutoLogged();
+
+    setpointGen =
+        new SwerveSetpointGen(getChassisSpeeds(), getModuleStates(), this::getRotation)
+            .withDeadband(TunerConstants.kSpeedAt12Volts.times(0.1))
+            .withRotationalDeadband(Constants.MaxAngularRate.times(0.1))
+            .withDriveRequestType(SwerveModule.DriveRequestType.OpenLoopVoltage);
 
     configureAutoBuilder();
   }
@@ -482,5 +493,9 @@ public class Drive extends DefaultCurrentCommandLoggableSubsystem {
     double offsetX = target.getX() - getPose().getX();
     double offsetY = target.getY() - getPose().getY();
     return (360 - Math.toDegrees(Math.atan2(offsetY, offsetX)) % 360);
+  }
+
+  public SwerveSetpointGen getSetpointGenerator() {
+    return setpointGen;
   }
 }

@@ -8,7 +8,10 @@ package frc.robot.subsystems.elevator;
 
 import static edu.wpi.first.units.Units.*;
 
-import edu.wpi.first.units.measure.*;
+import edu.wpi.first.units.measure.Angle;
+import edu.wpi.first.units.measure.AngularVelocity;
+import edu.wpi.first.units.measure.Current;
+import edu.wpi.first.units.measure.Voltage;
 import org.littletonrobotics.junction.AutoLog;
 
 public interface ElevatorIO {
@@ -35,8 +38,6 @@ public interface ElevatorIO {
 
     public boolean lowerLimit = false;
     public boolean upperLimit = false;
-
-    public Distance elevatorDistance = Inches.of(0);
 
     public Angle setpoint;
 

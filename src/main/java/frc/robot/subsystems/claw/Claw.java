@@ -38,6 +38,7 @@ public class Claw extends DefaultCurrentCommandLoggableSubsystem {
   public Claw(ClawIO io) {
     this.io = io;
     this.inputs = new ClawIOInputsAutoLogged();
+    setDefaultCommand(hold());
   }
 
   @Override

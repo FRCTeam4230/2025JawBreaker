@@ -1,11 +1,11 @@
 package frc.robot;
 
-import static edu.wpi.first.units.Units.*;
 import static frc.robot.Constants.*;
 
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 import com.ctre.phoenix6.swerve.SwerveRequest;
 import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.auto.NamedCommands;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
@@ -17,6 +17,9 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.commands.DriveCommands;
 import frc.robot.commands.ScoringCommands;
+import frc.robot.controls.ControlScheme;
+import frc.robot.controls.DefaultControlScheme;
+import frc.robot.controls.SimulationControlScheme;
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.arm.Arm;
 import frc.robot.subsystems.arm.ArmIOREV;
@@ -50,8 +53,7 @@ import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 public class RobotContainer {
 
   private LinearVelocity MaxSpeed = TunerConstants.kSpeedAt12Volts;
-  private final TunableController joystick =
-      new TunableController(0).withControllerType(TunableControllerType.QUADRATIC);
+  private final ControlScheme controlScheme;
 
   private final TunableController testJoystick =
       new TunableController(1).withControllerType(TunableControllerType.QUADRATIC);
@@ -96,6 +98,9 @@ public class RobotContainer {
         claw = new Claw(new ClawIOREV() {});
         climber = new Climber(new ClimberIOREV() {});
         counterWeight = new CounterWeight(new CounterWeightIOREV());
+
+        controlScheme = new DefaultControlScheme();
+
         break;
 
       case SIM:
@@ -134,6 +139,7 @@ public class RobotContainer {
         claw = new Claw(new ClawIOSIMREV());
         climber = new Climber(new ClimberIOSIM());
         counterWeight = new CounterWeight(new CounterWeightIOSIM());
+        controlScheme = new SimulationControlScheme();
 
         break;
 
@@ -153,6 +159,7 @@ public class RobotContainer {
         claw = new Claw(new ClawIOREV() {});
         climber = new Climber(new ClimberIOREV() {});
         counterWeight = new CounterWeight(new CounterWeightIOREV());
+        controlScheme = new DefaultControlScheme();
         break;
     }
 
@@ -185,22 +192,26 @@ public class RobotContainer {
         // Drivetrain will execute this command periodically
         drivetrain.applyRequest(
             () ->
-                drive
+                drivetrain
+                    .getSetpointGenerator()
                     .withVelocityX(
                         MaxSpeed.times(
-                            -joystick
-                                .customRight()
-                                .getY())) // Drive forward with negative Y (forward)
+                            controlScheme
+                                .getFieldX()
+                                .get())) // Drive forward with negative Y (forward)
                     .withVelocityY(
                         MaxSpeed.times(
-                            -joystick.customRight().getX())) // Drive left with negative X (left)
+                            controlScheme.getFieldY().get())) // Drive left with negative X (left)
                     .withRotationalRate(
-                        MaxAngularRate.times(
-                            joystick
-                                .customLeft()
-                                .getX())))); // Drive counterclockwise with negative X (left)
+                        Constants.MaxAngularRate.times(
+                            controlScheme
+                                .getFieldRotation()
+                                .get())))); // Drive counterclockwise with negative X (left)
 
-    joystick.back().onTrue(Commands.runOnce(() -> drivetrain.resetPose(Pose2d.kZero)));
+    controlScheme
+        .getController()
+        .back()
+        .onTrue(Commands.runOnce(() -> drivetrain.resetPose(Pose2d.kZero)));
     //    joystick
     //        .b()
     //        .whileTrue(
@@ -248,6 +259,7 @@ public class RobotContainer {
             .withDriveRequestType(DriveRequestType.OpenLoopVoltage);
     // Set PID for ProfiledFieldCentricFacingAngle
     driveFacingAngle.HeadingController.setPID(7, 0, 0);
+
     //    joystick
     //        .start()
     //        .whileTrue(
@@ -287,27 +299,27 @@ public class RobotContainer {
     //        .start()
     //        .and(joystick.x())
     //        .whileTrue(drivetrain.sysIdQuasistatic(SysIdRoutine.Direction.kReverse));
+    /*
+        joystick.leftTrigger().whileTrue(climber.climberOut(Volts.of(-12)));
+        joystick.rightTrigger().whileTrue(climber.climberOut(Volts.of(8)));
 
-    joystick.leftTrigger().whileTrue(climber.climberOut(Volts.of(-12)));
-    joystick.rightTrigger().whileTrue(climber.climberOut(Volts.of(8)));
+        joystick.rightBumper().whileTrue(claw.intake());
+        joystick.leftBumper().whileTrue(claw.extake());
 
-    joystick.rightBumper().whileTrue(claw.intake());
-    joystick.leftBumper().whileTrue(claw.extake());
+        joystick.a().onTrue(arm.intake().andThen(elevator.intake()));
+        joystick.x().onTrue(arm.L1());
+        joystick.y().onTrue(arm.L2());
+        joystick.b().onTrue(scoreCommands.stopAll().andThen(counterWeight.counterWeightStop()));
 
-    joystick.a().onTrue(arm.intake().andThen(elevator.intake()));
-    joystick.x().onTrue(arm.L1());
-    joystick.y().onTrue(arm.L2());
-    joystick.b().onTrue(scoreCommands.stopAll().andThen(counterWeight.counterWeightStop()));
+        joystick.povDown().onTrue(scoreCommands.intakeCoral());
 
-    joystick.povDown().onTrue(scoreCommands.intakeCoral());
+        joystick.povLeft().onTrue(scoreCommands.midLevel());
+        joystick.povUp().onTrue(scoreCommands.topLevel());
 
-    joystick.povLeft().onTrue(scoreCommands.midLevel());
-    joystick.povUp().onTrue(scoreCommands.topLevel());
-
-    joystick
-        .povRight()
-        .onTrue(arm.intake().andThen(Commands.waitSeconds(0.25)).andThen(elevator.L2()));
-
+        joystick
+            .povRight()
+            .onTrue(arm.intake().andThen(Commands.waitSeconds(0.25)).andThen(elevator.L2()));
+    */
     // reset the field-centric heading on left bumper press
     // joystick.leftBumper().onTrue(drivetrain.runOnce(drivetrain::seedFieldCentric));
 
@@ -318,28 +330,146 @@ public class RobotContainer {
     //        .rightBumper()
     //        .whileTrue(counterWeight.counterWeightOut()); // TODO: CONSTANTS and change this.
     //    joystick.leftBumper().whileTrue(counterWeight.counterWeightIn());
+
+    /****** ASSISTED DRIVE **** /
+     *
+     */
+    // reset the field-centric heading on left bumper press
+    // joystick.leftBumper().onTrue(drivetrain.runOnce(drivetrain::seedFieldCentric));
+    // controlScheme.getL1().onTrue(superstructure.CORAL_PLACE_L1());
+    // controlScheme.getL2().onTrue(superstructure.CORAL_PLACE_L2());
+    // controlScheme.getL3().onTrue(superstructure.CORAL_PLACE_L3());
+    // controlScheme.getL4().onTrue(superstructure.CORAL_PLACE_L4());
+
+    /*
+      controlScheme
+          .getL4()
+          .onTrue(
+              Commands.runOnce(
+                  () -> SmartController.targetReefHeight = FieldConstants.ReefHeight.L4));
+      controlScheme
+          .getL3()
+          .onTrue(
+              Commands.runOnce(
+                  () -> SmartController.targetReefHeight = FieldConstants.ReefHeight.L3));
+      controlScheme
+          .getL2()
+          .onTrue(
+              Commands.runOnce(
+                  () -> SmartController.targetReefHeight = FieldConstants.ReefHeight.L2));
+      controlScheme
+          .getL1()
+          .onTrue(
+              Commands.runOnce(
+                  () -> SmartController.targetReefHeight = FieldConstants.ReefHeight.L1));
+
+      coralWrist.hasGamePiece().onFalse(superstructure.INTAKE()).onTrue(coralWrist.FRONT());
+
+      coralWrist
+          .hasGamePiece()
+          .and(() -> SmartController.targetReefHeight == FieldConstants.ReefHeight.L2)
+          .onTrue(superstructure.TRANSIT());
+      coralWrist
+          .hasGamePiece()
+          .and(() -> SmartController.targetReefHeight != FieldConstants.ReefHeight.L2)
+          .onTrue(superstructure.CORAL_PLACE_L3());
+
+      controlScheme.setLoadGamePiece().onTrue(coralWrist.gamePieceLoaded());
+      controlScheme.setUnloadGamePiece().onTrue(coralWrist.gamePieceUnloaded());
+
+      controlScheme
+          .driveToCoralStation()
+          .whileTrue(
+              Commands.run(
+                  () ->
+                      DriveCommands.driveToPointMA(
+                          FieldConstants.CoralStation.leftCenterFace.transformBy(
+                              new Transform2d(
+                                  new Translation2d(Constants.robotScoringOffset, Inches.of(1.8)),
+                                  Rotation2d.kZero)),
+                          drivetrain,
+                          true),
+                  drivetrain));
+
+      Trigger autoReefHeight =
+          new Trigger(
+              () ->
+                  drivetrain.getPose().getTranslation().getDistance(FieldConstants.Reef.center)
+                      < 3.0);
+
+      autoReefHeight.whileTrue(
+          Commands.runOnce(
+              () -> {
+                switch (SmartController.targetReefHeight) {
+                  case L1:
+                    superstructure.CORAL_PLACE_L1().schedule();
+                    break;
+                  case L2:
+                    superstructure.CORAL_PLACE_L2().schedule();
+                    break;
+                  case L3:
+                    superstructure.CORAL_PLACE_L3().schedule();
+                    break;
+                  case L4:
+                    superstructure.CORAL_PLACE_L4().schedule();
+                    break;
+                  default:
+                    break;
+                }
+              }));
+
+      Pose3d reefBranch =
+          FieldConstants.Reef.branchPositions.get(4).get(FieldConstants.ReefHeight.L1);
+      controlScheme
+          .driveToReef()
+          .whileTrue(
+              Commands.run(
+                  () ->
+                      DriveCommands.driveToPointMA(
+                          reefBranch
+                              .toPose2d()
+                              .transformBy(
+                                  new Transform2d(
+                                      Inches.of(2.25).plus(Constants.robotScoringOffset),
+                                      Inches.of(1.8),
+                                      Rotation2d.k180deg)),
+                          drivetrain),
+                  drivetrain));
+    }
+    */
   }
 
-  /* public void setupNamedCommands() {
-    NamedCommands.registerCommand(
-        "Prepare L4", Commands.runOnce(() -> SmartController.targetReefHeight = FieldConstants.ReefHeight.L4));
-    NamedCommands.registerCommand(
-        "Prepare L3", Commands.runOnce(() -> SmartController.targetReefHeight = FieldConstants.ReefHeight.L3));
-    NamedCommands.registerCommand(
-        "Prepare L2", Commands.runOnce(() -> SmartController.targetReefHeight = FieldConstants.ReefHeight.L2));
-    NamedCommands.registerCommand(
-        "Prepare L1", Commands.runOnce(() -> SmartController.targetReefHeight = FieldConstants.ReefHeight.L1));
-    NamedCommands.registerCommand(
-        "Shoot",
-        Commands.waitUntil(superstructure.isAtTarget())
-                .andThen(new WaitCommand(0.5))
-                .andThen(coralWrist.gamePieceUnloaded()));
+  public void setupNamedCommands() {
+    //    NamedCommands.registerCommand(
+    //        "Prepare L4",
+    //        Commands.runOnce(() -> SmartController.targetReefHeight =
+    // FieldConstants.ReefHeight.L4));
+    //    NamedCommands.registerCommand(
+    //        "Prepare L3",
+    //        Commands.runOnce(() -> SmartController.targetReefHeight =
+    // FieldConstants.ReefHeight.L3));
+    //    NamedCommands.registerCommand(
+    //        "Prepare L2",
+    //        Commands.runOnce(() -> SmartController.targetReefHeight =
+    // FieldConstants.ReefHeight.L2));
+    //    NamedCommands.registerCommand(
+    //        "Prepare L1",
+    //        Commands.runOnce(() -> SmartController.targetReefHeight =
+    // FieldConstants.ReefHeight.L1));
+    //    NamedCommands.registerCommand(
+    //        "Shoot",
+    //        Commands.waitUntil(superstructure.isAtTarget())
+    //            .andThen(new WaitCommand(0.5))
+    //            .andThen(coralWrist.gamePieceUnloaded()));
     NamedCommands.registerCommand(
         "Intake",
-        Commands.waitUntil(superstructure.isAtTarget())
-                .andThen(new WaitCommand(0.5))
-                .andThen(coralWrist.gamePieceLoaded()));
-  }*/
+        Commands.waitUntil(elevator.isAtTarget())
+            .andThen(arm.intake())
+            .andThen(elevator.park())
+            .andThen(claw.intake())
+            .andThen(claw.hold()));
+    //   .andThen(coralWrist.gamePieceLoaded()));
+  }
 
   public Command getAutonomousCommand() {
     return autoChooser.get();
