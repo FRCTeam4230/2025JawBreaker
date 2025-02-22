@@ -41,6 +41,7 @@ import frc.robot.subsystems.elevator.ElevatorIOREV;
 import frc.robot.subsystems.elevator.ElevatorIOSIMREV;
 import frc.robot.subsystems.vision.Vision;
 import frc.robot.subsystems.vision.VisionIO;
+import frc.robot.subsystems.vision.VisionIOLimelight;
 import frc.robot.subsystems.vision.VisionIOPhotonVisionSIM;
 import frc.robot.utils.TunableController;
 import frc.robot.utils.TunableController.TunableControllerType;
@@ -85,10 +86,10 @@ public class RobotContainer {
         // Real robot, instantiate hardware IO implementations
         drivetrain = new Drive(currentDriveTrain);
 
-        //        new Vision(
-        //            drivetrain::addVisionData,
-        //            new VisionIOLimelight("limelight-front", drivetrain::getVisionParameters),
-        //            new VisionIOLimelight("limelight-back", drivetrain::getVisionParameters));
+        new Vision(
+            drivetrain::addVisionData,
+            new VisionIOLimelight("limelight-front", drivetrain::getVisionParameters),
+            new VisionIOLimelight("limelight-back", drivetrain::getVisionParameters));
 
         elevator = new Elevator(new ElevatorIOREV() {});
         arm = new Arm(new ArmIOREV() {});
@@ -187,15 +188,15 @@ public class RobotContainer {
                 drive
                     .withVelocityX(
                         MaxSpeed.times(
-                            joystick
+                            -joystick
                                 .customRight()
                                 .getY())) // Drive forward with negative Y (forward)
                     .withVelocityY(
                         MaxSpeed.times(
-                            joystick.customRight().getX())) // Drive left with negative X (left)
+                            -joystick.customRight().getX())) // Drive left with negative X (left)
                     .withRotationalRate(
                         MaxAngularRate.times(
-                            -joystick
+                            joystick
                                 .customLeft()
                                 .getX())))); // Drive counterclockwise with negative X (left)
 
