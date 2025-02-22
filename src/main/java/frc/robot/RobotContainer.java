@@ -274,18 +274,24 @@ public class RobotContainer {
     //    joystick.back().and(joystick.y()).whileTrue(drivetrain.sysIdDynamic(Direction.kForward));
     //    joystick.back().and(joystick.x()).whileTrue(drivetrain.sysIdDynamic(Direction.kReverse));
     //
-     joystick.start().and(joystick.y()).whileTrue(drivetrain.sysIdQuasistatic(SysIdRoutine.Direction.kForward));
+    joystick
+        .start()
+        .and(joystick.y())
+        .whileTrue(drivetrain.sysIdQuasistatic(SysIdRoutine.Direction.kForward));
 
-     joystick.start().and(joystick.x()).whileTrue(drivetrain.sysIdQuasistatic(SysIdRoutine.Direction.kReverse));
+    joystick
+        .start()
+        .and(joystick.x())
+        .whileTrue(drivetrain.sysIdQuasistatic(SysIdRoutine.Direction.kReverse));
 
-     arm.setDefaultCommand(arm.intake());
+    arm.setDefaultCommand(arm.intake());
 
     joystick.leftTrigger().whileTrue(climber.climberOut(Volts.of(-12)));
     joystick.rightTrigger().whileTrue(climber.climberOut(Volts.of(8)));
 
     // joystick.rightBumper().onTrue(claw.intake().onlyWhile(() -> !claw.hasCoral()));
-        joystick.rightBumper().whileTrue(claw.intake());
-        joystick.leftBumper().whileTrue(claw.extake());
+    joystick.rightBumper().whileTrue(claw.intake());
+    joystick.leftBumper().whileTrue(claw.extake());
 
     joystick.x().onTrue(arm.L1());
     joystick.y().onTrue(arm.L2());
@@ -309,10 +315,10 @@ public class RobotContainer {
     // testJoystick.back().onTrue(arm.reconfigPID());
 
     /**** COUNTER WEIGHT TEST ********/
-//    joystick
-//        .rightBumper()
-//        .whileTrue(counterWeight.counterWeightOut()); // TODO: CONSTANTS and change this.
-//    joystick.leftBumper().whileTrue(counterWeight.counterWeightIn());
+    //    joystick
+    //        .rightBumper()
+    //        .whileTrue(counterWeight.counterWeightOut()); // TODO: CONSTANTS and change this.
+    //    joystick.leftBumper().whileTrue(counterWeight.counterWeightIn());
   }
 
   public Command getAutonomousCommand() {
