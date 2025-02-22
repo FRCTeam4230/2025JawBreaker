@@ -11,14 +11,14 @@
 
 package frc.robot.subsystems.claw;
 
-import static edu.wpi.first.units.Units.*;
-
 import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.Alert.AlertType;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.subsystems.DefaultCurrentCommandLoggableSubsystem;
 import org.littletonrobotics.junction.Logger;
+
+import static edu.wpi.first.units.Units.*;
 
 /**
  * The Arm subsystem controls a dual-motor arm mechanism for game piece manipulation. It supports
@@ -55,7 +55,10 @@ public class Claw extends DefaultCurrentCommandLoggableSubsystem {
   }
 
   public Command hold() {
-    return Commands.run(() -> io.setVolts(Volts.of(0.5)), this);
+    return Commands.run(
+        () ->
+            Commands.waitUntil(this::hasCoral)
+                .andThen(() -> io.setVolts(Volts.of(ClawConstants.HOLD_VOLTAGE.get())), this));
   }
 
   public Command intake() {
@@ -64,11 +67,9 @@ public class Claw extends DefaultCurrentCommandLoggableSubsystem {
   // TODO: smart current limit for motor, set hold mode to only enable when proximity gets too far
 
   public Command extake() {
-    return Commands.run(
-        () ->
-            Commands.startEnd(
-                () -> io.setVolts(Volts.of(ClawConstants.INTAKE_VOLTAGE.get()).times(-0.5)),
-                () -> io.stop()),
+    return Commands.startEnd(
+        () -> io.setVolts(Volts.of(ClawConstants.INTAKE_VOLTAGE.get()).times(-0.5)),
+        () -> io.stop(),
         this);
   }
 
