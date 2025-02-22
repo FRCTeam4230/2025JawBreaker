@@ -39,8 +39,6 @@ public class ScoringCommands {
     return Commands.sequence(
         // Still would want to wait for elevator to have game
         Commands.waitUntil(elevatorHasGamePiece::getAsBoolean),
-        arm.intake(),
-        elevator.intake(),
         claw.intake().until(claw::hasCoral),
         claw.hold());
   }
@@ -49,7 +47,7 @@ public class ScoringCommands {
     var elevatorHasGamePiece = new Trigger(elevator::hasCoral);
     // Auto moves elevator to intake when it has game piece (this logic seems weird but is what you
     // have above)
-    elevatorHasGamePiece.onTrue(elevator.intake());
+    elevatorHasGamePiece.onTrue(elevator.park());
     // Auto move arm and elevator as soon as elevator and claw don't have a game piece
     elevatorHasGamePiece
         .and(claw::hasCoral)

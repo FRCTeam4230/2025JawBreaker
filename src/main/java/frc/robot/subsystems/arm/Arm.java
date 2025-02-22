@@ -164,7 +164,7 @@ public class Arm extends DefaultCurrentCommandLoggableSubsystem {
    * @return A command that implements the arm movement
    */
   private Command createPositionCommand(ArmMode mode) {
-    return Commands.runOnce(() -> setPosition(mode.targetAngle))
+    return Commands.runOnce(() -> setPosition(mode.targetAngle), this)
         .withName("Move to " + mode.toString());
   }
 
