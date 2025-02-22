@@ -319,6 +319,27 @@ public class RobotContainer {
     //    joystick.leftBumper().whileTrue(counterWeight.counterWeightIn());
   }
 
+  /* public void setupNamedCommands() {
+    NamedCommands.registerCommand(
+        "Prepare L4", Commands.runOnce(() -> SmartController.targetReefHeight = FieldConstants.ReefHeight.L4));
+    NamedCommands.registerCommand(
+        "Prepare L3", Commands.runOnce(() -> SmartController.targetReefHeight = FieldConstants.ReefHeight.L3));
+    NamedCommands.registerCommand(
+        "Prepare L2", Commands.runOnce(() -> SmartController.targetReefHeight = FieldConstants.ReefHeight.L2));
+    NamedCommands.registerCommand(
+        "Prepare L1", Commands.runOnce(() -> SmartController.targetReefHeight = FieldConstants.ReefHeight.L1));
+    NamedCommands.registerCommand(
+        "Shoot",
+        Commands.waitUntil(superstructure.isAtTarget())
+                .andThen(new WaitCommand(0.5))
+                .andThen(coralWrist.gamePieceUnloaded()));
+    NamedCommands.registerCommand(
+        "Intake",
+        Commands.waitUntil(superstructure.isAtTarget())
+                .andThen(new WaitCommand(0.5))
+                .andThen(coralWrist.gamePieceLoaded()));
+  }*/
+
   public Command getAutonomousCommand() {
     return autoChooser.get();
   }
