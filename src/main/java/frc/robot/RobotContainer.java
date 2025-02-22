@@ -452,8 +452,26 @@ public class RobotContainer {
                         () -> arm.getPosition() == Rotations.of(Degrees.of(-90).in(Rotations))))
                 .andThen(arm.park()));
 
-    // New Command when driver clicks intake
+    controlScheme.getController().leftTrigger().whileTrue(climber.climberOut(Volts.of(-12)));
+    controlScheme.getController().rightTrigger().whileTrue(climber.climberOut(Volts.of(8)));
+
+    controlScheme.getController().rightBumper().whileTrue(claw.intake());
+    controlScheme.getController().leftBumper().whileTrue(claw.extake());
+
+    controlScheme.getController().a().onTrue(arm.intake().andThen(elevator.intake()));
+    controlScheme.getController().x().onTrue(arm.L1());
+    controlScheme.getController().y().onTrue(arm.L2());
+    controlScheme.getController().b().onTrue(scoreCommands.stopAll().andThen(counterWeight.counterWeightStop()));
+
     controlScheme.getIntake().onTrue(scoreCommands.intakeCoral());
+    controlScheme.getL1().onTrue(scoreCommands.bottomLevel());
+    controlScheme.getL2().onTrue(scoreCommands.midLevel());
+    controlScheme.getL4().onTrue(scoreCommands.topLevel());
+
+//    controlScheme.getController()
+//            .povRight()
+//            .onTrue(arm.intake().andThen(Commands.waitSeconds(0.25)).andThen(elevator.L2()));
+
   }
 
   public void setupNamedCommands() {

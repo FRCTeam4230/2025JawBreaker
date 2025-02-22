@@ -25,29 +25,21 @@ public class DefaultControlScheme implements ControlScheme {
   }
 
   @Override
-  public Trigger getL1() {
-    return controller.a();
-  }
+  public Trigger getL1() {return controller.povDown();}
 
   @Override
-  public Trigger getL2() {
-    return controller.b();
-  }
+  public Trigger getL2() {return controller.povLeft();}
 
   @Override
-  public Trigger getL3() {
-    return controller.x();
-  }
+  public Trigger getL3() {return controller.b();}
 
   @Override
   public Trigger getL4() {
-    return controller.y();
+    return controller.povUp();
   }
 
   @Override
-  public Trigger getIntake() {
-    return controller.rightTrigger(0.5);
-  }
+  public Trigger getIntake() {return controller.povRight();}
 
   @Override
   public Trigger driveToCoralStation() {
