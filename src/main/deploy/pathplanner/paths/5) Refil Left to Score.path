@@ -3,25 +3,25 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 2.0,
-        "y": 7.0
+        "x": 1.2535714285714286,
+        "y": 0.9765422077922074
       },
       "prevControl": null,
       "nextControl": {
-        "x": 3.0,
-        "y": 7.0
+        "x": 2.1355323004379887,
+        "y": 1.6054355345792488
       },
       "isLocked": false,
-      "linkedName": null
+      "linkedName": "Refil Left"
     },
     {
       "anchor": {
-        "x": 4.0,
-        "y": 6.0
+        "x": 3.639630681818182,
+        "y": 2.5862418831168825
       },
       "prevControl": {
-        "x": 3.0,
-        "y": 6.0
+        "x": 2.787328121705848,
+        "y": 2.0258225598842836
       },
       "nextControl": null,
       "isLocked": false,
@@ -42,13 +42,13 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": 0.0
+    "rotation": 59.99999999999999
   },
   "reversed": false,
-  "folder": null,
+  "folder": "2025 Paths",
   "idealStartingState": {
     "velocity": 0,
-    "rotation": 0.0
+    "rotation": 55.0
   },
   "useDefaultConstraints": true
 }
