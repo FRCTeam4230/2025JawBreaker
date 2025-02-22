@@ -6,8 +6,6 @@
 
 package frc.robot.subsystems.arm;
 
-import static edu.wpi.first.units.Units.*;
-
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.spark.ClosedLoopSlot;
 import com.revrobotics.spark.SparkBase.ControlType;
@@ -24,6 +22,8 @@ import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.RobotController;
+
+import static edu.wpi.first.units.Units.*;
 
 /**
  * REV-based implementation of the ArmIO interface. This class uses two SparkFlex motor controllers
@@ -62,21 +62,16 @@ public class ArmIOREV implements ArmIO {
    * and applies example PID gains.
    */
   public ArmIOREV() {
-
     SparkFlexConfig leaderConfig = new SparkFlexConfig();
-    leaderConfig.idleMode(SparkBaseConfig.IdleMode.kBrake);
-    //    leaderConfig
-    //        .encoder
-    //        .velocityConversionFactor((1.0 / GEAR_RATIO) / 60.0) // Converts RPM to rotations per
-    // second
-    //        .positionConversionFactor(1.0 / GEAR_RATIO); // Converts motor rotations to arm
-    // rotations
     leaderConfig.limitSwitch.forwardLimitSwitchEnabled(false).reverseLimitSwitchEnabled(false);
 
     leaderConfig.externalEncoder.countsPerRevolution(8192);
     leaderConfig.externalEncoder.inverted(true);
     leaderConfig
         .inverted(true)
+        .idleMode(SparkBaseConfig.IdleMode.kBrake)
+        .voltageCompensation(12.0)
+        .smartCurrentLimit(40)
         .closedLoop
         .outputRange(-1, 1)
         .feedbackSensor(FeedbackSensor.kAlternateOrExternalEncoder)

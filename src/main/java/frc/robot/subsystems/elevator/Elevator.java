@@ -7,6 +7,7 @@
 package frc.robot.subsystems.elevator;
 
 import static edu.wpi.first.units.Units.*;
+import static java.util.Optional.*;
 
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.wpilibj.Alert;
@@ -256,15 +257,13 @@ public class Elevator extends DefaultCurrentCommandLoggableSubsystem {
    */
   // @AutoLogOutput
   public Trigger isAtTarget() {
-    //    return new Trigger(
-    //        () ->
-    //            ofNullable(inputs.encoderPosition)
-    //                .ifPresentOrElse(
-    //                    val  -> val.isNear(
-    //                inputs.setpoint,
-    //                currentMode.distanceTolerance) false); //
+    return new Trigger(
+        () ->
+            ofNullable(inputs.encoderPosition)
+                .map(val -> val.isNear(currentMode.targetDistance, currentMode.distanceTolerance))
+                .orElse(false));
+
     // getHeight().isNear(getTargetHeight(),
     // currentPosition.heightTolerance()));
-    return new Trigger(() -> false);
   }
 }

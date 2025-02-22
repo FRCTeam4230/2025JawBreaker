@@ -1,7 +1,5 @@
 package frc.robot;
 
-import static frc.robot.Constants.*;
-
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 import com.ctre.phoenix6.swerve.SwerveRequest;
 import com.pathplanner.lib.auto.AutoBuilder;
@@ -49,6 +47,8 @@ import frc.robot.subsystems.vision.VisionIOPhotonVisionSIM;
 import frc.robot.utils.TunableController;
 import frc.robot.utils.TunableController.TunableControllerType;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
+
+import static frc.robot.Constants.*;
 
 public class RobotContainer {
 
@@ -181,6 +181,9 @@ public class RobotContainer {
         "Drive Wheel Radius Characterization",
         DriveCommands.wheelRadiusCharacterization(drivetrain));
     scoreCommands = new ScoringCommands(elevator, arm, claw);
+
+    // just try it
+    arm.intake();
 
     configureBindings();
   }
@@ -437,6 +440,11 @@ public class RobotContainer {
                   drivetrain));
     }
     */
+
+    controlScheme.getController().x().onTrue(arm.park());
+    controlScheme.getController().y().onTrue(arm.intake());
+    controlScheme.getController().a().onTrue(arm.L2());
+
 
     // New Command when driver clicks intak
     controlScheme.getIntake().onTrue(scoreCommands.intakeCoral());
