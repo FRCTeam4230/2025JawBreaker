@@ -6,6 +6,9 @@
 
 package frc.robot.subsystems.arm;
 
+import static edu.wpi.first.units.Units.*;
+
+import com.revrobotics.AbsoluteEncoder;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.spark.ClosedLoopSlot;
 import com.revrobotics.spark.SparkBase.ControlType;
@@ -22,8 +25,7 @@ import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.RobotController;
-
-import static edu.wpi.first.units.Units.*;
+import edu.wpi.first.wpilibj2.command.Commands;
 
 /**
  * REV-based implementation of the ArmIO interface. This class uses two SparkFlex motor controllers
@@ -48,6 +50,8 @@ public class ArmIOREV implements ArmIO {
    */
   public final RelativeEncoder leaderEncoder = leader.getExternalEncoder();
 
+  public final AbsoluteEncoder absoluteEncoder = leader.getAbsoluteEncoder();
+
   private final SparkClosedLoopController closedLoopController = leader.getClosedLoopController();
   private final ArmFeedforward feedforward = new ArmFeedforward(0, 0.2, 0);
   // (leader.getAppliedOutput() * RobotController.getBatteryVoltage()) /
@@ -65,6 +69,7 @@ public class ArmIOREV implements ArmIO {
     SparkFlexConfig leaderConfig = new SparkFlexConfig();
     leaderConfig.limitSwitch.forwardLimitSwitchEnabled(false).reverseLimitSwitchEnabled(false);
 
+    leaderConfig.absoluteEncoder.inverted(true);
     leaderConfig.externalEncoder.countsPerRevolution(8192);
     leaderConfig.externalEncoder.inverted(true);
     leaderConfig
@@ -102,6 +107,7 @@ public class ArmIOREV implements ArmIO {
     double armVelRotPerSec = leaderEncoder.getVelocity();
 
     inputs.encoderPosition = Rotations.of(armRot);
+    inputs.absoluteEncoderPosition = Rotations.of(absoluteEncoder.getPosition());
     // For the motor’s rotor position we reconstruct the raw (pre–conversion) value.
     inputs.encoderVelocity = RotationsPerSecond.of(armVelRotPerSec);
 
@@ -157,6 +163,15 @@ public class ArmIOREV implements ArmIO {
 
   public void resetPos() {
     closedLoopController.setReference(0, ControlType.kPosition, ClosedLoopSlot.kSlot3);
+  }
+
+  @Override
+  public void resetEncoder() {
+    Commands.sequence(
+        Commands.runOnce(() -> setVoltage(Volts.of(-2))),
+        Commands.waitUntil(() -> leader.getForwardLimitSwitch().isPressed()),
+        Commands.runOnce(() -> setVoltage(Volts.of(0)))
+            .andThen(() -> leaderEncoder.setPosition(Degrees.of(-90).in(Rotations))));
   }
 
   @Override

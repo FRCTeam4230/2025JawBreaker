@@ -19,6 +19,7 @@ public interface ArmIO {
 
     public Angle motorPosition = Rotations.of(0);
     public Angle encoderPosition = Rotations.of(0);
+    public Angle absoluteEncoderPosition = Rotations.of(0);
 
     public AngularVelocity motorVelocity = RotationsPerSecond.of(0);
     public AngularVelocity encoderVelocity = RotationsPerSecond.of(0);
@@ -54,6 +55,8 @@ public interface ArmIO {
   default void stop() {
     throw new RuntimeException("stop not implemented");
   }
+
+  default void resetEncoder() {}
 
   default void reconfigurePID() {
     throw new RuntimeException("reconfigurePID not implemented");
