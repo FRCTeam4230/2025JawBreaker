@@ -28,7 +28,7 @@ import org.littletonrobotics.junction.Logger;
  */
 public class Arm extends DefaultCurrentCommandLoggableSubsystem {
   // Hardware interface and inputs
-  private ArmIO io = null;
+  private ArmIO io;
   private final ArmIOInputsAutoLogged inputs;
 
   public final PIDController pidController =
@@ -248,13 +248,14 @@ public class Arm extends DefaultCurrentCommandLoggableSubsystem {
     return setPositionCommand(ArmMode.INTAKE);
   }
 
-<<<<<<< Updated upstream
   public Command resetEncoder() {
-    return Commands.runOnce(io::resetEncoder);
+    return Commands.sequence(
+        Commands.run(() -> io.setVoltage(Volts.of(-0.4))).until(this::isParked),
+        Commands.runOnce(() -> io.setVoltage(Volts.of(0)))
+            .andThen(Commands.waitSeconds(0.4))
+            .andThen(() -> io.resetEncoder()));
   }
 
-=======
->>>>>>> Stashed changes
   public Command reconfigPID() {
     return Commands.runOnce(io::reconfigurePID);
   }
