@@ -25,7 +25,7 @@ public class ScoringCommands {
   }
 
   public Command bottomLevel() {
-    return Commands.runOnce(() -> arm.L1()).withName("bottomLevel");
+    return Commands.runOnce(() -> arm.L1()).alongWith(elevator.intake()).withName("bottomLevel");
   }
 
   public Command midLevel() {

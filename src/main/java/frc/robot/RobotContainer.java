@@ -465,6 +465,9 @@ public class RobotContainer {
     controlScheme.getL2().onTrue(scoreCommands.midLevel()); // D-PAD LEFT
     controlScheme.getL4().onTrue(scoreCommands.topLevel()); // D-PAD UP
 
+    controlScheme.getController().x().onTrue(arm.L1());
+    controlScheme.getController().b().onTrue(scoreCommands.stopAll());
+
     //    controlScheme.getController()
     //            .povRight()
     //            .onTrue(arm.intake().andThen(Commands.waitSeconds(0.25)).andThen(elevator.L2()));
@@ -487,14 +490,12 @@ public class RobotContainer {
                 () ->
                     DriveCommands.driveToPointMA(
                         FieldConstants.CoralStation.leftCenterFace.transformBy(
-                            new Transform2d(
-                                new Translation2d(maxDistanceReefLineup, Inches.of(10)),
-                                Rotation2d.kZero)),
+                            FieldConstants.CoralStation.coralOffset),
                         drivetrain,
                         true),
                 drivetrain));
     Pose3d reefBranch =
-        FieldConstants.Reef.branchPositions.get(1).get(FieldConstants.ReefHeight.L4);
+        FieldConstants.Reef.branchPositions.get(2).get(FieldConstants.ReefHeight.L4);
     controlScheme
         .getController()
         .y()
@@ -502,15 +503,18 @@ public class RobotContainer {
             Commands.run(
                 () ->
                     DriveCommands.driveToPointMA(
-                        reefBranch
-                            .toPose2d()
-                            .transformBy(
-                                new Transform2d(
-                                    Inches.of(2.25).plus(robotScoringOffset),
-                                    Inches.of(2.8),
-                                    Rotation2d.k180deg)),
+                        reefBranch.toPose2d().transformBy(FieldConstants.Reef.reefOffset),
                         drivetrain),
                 drivetrain));
+
+    controlScheme
+        .getController()
+        .start()
+        .onTrue(
+            Commands.runOnce(
+                () ->
+                    DriveCommands.findOffset(
+                        FieldConstants.CoralStation.leftCenterFace, drivetrain)));
   }
 
   public void setupNamedCommands() {

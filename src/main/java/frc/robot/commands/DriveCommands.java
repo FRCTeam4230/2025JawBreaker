@@ -31,9 +31,9 @@ import org.littletonrobotics.junction.Logger;
 
 public class DriveCommands extends Command {
 
-  private static PIDController translationController = new PIDController(6.5, 0, 0);
+  private static PIDController translationController = new PIDController(4.5, 0, 0);
 
-  private static PIDController rotationController = new PIDController(28, 0, 0);
+  private static PIDController rotationController = new PIDController(20, 0, 0);
 
   static {
     rotationController.enableContinuousInput(-0.5, 0.5);
@@ -200,5 +200,13 @@ public class DriveCommands extends Command {
         .withRotationalRate(speeds.omegaRadiansPerSecond);
     drive.setControl(setpointGenerator);
     Logger.recordOutput("Drive/TargetPose", target);
+  }
+
+  public static void findOffset(Pose2d target, Drive drive) {
+    Pose2d current = drive.getPose();
+    double offsetX = current.getX() - target.getX();
+    double offsetY = current.getY() - target.getY();
+    Logger.recordOutput("Drive/offsetX", offsetX);
+    Logger.recordOutput("Drive/offsetY", offsetY);
   }
 }
