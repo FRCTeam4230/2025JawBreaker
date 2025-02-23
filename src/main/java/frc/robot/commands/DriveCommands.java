@@ -7,18 +7,38 @@ package frc.robot.commands;
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 import com.ctre.phoenix6.swerve.SwerveModule.SteerRequestType;
 import com.ctre.phoenix6.swerve.SwerveRequest;
+import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.filter.SlewRateLimiter;
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.units.measure.Angle;
+import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.Constants;
 import frc.robot.subsystems.drive.*;
+import frc.robot.subsystems.drive.requests.SwerveSetpointGen;
+import org.littletonrobotics.junction.Logger;
+import frc.robot.utils.GeomUtil;
+
+
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 
+import static edu.wpi.first.units.Units.*;
+
 public class DriveCommands extends Command {
+
+    private static PIDController translationController = new PIDController(6.5, 0, 0);
+
+    private static PIDController rotationController = new PIDController(28, 0, 0);
+
+    static {
+        rotationController.enableContinuousInput(-0.5, 0.5);
+    }
 
   /** Measures the robot's wheel radius by spinning in a circle. */
   public static Command wheelRadiusCharacterization(Drive drive) {
@@ -109,4 +129,75 @@ public class DriveCommands extends Command {
     Rotation2d lastAngle = Rotation2d.kZero;
     double gyroDelta = 0.0;
   }
+    public static void driveToPointMA(Pose2d target, Drive drive) {
+        driveToPointMA(target, drive, Constants.robotScoringOffset, false);
+    }
+
+    public static void driveToPointMA(Pose2d target, Drive drive, boolean isBackOfRobot) {
+        driveToPointMA(target, drive, Constants.robotScoringOffset, isBackOfRobot);
+    }
+
+    public static void driveToPointMA(
+            Pose2d target, Drive drive, Distance offset, boolean isBackOfRobot) {
+        Pose2d newTarget = getDriveTarget(drive.getPose(), target, offset, isBackOfRobot);
+        driveToPoint(newTarget, drive);
+    }
+
+    /** Get drive target. */
+    private static Pose2d getDriveTarget(
+            Pose2d robot, Pose2d goal, Distance robotOffset, boolean isBackOfRobot) {
+
+        if (isBackOfRobot) {
+            goal = GeomUtil.flipRotation(goal);
+        }
+
+        // Final line up
+        var offset = robot.relativeTo(goal);
+        double yDistance = Math.abs(offset.getY());
+        double xDistance = Math.abs(offset.getX());
+
+        double shiftXT =
+                MathUtil.clamp(
+                        (yDistance / (Reef.faceLength.in(Meters) * 2))
+                                + ((xDistance - 0.3) / (Reef.faceLength.in(Meters) * 3)),
+                        0.0,
+                        1.0);
+        double shiftYT = MathUtil.clamp(offset.getX() / Reef.faceLength.in(Meters), 0.0, 1.0);
+
+        Pose2d goalPose =
+                goal.transformBy(
+                        GeomUtil.toTransform2d(
+                                -shiftXT * Constants.maxDistanceReefLineup.in(Meters),
+                                Math.copySign(
+                                        shiftYT * Constants.maxDistanceReefLineup.in(Meters) * 0.8, offset.getY())));
+
+        if (isBackOfRobot) {
+            goalPose = GeomUtil.flipRotation(goalPose);
+        }
+
+        return goalPose;
+    }
+
+    public static void driveToPoint(Pose2d target, Drive drive) {
+        driveToPoint(target, drive, Constants.robotScoringOffset);
+    }
+
+    public static void driveToPoint(Pose2d target, Drive drive, Distance offset) {
+        Pose2d current = drive.getPose();
+        double pidX = translationController.calculate(current.getX(), target.getX());
+        double pidY = translationController.calculate(current.getY(), target.getY());
+        double pidRot =
+                rotationController.calculate(
+                        drive.getRotation().getRotations(), target.getRotation().getRotations());
+        ChassisSpeeds speeds = new ChassisSpeeds(pidX, pidY, Rotations.of(pidRot).in(Radians));
+
+        SwerveSetpointGen setpointGenerator = drive.getSetpointGenerator();
+
+        setpointGenerator
+                .withVelocityX(speeds.vxMetersPerSecond)
+                .withVelocityY(speeds.vyMetersPerSecond)
+                .withRotationalRate(speeds.omegaRadiansPerSecond);
+        drive.setControl(setpointGenerator);
+        Logger.recordOutput("Drive/TargetPose", target);
+    }
 }

@@ -2,6 +2,7 @@ package frc.robot.commands;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.units.measure.LinearVelocity;
@@ -9,11 +10,10 @@ import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.Constants;
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.drive.Drive;
-import org.littletonrobotics.junction.AutoLogOutput;
-import org.littletonrobotics.junction.Logger;
-
 import java.util.Set;
 import java.util.function.BiConsumer;
+import org.littletonrobotics.junction.AutoLogOutput;
+import org.littletonrobotics.junction.Logger;
 
 public class ReefAlignCommand extends Command {
   private final Drive drivetrain;
@@ -58,7 +58,6 @@ public class ReefAlignCommand extends Command {
     addRequirements(drivetrain);
   }
 
-
   @Override
   public void execute() {
     // tv checks for valid target
@@ -72,6 +71,7 @@ public class ReefAlignCommand extends Command {
       return;
     }
 
+
     double[] targetpose =
         limelightTable.getEntry("targetpose_robotspace").getDoubleArray(new double[6]);
 
@@ -80,17 +80,16 @@ public class ReefAlignCommand extends Command {
       return;
     }
 
-    double x = targetpose[0];
-    double y = targetpose[1];
-    double rot = targetpose[5];
+    double x = drivetrain.getPose().getX();
+    double y = drivetrain.getPose().getY();
+    double rot = drivetrain.getPose().getRotation().getRadians();
 
-    double desiredX =
-        x
-            + (alignLeft
-                ? 0.1
-                : -0.1); // offset in metres to move left or right according to which side we are
+    double desiredX = targetpose[0]
+        + (alignLeft
+        ? 0.1
+        : -0.1); // offset in metres to move left or right according to which side we are
     // aligning to
-    double desiredY = y - (stationType == StationType.REEF ? REEF_DISTANCE : REFILL_DISTANCE);
+    double desiredY = targetpose[1] - (stationType == StationType.REEF ? REEF_DISTANCE : REFILL_DISTANCE);
     double desiredRot = 0;
 
     // if rotations is in radians this should rotate it 180 degrees?
