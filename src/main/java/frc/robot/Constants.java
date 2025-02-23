@@ -36,8 +36,8 @@ public final class Constants {
   public static final AngularVelocity MaxAngularRate = RotationsPerSecond.of(1.5);
   public static final AngularVelocity MaxModuleRate = RotationsPerSecond.of(20.0);
 
-  public static final Distance robotScoringOffset = Meters.of(0.1);
-  public static final Distance maxDistanceReefLineup = Meters.of(0.1);
+  public static final Distance robotScoringOffset = Inches.of(12);
+  public static final Distance maxDistanceReefLineup = Inches.of(0);
 
   // PathPlanner config constants
   private static final Mass ROBOT_MASS = Kilogram.of(69.78);

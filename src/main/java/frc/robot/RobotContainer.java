@@ -488,7 +488,7 @@ public class RobotContainer {
                     DriveCommands.driveToPointMA(
                         FieldConstants.CoralStation.leftCenterFace.transformBy(
                             new Transform2d(
-                                new Translation2d(Constants.robotScoringOffset, Inches.of(1.8)),
+                                new Translation2d(maxDistanceReefLineup, Inches.of(10)),
                                 Rotation2d.kZero)),
                         drivetrain,
                         true),
@@ -507,7 +507,7 @@ public class RobotContainer {
                             .transformBy(
                                 new Transform2d(
                                     Inches.of(2.25).plus(robotScoringOffset),
-                                    Inches.of(1.8),
+                                    Inches.of(2.8),
                                     Rotation2d.k180deg)),
                         drivetrain),
                 drivetrain));
