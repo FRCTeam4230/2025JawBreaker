@@ -9,6 +9,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.Constants;
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.drive.Drive;
+import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
 
 import java.util.Set;
@@ -146,6 +147,7 @@ public class ReefAlignCommand extends Command {
                 .withRotationalRate(Constants.MaxAngularRate.times(0)));
   }
 
+  @AutoLogOutput
   private boolean isValidTag(int tagId) {
     return switch (stationType) {
       case REEF -> REEF_TAG_IDS.contains(tagId);
@@ -154,11 +156,13 @@ public class ReefAlignCommand extends Command {
   }
 
   @Override
+  @AutoLogOutput
   public boolean isFinished() {
     return xController.atSetpoint() && yController.atSetpoint() && rotationController.atSetpoint();
   }
 
   @Override
+  @AutoLogOutput
   public void end(boolean interrupted) {
     stopRobot();
   }
