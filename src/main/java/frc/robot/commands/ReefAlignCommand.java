@@ -5,13 +5,14 @@ import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.units.measure.LinearVelocity;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.Constants;
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.drive.Drive;
-import java.util.Set;
+import org.littletonrobotics.junction.Logger;
 
+import java.util.Set;
+import java.util.function.BiConsumer;
 
 public class ReefAlignCommand extends Command {
   private final Drive drivetrain;
@@ -105,6 +106,26 @@ public class ReefAlignCommand extends Command {
     final double clampedXVelocity = MathUtil.clamp(xVelocity, -1.0, 1.0);
     final double clampedYVelocity = MathUtil.clamp(yVelocity, -1.0, 1.0);
     final double clampedRotationalRate = MathUtil.clamp(rotationalRate, -1.0, 1.0);
+
+    final String key = getClass().getSimpleName();
+    BiConsumer<String, Double> printPidValue =
+        (name, value) -> {
+          Logger.recordOutput(key + "/" + name, value);
+        };
+
+    printPidValue.accept("xVelocity", xVelocity);
+    printPidValue.accept("yVelocity", yVelocity);
+    printPidValue.accept("rotationRate", rotationalRate);
+    printPidValue.accept("clampedXVelocity", clampedXVelocity);
+    printPidValue.accept("clampedYVelocity", clampedYVelocity);
+    printPidValue.accept("clampedRorationRate", clampedRotationalRate);
+
+    printPidValue.accept(
+        "clampedTimesMaxSpeedXVelocity", MaxSpeed.times(clampedXVelocity).magnitude());
+    printPidValue.accept(
+        "clampedTimesMaxSpeedYVelocity", MaxSpeed.times(clampedYVelocity).magnitude());
+    printPidValue.accept(
+        "clampedTimesRotation", Constants.MaxAngularRate.times(rotationalRate).magnitude());
 
     drivetrain.applyRequest(
         () ->
