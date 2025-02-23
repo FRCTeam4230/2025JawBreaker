@@ -58,6 +58,7 @@ public class ReefAlignCommand extends Command {
     addRequirements(drivetrain);
   }
 
+
   @Override
   public void execute() {
     // tv checks for valid target
@@ -114,6 +115,12 @@ public class ReefAlignCommand extends Command {
           Logger.recordOutput(key + "/" + name, value);
         };
 
+    printPidValue.accept("x", x);
+    printPidValue.accept("y", y);
+    printPidValue.accept("rot", rot);
+    printPidValue.accept("desiredX", desiredX);
+    printPidValue.accept("desiredY", desiredY);
+    printPidValue.accept("desiredRot", desiredRot);
     printPidValue.accept("xVelocity", xVelocity);
     printPidValue.accept("yVelocity", yVelocity);
     printPidValue.accept("rotationRate", rotationalRate);
@@ -137,6 +144,7 @@ public class ReefAlignCommand extends Command {
                 .withRotationalRate(Constants.MaxAngularRate.times(clampedRotationalRate)));
   }
 
+  @AutoLogOutput
   private void stopRobot() {
     drivetrain.applyRequest(
         () ->
