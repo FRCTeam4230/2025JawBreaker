@@ -47,7 +47,7 @@ public class ScoringCommands {
                 .alongWith(arm.intake())
                 .until(claw::hasCoral),
             claw.hold())
-        //.withTimeout(3)
+        // .withTimeout(3)
         .withName("intake");
   }
 

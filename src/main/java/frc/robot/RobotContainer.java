@@ -1,5 +1,8 @@
 package frc.robot;
 
+import static edu.wpi.first.units.Units.*;
+import static frc.robot.Constants.*;
+
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 import com.ctre.phoenix6.swerve.SwerveRequest;
 import com.pathplanner.lib.auto.AutoBuilder;
@@ -14,6 +17,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.commands.DriveCommands;
+import frc.robot.commands.ReefAlignCommand;
 import frc.robot.commands.ScoringCommands;
 import frc.robot.controls.ControlScheme;
 import frc.robot.controls.DefaultControlScheme;
@@ -47,9 +51,6 @@ import frc.robot.subsystems.vision.VisionIOPhotonVisionSIM;
 import frc.robot.utils.TunableController;
 import frc.robot.utils.TunableController.TunableControllerType;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
-
-import static edu.wpi.first.units.Units.*;
-import static frc.robot.Constants.*;
 
 public class RobotContainer {
 
@@ -471,6 +472,14 @@ public class RobotContainer {
     //            .povRight()
     //            .onTrue(arm.intake().andThen(Commands.waitSeconds(0.25)).andThen(elevator.L2()));
 
+    controlScheme
+        .getController()
+        .y()
+        .whileTrue(new ReefAlignCommand(drivetrain, ReefAlignCommand.StationType.REEF, false));
+    controlScheme
+        .getController()
+        .a()
+        .whileTrue(new ReefAlignCommand(drivetrain, ReefAlignCommand.StationType.REFILL, false));
   }
 
   public void setupNamedCommands() {
