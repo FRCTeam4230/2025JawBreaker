@@ -2,7 +2,6 @@ package frc.robot.commands;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
-import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.units.measure.LinearVelocity;
@@ -71,7 +70,6 @@ public class ReefAlignCommand extends Command {
       return;
     }
 
-
     double[] targetpose =
         limelightTable.getEntry("targetpose_robotspace").getDoubleArray(new double[6]);
 
@@ -84,12 +82,14 @@ public class ReefAlignCommand extends Command {
     double y = drivetrain.getPose().getY();
     double rot = drivetrain.getPose().getRotation().getRadians();
 
-    double desiredX = targetpose[0]
-        + (alignLeft
-        ? 0.1
-        : -0.1); // offset in metres to move left or right according to which side we are
+    double desiredX =
+        targetpose[0]
+            + (alignLeft
+                ? 0.1
+                : -0.1); // offset in metres to move left or right according to which side we are
     // aligning to
-    double desiredY = targetpose[1] - (stationType == StationType.REEF ? REEF_DISTANCE : REFILL_DISTANCE);
+    double desiredY =
+        targetpose[1] - (stationType == StationType.REEF ? REEF_DISTANCE : REFILL_DISTANCE);
     double desiredRot = 0;
 
     // if rotations is in radians this should rotate it 180 degrees?

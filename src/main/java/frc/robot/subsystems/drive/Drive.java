@@ -38,6 +38,7 @@ import frc.robot.Constants.Mode;
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.DefaultCurrentCommandLoggableSubsystem;
 import frc.robot.subsystems.drive.requests.SwerveSetpointGen;
+import frc.robot.subsystems.drive.requests.SysIdSwerveTranslation_Torque;
 import frc.robot.subsystems.vision.VisionConsts;
 import frc.robot.subsystems.vision.VisionUtil.VisionMeasurement;
 import frc.robot.utils.ArrayBuilder;
@@ -92,6 +93,27 @@ public class Drive extends DefaultCurrentCommandLoggableSubsystem {
       new SwerveRequest.SysIdSwerveSteerGains();
   private final SwerveRequest.SysIdSwerveRotation m_rotationCharacterization =
       new SwerveRequest.SysIdSwerveRotation();
+
+  // Example TorqueCurrent SysID - Others are avalible.
+  private final SysIdSwerveTranslation_Torque m_translationTorqueCharacterization =
+      new SysIdSwerveTranslation_Torque();
+
+  /* SysId routine for characterizing torque translation. This is used to find PID gains for Torque Current of the drive motors. */
+  private final SysIdRoutine m_sysIdRoutineTorqueTranslation =
+      new SysIdRoutine(
+          new SysIdRoutine.Config(
+              Volts.of(5).per(Second), // Use ramp rate of 5 A/s
+              Volts.of(10), // Use dynamic step of 10 A
+              Seconds.of(5), // Use timeout of 5 seconds
+              // Log state with SignalLogger class
+              state -> Logger.recordOutput("SysIdTranslation_State", state.toString())),
+          new SysIdRoutine.Mechanism(
+              output ->
+                  setControl(
+                      m_translationTorqueCharacterization.withTorqueCurrent(
+                          output.in(Volts))), // treat volts as amps
+              null,
+              this));
 
   private SwerveSetpointGen setpointGen;
 
