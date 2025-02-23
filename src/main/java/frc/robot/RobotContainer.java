@@ -1,8 +1,5 @@
 package frc.robot;
 
-import static edu.wpi.first.units.Units.*;
-import static frc.robot.Constants.*;
-
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 import com.ctre.phoenix6.swerve.SwerveRequest;
 import com.pathplanner.lib.auto.AutoBuilder;
@@ -50,6 +47,9 @@ import frc.robot.subsystems.vision.VisionIOPhotonVisionSIM;
 import frc.robot.utils.TunableController;
 import frc.robot.utils.TunableController.TunableControllerType;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
+
+import static edu.wpi.first.units.Units.*;
+import static frc.robot.Constants.*;
 
 public class RobotContainer {
 
@@ -438,10 +438,7 @@ public class RobotContainer {
                   drivetrain));
     }
     */
-
-    controlScheme.getController().x().onTrue(arm.park());
-    controlScheme.getController().y().onTrue(arm.intake());
-    controlScheme.getController().a().onTrue(arm.L2());
+    // RESET ENCODER
     controlScheme
         .getController()
         .b()
@@ -452,29 +449,34 @@ public class RobotContainer {
                         () -> arm.getPosition() == Rotations.of(Degrees.of(-90).in(Rotations))))
                 .andThen(arm.park()));
 
+    // CLIMBER
     controlScheme.getController().leftTrigger().whileTrue(climber.climberOut(Volts.of(-12)));
     controlScheme.getController().rightTrigger().whileTrue(climber.climberOut(Volts.of(8)));
 
+    // CLAW
     controlScheme.getController().rightBumper().whileTrue(claw.intake());
     controlScheme.getController().leftBumper().whileTrue(claw.extake());
 
-    controlScheme.getController().a().onTrue(arm.intake().andThen(elevator.intake()));
-    controlScheme.getController().x().onTrue(arm.L1());
-    controlScheme.getController().y().onTrue(arm.L2());
-    controlScheme.getController().b().onTrue(scoreCommands.stopAll().andThen(counterWeight.counterWeightStop()));
+    //    controlScheme
+    //        .getController()
+    //        .b()
+    //        .onTrue(scoreCommands.stopAll().andThen(counterWeight.counterWeightStop()));
 
-    controlScheme.getIntake().onTrue(scoreCommands.intakeCoral());
-    controlScheme.getL1().onTrue(scoreCommands.bottomLevel());
-    controlScheme.getL2().onTrue(scoreCommands.midLevel());
-    controlScheme.getL4().onTrue(scoreCommands.topLevel());
+    controlScheme.getIntake().onTrue(scoreCommands.intakeCoral()); // D-PAD RIGHT
+    controlScheme.getL1().onTrue(scoreCommands.bottomLevel()); // D-PAD DOWN
+    controlScheme.getL2().onTrue(scoreCommands.midLevel()); // D-PAD LEFT
+    controlScheme.getL4().onTrue(scoreCommands.topLevel()); // D-PAD UP
 
-//    controlScheme.getController()
-//            .povRight()
-//            .onTrue(arm.intake().andThen(Commands.waitSeconds(0.25)).andThen(elevator.L2()));
+    //    controlScheme.getController()
+    //            .povRight()
+    //            .onTrue(arm.intake().andThen(Commands.waitSeconds(0.25)).andThen(elevator.L2()));
 
   }
 
   public void setupNamedCommands() {
+
+    NamedCommands.registerCommand("Prep L1", arm.L1());
+
     //    NamedCommands.registerCommand(
     //        "Prepare L4",
     //        Commands.runOnce(() -> SmartController.targetReefHeight =
