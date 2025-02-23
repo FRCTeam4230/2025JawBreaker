@@ -7,17 +7,13 @@ import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 import com.ctre.phoenix6.swerve.SwerveRequest;
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
-import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation3d;
-import edu.wpi.first.math.geometry.Transform3d;
-import edu.wpi.first.math.geometry.Translation3d;
+import edu.wpi.first.math.geometry.*;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.units.measure.LinearVelocity;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.commands.DriveCommands;
-import frc.robot.commands.ReefAlignCommand;
 import frc.robot.commands.ScoringCommands;
 import frc.robot.controls.ControlScheme;
 import frc.robot.controls.DefaultControlScheme;
@@ -48,6 +44,7 @@ import frc.robot.subsystems.vision.Vision;
 import frc.robot.subsystems.vision.VisionIO;
 import frc.robot.subsystems.vision.VisionIOLimelight;
 import frc.robot.subsystems.vision.VisionIOPhotonVisionSIM;
+import frc.robot.utils.FieldConstants;
 import frc.robot.utils.TunableController;
 import frc.robot.utils.TunableController.TunableControllerType;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
@@ -472,14 +469,48 @@ public class RobotContainer {
     //            .povRight()
     //            .onTrue(arm.intake().andThen(Commands.waitSeconds(0.25)).andThen(elevator.L2()));
 
-    controlScheme
-        .getController()
-        .y()
-        .whileTrue(new ReefAlignCommand(drivetrain, ReefAlignCommand.StationType.REEF, false));
+    //    controlScheme
+    //        .getController()
+    //        .y()
+    //        .whileTrue(new ReefAlignCommand(drivetrain, ReefAlignCommand.StationType.REEF,
+    // false));
+    //    controlScheme
+    //        .getController()
+    //        .a()
+    //        .whileTrue(new ReefAlignCommand(drivetrain, ReefAlignCommand.StationType.REFILL,
+    // false));
     controlScheme
         .getController()
         .a()
-        .whileTrue(new ReefAlignCommand(drivetrain, ReefAlignCommand.StationType.REFILL, false));
+        .whileTrue(
+            Commands.run(
+                () ->
+                    DriveCommands.driveToPointMA(
+                        FieldConstants.CoralStation.leftCenterFace.transformBy(
+                            new Transform2d(
+                                new Translation2d(Constants.robotScoringOffset, Inches.of(1.8)),
+                                Rotation2d.kZero)),
+                        drivetrain,
+                        true),
+                drivetrain));
+    Pose3d reefBranch =
+        FieldConstants.Reef.branchPositions.get(1).get(FieldConstants.ReefHeight.L4);
+    controlScheme
+        .getController()
+        .y()
+        .whileTrue(
+            Commands.run(
+                () ->
+                    DriveCommands.driveToPointMA(
+                        reefBranch
+                            .toPose2d()
+                            .transformBy(
+                                new Transform2d(
+                                    Inches.of(2.25).plus(robotScoringOffset),
+                                    Inches.of(1.8),
+                                    Rotation2d.k180deg)),
+                        drivetrain),
+                drivetrain));
   }
 
   public void setupNamedCommands() {
