@@ -4,6 +4,8 @@
 
 package frc.robot.commands;
 
+import static edu.wpi.first.units.Units.*;
+
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 import com.ctre.phoenix6.swerve.SwerveModule.SteerRequestType;
 import com.ctre.phoenix6.swerve.SwerveRequest;
@@ -25,13 +27,10 @@ import frc.robot.utils.FieldConstants;
 import frc.robot.utils.GeomUtil;
 import frc.robot.utils.LoggedTunableNumber;
 import frc.robot.utils.TunableNumberWrapper;
-import org.littletonrobotics.junction.Logger;
-
 import java.lang.invoke.MethodHandles;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
-
-import static edu.wpi.first.units.Units.*;
+import org.littletonrobotics.junction.Logger;
 
 public class DriveCommands extends Command {
 

@@ -50,7 +50,6 @@ public class ScoringCommands {
             claw.hold())
         // .withTimeout(3)
         .withName("intake");
-
   }
 
   public Command score() {
@@ -59,8 +58,11 @@ public class ScoringCommands {
             () -> claw.extake().until(() -> !claw.hasCoral()),
             onEnd -> intakeCoral(),
             () -> !claw.hasCoral(),
-            arm, claw).withName("scoreCoral");
+            arm,
+            claw)
+        .withName("scoreCoral");
   }
+
   @AutoLogOutput
   private Trigger elevatorHasGamePiece() {
     var elevatorHasGamePiece = new Trigger(elevator::hasCoral);

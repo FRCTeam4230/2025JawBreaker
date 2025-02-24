@@ -438,15 +438,16 @@ public class RobotContainer {
     }
     */
     // RESET ENCODER
-//    controlScheme
-//        .getController()
-//        .b()
-//        .onTrue(
-//            arm.resetEncoder()
-//                .andThen(
-//                    Commands.waitUntil(
-//                        () -> arm.getPosition() == Rotations.of(Degrees.of(-90).in(Rotations))))
-//                .andThen(arm.park()));
+    //    controlScheme
+    //        .getController()
+    //        .b()
+    //        .onTrue(
+    //            arm.resetEncoder()
+    //                .andThen(
+    //                    Commands.waitUntil(
+    //                        () -> arm.getPosition() ==
+    // Rotations.of(Degrees.of(-90).in(Rotations))))
+    //                .andThen(arm.park()));
 
     // CLIMBER
     controlScheme.getController().leftTrigger().whileTrue(climber.climberOut(Volts.of(-12)));
