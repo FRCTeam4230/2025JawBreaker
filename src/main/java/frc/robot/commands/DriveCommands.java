@@ -25,15 +25,26 @@ import frc.robot.subsystems.drive.*;
 import frc.robot.subsystems.drive.requests.SwerveSetpointGen;
 import frc.robot.utils.FieldConstants;
 import frc.robot.utils.GeomUtil;
+import frc.robot.utils.LoggedTunableNumber;
+import frc.robot.utils.TunableNumberWrapper;
+import java.lang.invoke.MethodHandles;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import org.littletonrobotics.junction.Logger;
 
 public class DriveCommands extends Command {
 
-  private static PIDController translationController = new PIDController(4.5, 0, 0);
+  private static final TunableNumberWrapper tunableTable =
+      new TunableNumberWrapper(MethodHandles.lookup().lookupClass());
 
-  private static PIDController rotationController = new PIDController(20, 0, 0);
+  public static final LoggedTunableNumber kP = tunableTable.makeField("kP", 1.2);
+  public static final LoggedTunableNumber kI = tunableTable.makeField("kI", 0.0);
+  public static final LoggedTunableNumber kD = tunableTable.makeField("kD", 0.0);
+
+  private static PIDController translationController =
+      new PIDController(kP.get(), kI.get(), kD.get());
+
+  private static PIDController rotationController = new PIDController(5, 0, 0);
 
   static {
     rotationController.enableContinuousInput(-0.5, 0.5);
@@ -202,11 +213,7 @@ public class DriveCommands extends Command {
     Logger.recordOutput("Drive/TargetPose", target);
   }
 
-  public static void findOffset(Pose2d target, Drive drive) {
-    Pose2d current = drive.getPose();
-    double offsetX = current.getX() - target.getX();
-    double offsetY = current.getY() - target.getY();
-    Logger.recordOutput("Drive/offsetX", offsetX);
-    Logger.recordOutput("Drive/offsetY", offsetY);
+  public static void reconfigurePID() {
+    translationController = new PIDController(kP.get(), kI.get(), kD.get());
   }
 }

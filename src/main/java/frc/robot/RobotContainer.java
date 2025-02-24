@@ -507,14 +507,7 @@ public class RobotContainer {
                         drivetrain),
                 drivetrain));
 
-    controlScheme
-        .getController()
-        .start()
-        .onTrue(
-            Commands.runOnce(
-                () ->
-                    DriveCommands.findOffset(
-                        FieldConstants.CoralStation.leftCenterFace, drivetrain)));
+    controlScheme.getController().start().onTrue(Commands.runOnce(DriveCommands::reconfigurePID));
   }
 
   public void setupNamedCommands() {
