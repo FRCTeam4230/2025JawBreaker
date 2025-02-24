@@ -1,8 +1,5 @@
 package frc.robot;
 
-import static edu.wpi.first.units.Units.*;
-import static frc.robot.Constants.*;
-
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 import com.ctre.phoenix6.swerve.SwerveRequest;
 import com.pathplanner.lib.auto.AutoBuilder;
@@ -49,6 +46,9 @@ import frc.robot.utils.TunableController;
 import frc.robot.utils.TunableController.TunableControllerType;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
+import static edu.wpi.first.units.Units.*;
+import static frc.robot.Constants.*;
+
 public class RobotContainer {
 
   private LinearVelocity MaxSpeed = TunerConstants.kSpeedAt12Volts;
@@ -89,7 +89,7 @@ public class RobotContainer {
 
         new Vision(
             drivetrain::addVisionData,
-            new VisionIOLimelight("limelight-front", drivetrain::getVisionParameters),
+            new VisionIOLimelight("limelight-fr", drivetrain::getVisionParameters),
             new VisionIOLimelight("limelight-fl", drivetrain::getVisionParameters),
             new VisionIOLimelight("limelight-back", drivetrain::getVisionParameters));
 
