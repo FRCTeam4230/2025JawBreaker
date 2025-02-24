@@ -3,13 +3,13 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 3.854398392100324,
-        "y": 5.487338993380016
+        "x": 3.8444908098197987,
+        "y": 5.462570037678704
       },
       "prevControl": null,
       "nextControl": {
-        "x": 1.8592600605853344,
-        "y": 6.680735847964093
+        "x": 1.8493524783048092,
+        "y": 6.655966892262781
       },
       "isLocked": false,
       "linkedName": "Start Score End"
@@ -48,7 +48,7 @@
   "folder": "2025 Paths",
   "idealStartingState": {
     "velocity": 0,
-    "rotation": -59.99999999999999
+    "rotation": -60.5
   },
   "useDefaultConstraints": true
 }

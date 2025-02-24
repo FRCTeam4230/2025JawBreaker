@@ -8,20 +8,20 @@
       },
       "prevControl": null,
       "nextControl": {
-        "x": 3.3256516479855724,
-        "y": 4.551539202880038
+        "x": 2.2904284123621608,
+        "y": 5.349106137867387
       },
       "isLocked": false,
       "linkedName": "Refil Right"
     },
     {
       "anchor": {
-        "x": 2.806290584415584,
-        "y": 4.03924512987013
+        "x": 2.913129058441558,
+        "y": 4.195941558441558
       },
       "prevControl": {
-        "x": 2.6711718326779983,
-        "y": 3.8289051124486306
+        "x": 2.785220904236376,
+        "y": 4.41074263871776
       },
       "nextControl": null,
       "isLocked": false,
@@ -31,7 +31,14 @@
   "rotationTargets": [],
   "constraintZones": [],
   "pointTowardsZones": [],
-  "eventMarkers": [],
+  "eventMarkers": [
+    {
+      "name": "topLevel",
+      "waypointRelativePos": 0.6998769987699857,
+      "endWaypointRelativePos": null,
+      "command": null
+    }
+  ],
   "globalConstraints": {
     "maxVelocity": 1.5,
     "maxAcceleration": 2.5,
