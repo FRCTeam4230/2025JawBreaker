@@ -13,19 +13,13 @@
         {
           "type": "named",
           "data": {
-            "name": "ScoreL4"
+            "name": "scoreCoral"
           }
         },
         {
           "type": "path",
           "data": {
             "pathName": "2) Refil Right"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "intakeCoral"
           }
         },
         {
@@ -37,19 +31,13 @@
         {
           "type": "named",
           "data": {
-            "name": "ScoreL4"
+            "name": "scoreCoral"
           }
         },
         {
           "type": "path",
           "data": {
             "pathName": "4) Score Middle to Refil Left"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "intakeCoral"
           }
         },
         {
@@ -61,7 +49,7 @@
         {
           "type": "named",
           "data": {
-            "name": "ScoreL4"
+            "name": "scoreCoral"
           }
         }
       ]
