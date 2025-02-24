@@ -6,7 +6,6 @@ import static frc.robot.Constants.*;
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 import com.ctre.phoenix6.swerve.SwerveRequest;
 import com.pathplanner.lib.auto.AutoBuilder;
-import com.pathplanner.lib.auto.NamedCommands;
 import edu.wpi.first.math.geometry.*;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.units.measure.LinearVelocity;
@@ -299,37 +298,11 @@ public class RobotContainer {
     //        .start()
     //        .and(joystick.x())
     //        .whileTrue(drivetrain.sysIdQuasistatic(SysIdRoutine.Direction.kReverse));
-    /*
-        joystick.leftTrigger().whileTrue(climber.climberOut(Volts.of(-12)));
-        joystick.rightTrigger().whileTrue(climber.climberOut(Volts.of(8)));
 
-        joystick.rightBumper().whileTrue(claw.intake());
-        joystick.leftBumper().whileTrue(claw.extake());
-
-        joystick.a().onTrue(arm.intake().andThen(elevator.intake()));
-        joystick.x().onTrue(arm.L1());
-        joystick.y().onTrue(arm.L2());
-        joystick.b().onTrue(scoreCommands.stopAll().andThen(counterWeight.counterWeightStop()));
-
-        joystick.povDown().onTrue(scoreCommands.intakeCoral());
-
-        joystick.povLeft().onTrue(scoreCommands.midLevel());
-        joystick.povUp().onTrue(scoreCommands.topLevel());
-
-        joystick
-            .povRight()
-            .onTrue(arm.intake().andThen(Commands.waitSeconds(0.25)).andThen(elevator.L2()));
-    */
     // reset the field-centric heading on left bumper press
     // joystick.leftBumper().onTrue(drivetrain.runOnce(drivetrain::seedFieldCentric));
 
     // testJoystick.back().onTrue(arm.reconfigPID());
-
-    /**** COUNTER WEIGHT TEST ********/
-    //    joystick
-    //        .rightBumper()
-    //        .whileTrue(counterWeight.counterWeightOut()); // TODO: CONSTANTS and change this.
-    //    joystick.leftBumper().whileTrue(counterWeight.counterWeightIn());
 
     /****** ASSISTED DRIVE **** /
      *
@@ -450,18 +423,14 @@ public class RobotContainer {
     //                .andThen(arm.park()));
 
     // CLIMBER
-    controlScheme.getController().leftTrigger().whileTrue(climber.climberOut(Volts.of(-12)));
-    controlScheme.getController().rightTrigger().whileTrue(climber.climberOut(Volts.of(8)));
+    //    controlScheme.getController().leftTrigger().whileTrue(climber.climberOut(Volts.of(-12)));
+    //    controlScheme.getController().rightTrigger().whileTrue(climber.climberOut(Volts.of(8)));
 
     // CLAW
     controlScheme.getController().rightBumper().whileTrue(claw.intake());
     controlScheme.getController().leftBumper().whileTrue(claw.extake());
 
-    //    controlScheme
-    //        .getController()
-    //        .b()
-    //        .onTrue(scoreCommands.stopAll().andThen(counterWeight.counterWeightStop()));
-
+    // CHANGE SUPER STRUCTURE LEVEL
     controlScheme.getIntake().onTrue(scoreCommands.intakeCoral()); // D-PAD RIGHT
     controlScheme.getL1().onTrue(scoreCommands.bottomLevel()); // D-PAD DOWN
     controlScheme.getL2().onTrue(scoreCommands.midLevel()); // D-PAD LEFT
@@ -469,26 +438,14 @@ public class RobotContainer {
 
     controlScheme.score().onTrue(scoreCommands.score());
 
+    // MOVE ARM
     controlScheme.getController().x().onTrue(arm.L1());
     controlScheme.getController().b().onTrue(scoreCommands.stopAll());
 
-    //    controlScheme.getController()
-    //            .povRight()
-    //            .onTrue(arm.intake().andThen(Commands.waitSeconds(0.25)).andThen(elevator.L2()));
-
-    //    controlScheme
-    //        .getController()
-    //        .y()
-    //        .whileTrue(new ReefAlignCommand(drivetrain, ReefAlignCommand.StationType.REEF,
-    // false));
-    //    controlScheme
-    //        .getController()
-    //        .a()
-    //        .whileTrue(new ReefAlignCommand(drivetrain, ReefAlignCommand.StationType.REFILL,
-    // false));
+    // DRIVE TO STATION
     controlScheme
         .getController()
-        .leftStick()
+        .leftTrigger()
         .whileTrue(
             Commands.run(
                 () ->
@@ -498,11 +455,13 @@ public class RobotContainer {
                         drivetrain,
                         true),
                 drivetrain));
+
+    // DRIVE TO REEF
     Pose3d reefBranch =
         FieldConstants.Reef.branchPositions.get(2).get(FieldConstants.ReefHeight.L4);
     controlScheme
         .getController()
-        .rightStick()
+        .rightTrigger()
         .whileTrue(
             Commands.run(
                 () ->
@@ -512,34 +471,6 @@ public class RobotContainer {
                 drivetrain));
 
     controlScheme.getController().start().onTrue(Commands.runOnce(DriveCommands::reconfigurePID));
-  }
-
-  public void setupNamedCommands() {
-
-    NamedCommands.registerCommand("Prep L1", arm.L1());
-
-    //    NamedCommands.registerCommand(
-    //        "Prepare L4",
-    //        Commands.runOnce(() -> SmartController.targetReefHeight =
-    // FieldConstants.ReefHeight.L4));
-    //    NamedCommands.registerCommand(
-    //        "Prepare L3",
-    //        Commands.runOnce(() -> SmartController.targetReefHeight =
-    // FieldConstants.ReefHeight.L3));
-    //    NamedCommands.registerCommand(
-    //        "Prepare L2",
-    //        Commands.runOnce(() -> SmartController.targetReefHeight =
-    // FieldConstants.ReefHeight.L2));
-    //    NamedCommands.registerCommand(
-    //        "Prepare L1",
-    //        Commands.runOnce(() -> SmartController.targetReefHeight =
-    // FieldConstants.ReefHeight.L1));
-    //    NamedCommands.registerCommand(
-    //        "Shoot",
-    //        Commands.waitUntil(superstructure.isAtTarget())
-    //            .andThen(new WaitCommand(0.5))
-    //            .andThen(coralWrist.gamePieceUnloaded()));
-    NamedCommands.registerCommand("Intake", scoreCommands.intakeCoral());
   }
 
   public Command getAutonomousCommand() {

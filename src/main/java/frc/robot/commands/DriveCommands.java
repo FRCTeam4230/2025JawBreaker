@@ -4,6 +4,8 @@
 
 package frc.robot.commands;
 
+import static edu.wpi.first.units.Units.*;
+
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 import com.ctre.phoenix6.swerve.SwerveModule.SteerRequestType;
 import com.ctre.phoenix6.swerve.SwerveRequest;
@@ -25,13 +27,10 @@ import frc.robot.utils.FieldConstants;
 import frc.robot.utils.GeomUtil;
 import frc.robot.utils.LoggedTunableNumber;
 import frc.robot.utils.TunableNumberWrapper;
-import org.littletonrobotics.junction.Logger;
-
 import java.lang.invoke.MethodHandles;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
-
-import static edu.wpi.first.units.Units.*;
+import org.littletonrobotics.junction.Logger;
 
 public class DriveCommands extends Command {
 
@@ -42,7 +41,7 @@ public class DriveCommands extends Command {
   public static final LoggedTunableNumber kI = tunableTable.makeField("kI", 0.0);
   public static final LoggedTunableNumber kD = tunableTable.makeField("kD", 0.0);
 
-  //private static PhoenixPIDController translationController =
+  // private static PhoenixPIDController translationController =
   private static PIDController translationController =
       new PIDController(kP.get(), kI.get(), kD.get());
 
@@ -199,15 +198,16 @@ public class DriveCommands extends Command {
   public static void driveToPoint(Pose2d target, Drive drive, Distance offset) {
     Pose2d current = drive.getPose();
     double currentTimestamp = drive.getCurrentTimestamp();
-    //double pidX = translationController.calculate(current.getX(), target.getX(), currentTimestamp);
-    //double pidY = translationController.calculate(current.getY(), target.getY(), currentTimestamp);
+    // double pidX = translationController.calculate(current.getX(), target.getX(),
+    // currentTimestamp);
+    // double pidY = translationController.calculate(current.getY(), target.getY(),
+    // currentTimestamp);
     double pidX = translationController.calculate(current.getX(), target.getX());
     double pidY = translationController.calculate(current.getY(), target.getY());
     double pidRot =
         rotationController.calculate(
-            drive.getRotation().getRotations(),
-            target.getRotation().getRotations());
-            //drive.getCurrentTimestamp());
+            drive.getRotation().getRotations(), target.getRotation().getRotations());
+    // drive.getCurrentTimestamp());
     ChassisSpeeds speeds = new ChassisSpeeds(pidX, pidY, Rotations.of(pidRot).in(Radians));
 
     SwerveSetpointGen setpointGenerator = drive.getSetpointGenerator();
