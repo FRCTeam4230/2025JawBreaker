@@ -50,6 +50,11 @@ public class DefaultControlScheme implements ControlScheme {
   }
 
   @Override
+  public Trigger score() {
+    return controller.a();
+  }
+
+  @Override
   public Trigger driveToCoralStation() {
     return controller.leftBumper();
   }

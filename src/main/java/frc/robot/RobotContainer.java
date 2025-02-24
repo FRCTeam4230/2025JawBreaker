@@ -438,15 +438,15 @@ public class RobotContainer {
     }
     */
     // RESET ENCODER
-    controlScheme
-        .getController()
-        .b()
-        .onTrue(
-            arm.resetEncoder()
-                .andThen(
-                    Commands.waitUntil(
-                        () -> arm.getPosition() == Rotations.of(Degrees.of(-90).in(Rotations))))
-                .andThen(arm.park()));
+//    controlScheme
+//        .getController()
+//        .b()
+//        .onTrue(
+//            arm.resetEncoder()
+//                .andThen(
+//                    Commands.waitUntil(
+//                        () -> arm.getPosition() == Rotations.of(Degrees.of(-90).in(Rotations))))
+//                .andThen(arm.park()));
 
     // CLIMBER
     controlScheme.getController().leftTrigger().whileTrue(climber.climberOut(Volts.of(-12)));
@@ -465,6 +465,8 @@ public class RobotContainer {
     controlScheme.getL1().onTrue(scoreCommands.bottomLevel()); // D-PAD DOWN
     controlScheme.getL2().onTrue(scoreCommands.midLevel()); // D-PAD LEFT
     controlScheme.getL4().onTrue(scoreCommands.topLevel()); // D-PAD UP
+
+    controlScheme.score().onTrue(scoreCommands.score());
 
     controlScheme.getController().x().onTrue(arm.L1());
     controlScheme.getController().b().onTrue(scoreCommands.stopAll());
@@ -485,7 +487,7 @@ public class RobotContainer {
     // false));
     controlScheme
         .getController()
-        .a()
+        .leftStick()
         .whileTrue(
             Commands.run(
                 () ->
@@ -499,7 +501,7 @@ public class RobotContainer {
         FieldConstants.Reef.branchPositions.get(2).get(FieldConstants.ReefHeight.L4);
     controlScheme
         .getController()
-        .y()
+        .rightStick()
         .whileTrue(
             Commands.run(
                 () ->

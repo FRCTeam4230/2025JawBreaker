@@ -2,6 +2,7 @@ package frc.robot.commands;
 
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.FunctionalCommand;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.subsystems.arm.Arm;
 import frc.robot.subsystems.claw.Claw;
@@ -49,8 +50,17 @@ public class ScoringCommands {
             claw.hold())
         // .withTimeout(3)
         .withName("intake");
+
   }
 
+  public Command score() {
+    return new FunctionalCommand(
+            () -> arm.L1().andThen(Commands.waitSeconds(0.25)),
+            () -> claw.extake().until(() -> !claw.hasCoral()),
+            onEnd -> intakeCoral(),
+            () -> !claw.hasCoral(),
+            arm, claw).withName("scoreCoral");
+  }
   @AutoLogOutput
   private Trigger elevatorHasGamePiece() {
     var elevatorHasGamePiece = new Trigger(elevator::hasCoral);

@@ -21,6 +21,8 @@ public interface ControlScheme {
 
   public Trigger getIntake();
 
+  public Trigger score();
+
   public Trigger driveToCoralStation();
 
   public Trigger driveToReef();
