@@ -90,6 +90,7 @@ public class RobotContainer {
         new Vision(
             drivetrain::addVisionData,
             new VisionIOLimelight("limelight-front", drivetrain::getVisionParameters),
+            new VisionIOLimelight("limelight-fl", drivetrain::getVisionParameters),
             new VisionIOLimelight("limelight-back", drivetrain::getVisionParameters));
 
         elevator = new Elevator(new ElevatorIOREV() {});
