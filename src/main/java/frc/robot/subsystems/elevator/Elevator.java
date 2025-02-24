@@ -266,4 +266,10 @@ public class Elevator extends DefaultCurrentCommandLoggableSubsystem {
     // getHeight().isNear(getTargetHeight(),
     // currentPosition.heightTolerance()));
   }
+
+  public boolean isAtTargetPos() {
+    return ofNullable(inputs.encoderPosition)
+        .map(val -> val.isNear(currentMode.targetDistance, currentMode.distanceTolerance))
+        .orElse(false);
+  }
 }

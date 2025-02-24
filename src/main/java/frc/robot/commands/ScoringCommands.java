@@ -26,36 +26,87 @@ public class ScoringCommands {
   }
 
   public Command bottomLevel() {
-    return Commands.runOnce(() -> arm.L1()).alongWith(elevator.intake()).withName("bottomLevel");
+    //    return Commands.runOnce(() ->
+    // arm.L1()).alongWith(elevator.intake()).withName("bottomLevel");
+
+    return new FunctionalCommand(
+            () -> Commands.waitUntil(claw::hasCoral),
+            () -> arm.L1().alongWith(elevator.intake()),
+            onEnd -> {},
+            () -> elevator.isAtTargetPos(),
+            claw,
+            elevator,
+            arm)
+        .withName("bottomLevel");
   }
 
   public Command midLevel() {
-    return Commands.sequence(arm.L2(), elevator.L3()).withName("midLevel");
+    //    return Commands.sequence(arm.L2(), elevator.L3()).withName("midLevel");
+
+    return new FunctionalCommand(
+            () -> Commands.waitUntil(claw::hasCoral),
+            () -> arm.L2().alongWith(elevator.L3()),
+            onEnd -> {},
+            () -> elevator.isAtTargetPos(),
+            claw,
+            elevator,
+            arm)
+        .withName("midLevel");
   }
 
   public Command topLevel() {
-    return Commands.sequence(
-        Commands.waitUntil(claw::hasCoral)
-            .andThen(arm.L2().alongWith(elevator.L4()).withName("topLevel")));
+    //    return Commands.sequence(
+    //        Commands.waitUntil(claw::hasCoral)
+    //            .andThen(arm.L2().alongWith(elevator.L4()).withName("topLevel")));
+
+    return new FunctionalCommand(
+            () -> Commands.waitUntil(claw::hasCoral),
+            () -> arm.L2().alongWith(elevator.L4()),
+            onEnd -> {},
+            () -> elevator.isAtTargetPos(),
+            claw,
+            elevator,
+            arm)
+        .withName("topLevel");
   }
 
   public Command intakeCoral() {
-    return Commands.sequence(
-            // Still would want to wait for elevator to have game
-            Commands.waitUntil(elevator::hasCoral),
-            claw.intake()
-                .alongWith(elevator.intake())
-                .alongWith(arm.intake())
-                .until(claw::hasCoral),
-            claw.hold())
-        // .withTimeout(3)
+    //    return Commands.sequence(
+    //            // Still would want to wait for elevator to have game
+    //            Commands.waitUntil(elevator::hasCoral),
+    //            claw.intake()
+    //                .alongWith(elevator.intake())
+    //                .alongWith(arm.intake())
+    //                .until(claw::hasCoral),
+    //            claw.hold())
+    //        // .withTimeout(3)
+    //        .withName("intake");
+
+    return new FunctionalCommand(
+            () -> Commands.waitUntil(() -> elevator.hasCoral()),
+            () -> claw.intake().alongWith(elevator.intake()).alongWith(arm.intake()),
+            onEnd -> claw.hold(),
+            claw::hasCoral,
+            claw,
+            elevator,
+            arm)
         .withName("intake");
   }
 
   public Command score() {
+    //    return Commands.sequence(
+    //            arm.L1(),
+    //            Commands.waitSeconds(0.25),
+    //            claw.extake().until(() -> !claw.hasCoral()),
+    //            intakeCoral()
+    //    ).withName("scoreCoral");
+
     return new FunctionalCommand(
-            () -> arm.L1().andThen(Commands.waitSeconds(0.25)),
-            () -> claw.extake().until(() -> !claw.hasCoral()),
+            () -> claw.stopClaw(),
+            () ->
+                arm.L1()
+                    .andThen(Commands.waitSeconds(0.25))
+                    .andThen(claw.extake().until(() -> !claw.hasCoral())),
             onEnd -> intakeCoral(),
             () -> !claw.hasCoral(),
             arm,
