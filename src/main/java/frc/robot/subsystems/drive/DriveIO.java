@@ -6,11 +6,7 @@
 
 package frc.robot.subsystems.drive;
 
-import static edu.wpi.first.units.Units.Amps;
-import static edu.wpi.first.units.Units.Radians;
-import static edu.wpi.first.units.Units.Rotations;
-import static edu.wpi.first.units.Units.RotationsPerSecond;
-import static edu.wpi.first.units.Units.Volt;
+import static edu.wpi.first.units.Units.*;
 
 import com.ctre.phoenix6.swerve.SwerveRequest;
 import edu.wpi.first.math.Matrix;
@@ -63,6 +59,7 @@ public interface DriveIO {
     // Module position arrays
     public double[][] drivePositions = new double[Constants.PP_CONFIG.numModules][0];
     public Rotation2d[][] steerPositions = new Rotation2d[Constants.PP_CONFIG.numModules][0];
+    public double currentTimestamp;
   }
 
   @AutoLog

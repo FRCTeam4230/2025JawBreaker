@@ -520,4 +520,8 @@ public class Drive extends DefaultCurrentCommandLoggableSubsystem {
   public SwerveSetpointGen getSetpointGenerator() {
     return setpointGen;
   }
+
+  public double getCurrentTimestamp() {
+    return inputs.currentTimestamp;
+  }
 }

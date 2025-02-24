@@ -4,13 +4,11 @@
 
 package frc.robot.commands;
 
-import static edu.wpi.first.units.Units.*;
-
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 import com.ctre.phoenix6.swerve.SwerveModule.SteerRequestType;
 import com.ctre.phoenix6.swerve.SwerveRequest;
+import com.ctre.phoenix6.swerve.utility.PhoenixPIDController;
 import edu.wpi.first.math.MathUtil;
-import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -21,16 +19,19 @@ import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.Constants;
-import frc.robot.subsystems.drive.*;
+import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.drive.requests.SwerveSetpointGen;
 import frc.robot.utils.FieldConstants;
 import frc.robot.utils.GeomUtil;
 import frc.robot.utils.LoggedTunableNumber;
 import frc.robot.utils.TunableNumberWrapper;
+import org.littletonrobotics.junction.Logger;
+
 import java.lang.invoke.MethodHandles;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
-import org.littletonrobotics.junction.Logger;
+
+import static edu.wpi.first.units.Units.*;
 
 public class DriveCommands extends Command {
 
@@ -41,10 +42,10 @@ public class DriveCommands extends Command {
   public static final LoggedTunableNumber kI = tunableTable.makeField("kI", 0.0);
   public static final LoggedTunableNumber kD = tunableTable.makeField("kD", 0.0);
 
-  private static PIDController translationController =
-      new PIDController(kP.get(), kI.get(), kD.get());
+  private static PhoenixPIDController translationController =
+      new PhoenixPIDController(kP.get(), kI.get(), kD.get());
 
-  private static PIDController rotationController = new PIDController(5, 0, 0);
+  private static PhoenixPIDController rotationController = new PhoenixPIDController(5, 0, 0);
 
   static {
     rotationController.enableContinuousInput(-0.5, 0.5);
@@ -196,11 +197,14 @@ public class DriveCommands extends Command {
 
   public static void driveToPoint(Pose2d target, Drive drive, Distance offset) {
     Pose2d current = drive.getPose();
-    double pidX = translationController.calculate(current.getX(), target.getX());
-    double pidY = translationController.calculate(current.getY(), target.getY());
+    double currentTimestamp = drive.getCurrentTimestamp();
+    double pidX = translationController.calculate(current.getX(), target.getX(), currentTimestamp);
+    double pidY = translationController.calculate(current.getY(), target.getY(), currentTimestamp);
     double pidRot =
         rotationController.calculate(
-            drive.getRotation().getRotations(), target.getRotation().getRotations());
+            drive.getRotation().getRotations(),
+            target.getRotation().getRotations(),
+            drive.getCurrentTimestamp());
     ChassisSpeeds speeds = new ChassisSpeeds(pidX, pidY, Rotations.of(pidRot).in(Radians));
 
     SwerveSetpointGen setpointGenerator = drive.getSetpointGenerator();
@@ -214,6 +218,6 @@ public class DriveCommands extends Command {
   }
 
   public static void reconfigurePID() {
-    translationController = new PIDController(kP.get(), kI.get(), kD.get());
+    translationController.setPID(kP.get(), kI.get(), kD.get());
   }
 }
