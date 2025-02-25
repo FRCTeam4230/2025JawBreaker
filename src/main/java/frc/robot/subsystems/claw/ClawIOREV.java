@@ -1,7 +1,5 @@
 package frc.robot.subsystems.claw;
 
-import static edu.wpi.first.units.Units.*;
-
 import com.revrobotics.spark.SparkBase;
 import com.revrobotics.spark.SparkLowLevel;
 import com.revrobotics.spark.SparkMax;
@@ -9,6 +7,8 @@ import com.revrobotics.spark.config.SparkBaseConfig;
 import com.revrobotics.spark.config.SparkMaxConfig;
 import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.wpilibj.DigitalInput;
+
+import static edu.wpi.first.units.Units.*;
 
 public class ClawIOREV implements ClawIO {
   protected final SparkMax motor =
@@ -51,7 +51,7 @@ public class ClawIOREV implements ClawIO {
     inputs.encoderConnected = true;
 
     inputs.motorVelocity = RotationsPerSecond.of(motor.getEncoder().getVelocity());
-    inputs.appliedVoltage = Volts.of(motor.getBusVoltage());
+    inputs.appliedVoltage = Volts.of(motor.getAppliedOutput());
     inputs.supplyCurrent = Amps.of(motor.getOutputCurrent());
     inputs.motorTempCelsius = Celsius.of(motor.getMotorTemperature());
   }
