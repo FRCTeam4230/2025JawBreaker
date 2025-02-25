@@ -5,10 +5,10 @@ import static edu.wpi.first.units.Units.*;
 import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
-import frc.robot.subsystems.DefaultCurrentCommandLoggableSubsystem;
+import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 /** //TODO CDhange this subsystem to use a pid to drive the counterwewight out to it's end point. */
-public class CounterWeight extends DefaultCurrentCommandLoggableSubsystem {
+public class CounterWeight extends SubsystemBase {
 
   private final CounterWeightIO io;
   private final CounterWeightIOInputsAutoLogged inputs;

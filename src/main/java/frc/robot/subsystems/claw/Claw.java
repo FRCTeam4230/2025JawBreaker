@@ -17,7 +17,7 @@ import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.Alert.AlertType;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
-import frc.robot.subsystems.DefaultCurrentCommandLoggableSubsystem;
+import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import org.littletonrobotics.junction.Logger;
 
 /**
@@ -25,7 +25,7 @@ import org.littletonrobotics.junction.Logger;
  * multiple positions for different game actions and provides both open-loop and closed-loop control
  * options.
  */
-public class Claw extends DefaultCurrentCommandLoggableSubsystem {
+public class Claw extends SubsystemBase {
   // Hardware interface and inputs
   private final ClawIO io;
   private final ClawIOInputsAutoLogged inputs;

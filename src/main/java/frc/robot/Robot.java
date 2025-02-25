@@ -5,10 +5,9 @@
 package frc.robot;
 
 import com.pathplanner.lib.commands.FollowPathCommand;
-import com.pathplanner.lib.commands.PathfindingCommand;
 import com.pathplanner.lib.pathfinding.Pathfinding;
 import edu.wpi.first.wpilibj.RobotController;
-import edu.wpi.first.wpilibj.Threads;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import frc.robot.utils.LocalADStarAK;
@@ -63,16 +62,17 @@ public class Robot extends LoggedRobot {
     // Warmup the PPLib library
 
     FollowPathCommand.warmupCommand().schedule();
-    PathfindingCommand.warmupCommand().schedule();
+    // PathfindingCommand.warmupCommand().schedule();
 
+    SmartDashboard.putData(CommandScheduler.getInstance());
     m_robotContainer = new RobotContainer();
   }
 
   @Override
   public void robotPeriodic() {
-    Threads.setCurrentThreadPriority(true, 99);
+    // Threads.setCurrentThreadPriority(true, 99);
     CommandScheduler.getInstance().run();
-    Threads.setCurrentThreadPriority(false, 10);
+    // Threads.setCurrentThreadPriority(false, 10);
   }
 
   @Override

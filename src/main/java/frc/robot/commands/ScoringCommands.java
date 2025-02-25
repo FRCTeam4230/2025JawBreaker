@@ -47,7 +47,7 @@ public class ScoringCommands {
   }
 
   public Command topLevel() {
-    return Commands.sequence(Commands.waitUntil(claw::hasCoral), arm.L2(), elevator.L4())
+    return Commands.sequence(arm.L2(), elevator.L4())
         // claw.hold().until(() -> !claw.hasCoral())
         .withName("topLevel");
 
@@ -62,11 +62,7 @@ public class ScoringCommands {
   public Command intakeCoral() {
     return Commands.sequence(
             // Still would want to wait for elevator to have game
-
-            Commands.parallel(elevator.intake(), arm.intake()),
-            Commands.sequence(elevator.park(), claw.intake().until(claw::hasCoral))
-                .onlyWhile(elevator::hasCoral))
-        //                    claw.hold())
+            elevator.intake(), arm.intake())
         .withName("intake");
 
     //    return new FunctionalCommand(
@@ -103,7 +99,7 @@ public class ScoringCommands {
     var elevatorHasGamePiece = new Trigger(elevator::hasCoral);
     // Auto moves elevator to intake when it has game piece (this logic seems weird but is what you
     // have above)
-    // elevatorHasGamePiece.onTrue(elevator.park());
+    elevatorHasGamePiece.onTrue(elevator.park().andThen(claw.intake().until(claw::hasCoral)));
     // Auto move arm and elevator as soon as elevator and claw don't have a game piece
     // elevatorHasGamePiece.and(claw::hasCoral).onFalse(arm.intake().andThen(elevator.intake()));
     return elevatorHasGamePiece;

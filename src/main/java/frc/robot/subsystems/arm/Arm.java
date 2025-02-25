@@ -15,8 +15,8 @@ import edu.wpi.first.wpilibj.Alert.AlertType;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SelectCommand;
+import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
-import frc.robot.subsystems.DefaultCurrentCommandLoggableSubsystem;
 import java.util.Map;
 import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
@@ -26,7 +26,7 @@ import org.littletonrobotics.junction.Logger;
  * multiple positions for different game actions and provides both open-loop and closed-loop control
  * options.
  */
-public class Arm extends DefaultCurrentCommandLoggableSubsystem {
+public class Arm extends SubsystemBase {
 
   // Hardware interface and inputs
   private ArmIO io;

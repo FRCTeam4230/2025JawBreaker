@@ -15,9 +15,9 @@ import edu.wpi.first.wpilibj.Alert.AlertType;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SelectCommand;
+import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
-import frc.robot.subsystems.DefaultCurrentCommandLoggableSubsystem;
 import java.util.Map;
 import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
@@ -27,7 +27,7 @@ import org.littletonrobotics.junction.Logger;
  * supports multiple distances for different game actions and provides both open-loop and
  * closed-loop control options.
  */
-public class Elevator extends DefaultCurrentCommandLoggableSubsystem {
+public class Elevator extends SubsystemBase {
   // Hardware interface and inputs
   private ElevatorIO io = null;
   private final ElevatorIOInputsAutoLogged inputs;
@@ -259,7 +259,7 @@ public class Elevator extends DefaultCurrentCommandLoggableSubsystem {
    *
    * @return true if at target height, false otherwise
    */
-  // @AutoLogOutput
+  @AutoLogOutput
   public Trigger isAtTarget() {
     return new Trigger(
         () ->
@@ -271,6 +271,7 @@ public class Elevator extends DefaultCurrentCommandLoggableSubsystem {
     // currentPosition.heightTolerance()));
   }
 
+  @AutoLogOutput
   public boolean isAtTargetPos() {
     return ofNullable(inputs.encoderPosition)
         .map(val -> val.isNear(currentMode.targetDistance, currentMode.distanceTolerance))

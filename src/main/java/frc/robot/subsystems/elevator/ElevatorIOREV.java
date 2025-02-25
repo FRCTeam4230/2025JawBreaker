@@ -134,14 +134,19 @@ public class ElevatorIOREV implements ElevatorIO {
 
     inputs.beamBreakTriggered = !beamBreakSensor.get();
 
-    if (inputs.lowerLimit && inputs.leaderVelocity.magnitude() < 0) {
+    if (inputs.lowerLimit
+        && inputs.leaderVelocity.magnitude() < 0
+        && !setpoint.isEquivalent(Rotations.of(0))) {
       stop();
     }
+
     if (inputs.upperLimit && inputs.leaderVelocity.magnitude() > 0) {
       pidController.setReference(
           inputs.leaderPosition.minus(Rotations.of(0.1)).in(Rotations),
           SparkBase.ControlType.kPosition);
     }
+
+    //
   }
 
   @Override
