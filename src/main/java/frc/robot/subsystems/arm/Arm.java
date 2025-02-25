@@ -27,6 +27,7 @@ import org.littletonrobotics.junction.Logger;
  * options.
  */
 public class Arm extends DefaultCurrentCommandLoggableSubsystem {
+
   // Hardware interface and inputs
   private ArmIO io;
   private final ArmIOInputsAutoLogged inputs;

@@ -7,7 +7,19 @@
         {
           "type": "path",
           "data": {
-            "pathName": "Test Path"
+            "pathName": "1) Start to Score"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "scoreCoral"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "2) Refil Right"
           }
         }
       ]
