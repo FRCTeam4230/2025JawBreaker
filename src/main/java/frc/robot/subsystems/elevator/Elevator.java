@@ -19,6 +19,7 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.subsystems.DefaultCurrentCommandLoggableSubsystem;
 import java.util.Map;
+import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
 
 /**
@@ -113,6 +114,7 @@ public class Elevator extends DefaultCurrentCommandLoggableSubsystem {
    *
    * @return The current ElevatorPosition
    */
+  @AutoLogOutput
   public ElevatorMode getMode() {
     return currentMode;
   }
@@ -162,7 +164,7 @@ public class Elevator extends DefaultCurrentCommandLoggableSubsystem {
    * @return A command that implements the elevator movement
    */
   private Command createPositionCommand(ElevatorMode mode) {
-    return Commands.runOnce(() -> setDistance(mode.targetDistance))
+    return Commands.runOnce(() -> setDistance(mode.targetDistance), this)
         .withName("Move to " + mode.toString());
   }
 

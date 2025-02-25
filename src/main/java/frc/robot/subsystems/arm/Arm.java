@@ -120,6 +120,7 @@ public class Arm extends DefaultCurrentCommandLoggableSubsystem {
    *
    * @return The current ArmMode
    */
+  @AutoLogOutput
   public ArmMode getMode() {
     return currentMode;
   }

@@ -47,9 +47,8 @@ public class ScoringCommands {
   }
 
   public Command topLevel() {
-    return Commands.sequence(
-            Commands.waitUntil(claw::hasCoral),
-            Commands.parallel(claw.hold().until(() -> !claw.hasCoral()), arm.L2(), elevator.L4()))
+    return Commands.sequence(Commands.waitUntil(claw::hasCoral), arm.L2(), elevator.L4())
+        // claw.hold().until(() -> !claw.hasCoral())
         .withName("topLevel");
 
     //    return new FunctionalCommand(
@@ -64,11 +63,9 @@ public class ScoringCommands {
     return Commands.sequence(
             // Still would want to wait for elevator to have game
 
-            elevator.intake(),
-            arm.intake(),
-            Commands.waitUntil(elevator::hasCoral),
-            elevator.park(),
-            claw.intake().until(claw::hasCoral))
+            Commands.parallel(elevator.intake(), arm.intake()),
+            Commands.sequence(elevator.park(), claw.intake().until(claw::hasCoral))
+                .onlyWhile(elevator::hasCoral))
         //                    claw.hold())
         .withName("intake");
 
