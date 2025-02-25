@@ -256,9 +256,6 @@ public class Drive extends SubsystemBase {
      * Otherwise, only check and apply the operator perspective if the DS is disabled.
      * This ensures driving behavior doesn't change until an explicit disable event occurs during testing.
      */
-
-    super.periodic(); // LOG commands
-
     io.updateInputs(inputs);
     Logger.processInputs("Drive", inputs);
     gyroDisconnectedAlert.set(!inputs.gyroConnected);

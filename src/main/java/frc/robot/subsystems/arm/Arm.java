@@ -57,7 +57,6 @@ public class Arm extends SubsystemBase {
 
   @Override
   public void periodic() {
-    super.periodic(); // LOG commands
     // Update and log inputs from hardware
     io.updateInputs(inputs);
     Logger.processInputs("Arm", inputs);
