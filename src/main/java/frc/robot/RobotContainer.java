@@ -427,8 +427,8 @@ public class RobotContainer {
     //    controlScheme.getController().rightTrigger().whileTrue(climber.climberOut(Volts.of(8)));
 
     // CLAW
-    controlScheme.getController().rightBumper().whileTrue(claw.intake());
-    controlScheme.getController().leftBumper().whileTrue(claw.extake());
+    //    controlScheme.getController().rightBumper().whileTrue(claw.intake());
+    //    controlScheme.getController().leftBumper().whileTrue(claw.extake());
 
     // CHANGE SUPER STRUCTURE LEVEL
     controlScheme.getIntake().onTrue(scoreCommands.intakeCoral()); // D-PAD RIGHT

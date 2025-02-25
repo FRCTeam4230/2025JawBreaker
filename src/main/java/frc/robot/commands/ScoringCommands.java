@@ -61,9 +61,11 @@ public class ScoringCommands {
   public Command intakeCoral() {
     return Commands.sequence(
             // Still would want to wait for elevator to have game
-            Commands.waitUntil(elevator::hasCoral),
+
             elevator.intake(),
             arm.intake(),
+            Commands.waitUntil(elevator::hasCoral),
+            elevator.park(),
             claw.intake().until(claw::hasCoral))
         //                    claw.hold())
         .withName("intake");
