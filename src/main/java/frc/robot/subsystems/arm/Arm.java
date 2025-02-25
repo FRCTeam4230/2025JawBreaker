@@ -6,6 +6,8 @@
 
 package frc.robot.subsystems.arm;
 
+import static edu.wpi.first.units.Units.*;
+
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.wpilibj.Alert;
@@ -15,12 +17,9 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SelectCommand;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.subsystems.DefaultCurrentCommandLoggableSubsystem;
+import java.util.Map;
 import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
-
-import java.util.Map;
-
-import static edu.wpi.first.units.Units.*;
 
 /**
  * The Arm subsystem controls a dual-motor arm mechanism for game piece manipulation. It supports

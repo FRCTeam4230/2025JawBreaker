@@ -47,13 +47,9 @@ public class ScoringCommands {
   }
 
   public Command topLevel() {
-<<<<<<< Updated upstream
     return Commands.sequence(
             Commands.waitUntil(claw::hasCoral),
             Commands.parallel(claw.hold().until(() -> !claw.hasCoral()), arm.L2(), elevator.L4()))
-=======
-    return Commands.sequence(Commands.waitUntil(claw::hasCoral), Commands.parallel(arm.L2(),claw.hold(),elevator.L4()))
->>>>>>> Stashed changes
         .withName("topLevel");
 
     //    return new FunctionalCommand(
