@@ -16,7 +16,6 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SelectCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import edu.wpi.first.wpilibj2.command.button.Trigger;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import java.util.Map;
 import org.littletonrobotics.junction.AutoLogOutput;
@@ -259,15 +258,10 @@ public class Elevator extends SubsystemBase {
    * @return true if at target height, false otherwise
    */
   @AutoLogOutput
-  public Trigger isAtTarget() {
-    return new Trigger(
-        () ->
-            ofNullable(inputs.encoderPosition)
-                .map(val -> val.isNear(currentMode.targetDistance, currentMode.distanceTolerance))
-                .orElse(false));
-
-    // getHeight().isNear(getTargetHeight(),
-    // currentPosition.heightTolerance()));
+  public boolean isAtTarget() {
+    return ofNullable(inputs.encoderPosition)
+        .map(val -> val.isNear(currentMode.targetDistance, currentMode.distanceTolerance))
+        .orElse(false);
   }
 
   @AutoLogOutput
