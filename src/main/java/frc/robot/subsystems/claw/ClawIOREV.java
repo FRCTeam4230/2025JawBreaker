@@ -19,7 +19,7 @@ public class ClawIOREV implements ClawIO {
   public ClawIOREV() {
     motor.configure(
         new SparkMaxConfig()
-            .idleMode(SparkBaseConfig.IdleMode.kCoast)
+            .idleMode(SparkBaseConfig.IdleMode.kBrake)
             .voltageCompensation(12.0)
             .smartCurrentLimit(30)
             .closedLoopRampRate(ClawConstants.CLOSED_LOOP_RAMP_RATE)

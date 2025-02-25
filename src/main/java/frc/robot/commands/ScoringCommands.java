@@ -25,16 +25,13 @@ public class ScoringCommands {
   }
 
   public Command bottomLevel() {
-    return Commands.runOnce(() -> arm.L1()).alongWith(elevator.intake()).withName("bottomLevel");
+    return Commands.sequence(arm.L1(), elevator.intake()).withName("bottomLevel");
 
     //    return new FunctionalCommand(
     //            () -> Commands.waitUntil(claw::hasCoral),
     //            () -> arm.L1().alongWith(elevator.intake()),
     //            onEnd -> {},
-    //            () -> elevator.isAtTargetPos(),
-    //            claw,
-    //            elevator,
-    //            arm)
+    //            () -> elevator.isAtTargetPos())
     //        .withName("bottomLevel");
   }
 
@@ -45,26 +42,19 @@ public class ScoringCommands {
     //            () -> Commands.waitUntil(claw::hasCoral),
     //            () -> arm.L2().alongWith(elevator.L3()),
     //            onEnd -> {},
-    //            () -> elevator.isAtTargetPos(),
-    //            claw,
-    //            elevator,
-    //            arm)
+    //            () -> elevator.isAtTargetPos())
     //        .withName("midLevel");
   }
 
   public Command topLevel() {
-    return Commands.sequence(
-        Commands.waitUntil(claw::hasCoral)
-            .andThen(arm.L2().alongWith(elevator.L4()).withName("topLevel")));
+    return Commands.sequence(Commands.waitUntil(claw::hasCoral), arm.L2(), elevator.L4())
+        .withName("topLevel");
 
     //    return new FunctionalCommand(
     //            () -> Commands.waitUntil(claw::hasCoral),
     //            () -> arm.L2().alongWith(elevator.L4()),
     //            onEnd -> {},
-    //            () -> elevator.isAtTargetPos(),
-    //            claw,
-    //            elevator,
-    //            arm)
+    //            () -> elevator.isAtTargetPos())
     //        .withName("topLevel");
   }
 
@@ -72,22 +62,17 @@ public class ScoringCommands {
     return Commands.sequence(
             // Still would want to wait for elevator to have game
             Commands.waitUntil(elevator::hasCoral),
-            claw.intake()
-                .alongWith(elevator.intake())
-                .alongWith(arm.intake())
-                .until(claw::hasCoral),
-            claw.hold())
-        // .withTimeout(3)
+            elevator.intake(),
+            arm.intake(),
+            claw.intake().until(claw::hasCoral))
+        //                    claw.hold())
         .withName("intake");
 
     //    return new FunctionalCommand(
     //            () -> Commands.waitUntil(() -> elevator.hasCoral()),
     //            () -> claw.intake().alongWith(elevator.intake()).alongWith(arm.intake()),
     //            onEnd -> {},
-    //            claw::hasCoral,
-    //            claw,
-    //            elevator,
-    //            arm)
+    //            claw::hasCoral)
     //        .withName("intake");
   }
 
@@ -108,9 +93,7 @@ public class ScoringCommands {
     //                    .andThen(Commands.waitSeconds(0.25))
     //                    .andThen(claw.extake().until(() -> !claw.hasCoral())),
     //            onEnd -> intakeCoral(),
-    //            () -> !claw.hasCoral(),
-    //            arm,
-    //            claw)
+    //            () -> !claw.hasCoral())
     //        .withName("scoreCoral");
   }
 

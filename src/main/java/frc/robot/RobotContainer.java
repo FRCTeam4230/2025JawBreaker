@@ -427,41 +427,20 @@ public class RobotContainer {
     //    controlScheme.getController().rightTrigger().whileTrue(climber.climberOut(Volts.of(8)));
 
     // CLAW
-    controlScheme
-        .getController()
-        .rightBumper()
-        .whileTrue(Commands.runOnce(() -> claw.intake(), claw));
-    controlScheme
-        .getController()
-        .leftBumper()
-        .whileTrue(Commands.runOnce(() -> claw.extake(), claw));
+    controlScheme.getController().rightBumper().whileTrue(claw.intake());
+    controlScheme.getController().leftBumper().whileTrue(claw.extake());
 
     // CHANGE SUPER STRUCTURE LEVEL
-    controlScheme
-        .getIntake()
-        .onTrue(
-            Commands.runOnce(
-                () -> scoreCommands.intakeCoral(), arm, elevator, claw)); // D-PAD RIGHT
-    controlScheme
-        .getL1()
-        .onTrue(Commands.runOnce(() -> scoreCommands.bottomLevel(), arm, elevator)); // D-PAD DOWN
-    controlScheme
-        .getL2()
-        .onTrue(Commands.runOnce(() -> scoreCommands.midLevel(), arm, elevator)); // D-PAD LEFT
-    controlScheme
-        .getL4()
-        .onTrue(Commands.runOnce(() -> scoreCommands.topLevel(), arm, elevator)); // D-PAD UP
+    controlScheme.getIntake().onTrue(scoreCommands.intakeCoral()); // D-PAD RIGHT
+    controlScheme.getL1().onTrue(scoreCommands.bottomLevel()); // D-PAD DOWN
+    controlScheme.getL2().onTrue(scoreCommands.midLevel()); // D-PAD LEFT
+    controlScheme.getL4().onTrue(scoreCommands.topLevel()); // D-PAD UP
 
-    controlScheme
-        .score()
-        .onTrue(Commands.runOnce(() -> scoreCommands.score(), arm, elevator, claw));
+    controlScheme.score().onTrue(scoreCommands.score());
 
     // MOVE ARM
-    controlScheme.getController().x().onTrue(Commands.runOnce(() -> arm.L1(), arm));
-    controlScheme
-        .getController()
-        .b()
-        .onTrue(Commands.runOnce(() -> scoreCommands.stopAll(), arm, elevator, claw));
+    controlScheme.getController().x().onTrue(arm.L1());
+    controlScheme.getController().b().onTrue(scoreCommands.stopAll());
 
     // DRIVE TO STATION
     controlScheme

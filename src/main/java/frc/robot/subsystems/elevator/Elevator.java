@@ -82,8 +82,8 @@ public class Elevator extends DefaultCurrentCommandLoggableSubsystem {
   /** Enumeration of available elevator distances with their corresponding target angles. */
   public enum ElevatorMode {
     STOP(Rotations.of(0)), // Stop the elevator
-    INTAKE(Rotations.of(0)), // Elevator tucked in
-    PARKED(Rotations.of(0.1)),
+    INTAKE(Rotations.of(0.2)), // Elevator tucked in
+    PARKED(Rotations.of(0)),
     L1(Rotations.of(0.2)), // Position for scoring in L1
     L2(Rotations.of(1.25)), // Position for scoring in L2
     L3(Rotations.of(5)), // Position for scoring in L3

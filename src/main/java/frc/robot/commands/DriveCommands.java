@@ -45,7 +45,7 @@ public class DriveCommands extends Command {
   private static PIDController translationController =
       new PIDController(kP.get(), kI.get(), kD.get());
 
-  private static PIDController rotationController = new PIDController(5, 0, 0);
+  private static PIDController rotationController = new PIDController(12, 0, 0.5);
 
   static {
     rotationController.enableContinuousInput(-0.5, 0.5);
