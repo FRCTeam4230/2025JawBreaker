@@ -1,7 +1,5 @@
 package frc.robot;
 
-import static frc.robot.Constants.*;
-
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 import com.ctre.phoenix6.swerve.SwerveRequest;
 import com.pathplanner.lib.auto.AutoBuilder;
@@ -46,6 +44,8 @@ import frc.robot.utils.FieldConstants;
 import frc.robot.utils.TunableController;
 import frc.robot.utils.TunableController.TunableControllerType;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
+
+import static frc.robot.Constants.*;
 
 public class RobotContainer {
 
@@ -430,12 +430,12 @@ public class RobotContainer {
     //    controlScheme.getController().leftBumper().whileTrue(claw.extake());
 
     // CHANGE SUPER STRUCTURE LEVEL
-    controlScheme.getIntake().onTrue(scoreCommands.intakeCoral()); // D-PAD RIGHT
+    /*controlScheme.getIntake().onTrue(scoreCommands.intakeCoral()); // D-PAD RIGHT
     controlScheme.getL1().onTrue(scoreCommands.bottomLevel()); // D-PAD DOWN
     controlScheme.getL2().onTrue(scoreCommands.midLevel()); // D-PAD LEFT
     controlScheme.getL4().onTrue(scoreCommands.topLevel()); // D-PAD UP
 
-    controlScheme.score().onTrue(scoreCommands.score());
+    controlScheme.score().onTrue(scoreCommands.score());*/
 
     // MOVE ARM
     controlScheme.getController().x().onTrue(arm.L1());

@@ -5,11 +5,7 @@ plugins {
     id "com.diffplug.spotless" version "6.12.0"
     id("io.freefair.lombok") version "8.12"
 }
-compileJava.options.encoding = 'UTF-8'
 
-tasks.withType(JavaCompile) {
-    options.encoding = 'UTF-8'
-}
 java {
     sourceCompatibility = JavaVersion.VERSION_17
     targetCompatibility = JavaVersion.VERSION_17
@@ -46,14 +42,6 @@ deploy {
                     jvmArgs.add("-Xmx" + MAX_JAVA_HEAP_SIZE_MB + "M")
                     jvmArgs.add("-Xms" + MAX_JAVA_HEAP_SIZE_MB + "M")
                     jvmArgs.add("-XX:+AlwaysPreTouch")
-
-                    /*   // Enable VisualVM connection
-                     jvmArgs.add("-Dcom.sun.management.jmxremote=true")
-                     jvmArgs.add("-Dcom.sun.management.jmxremote.port=1198")
-                     jvmArgs.add("-Dcom.sun.management.jmxremote.local.only=false")
-                     jvmArgs.add("-Dcom.sun.management.jmxremote.ssl=false")
-                     jvmArgs.add("-Dcom.sun.management.jmxremote.authenticate=false")
-                     jvmArgs.add("-Djava.rmi.server.hostname=10.42.30.2") */// Replace TE.AM with team number
                 }
 
                 // Static files artifact
@@ -122,7 +110,7 @@ test {
 // AdvantageKit log replay from the command line. Set the
 // value to "true" to enable the sim GUI by default (this
 // is the standard WPILib behavior).
-wpi.sim.addGui().defaultEnabled = true
+wpi.sim.addGui().defaultEnabled = false
 wpi.sim.addDriverstation()
 
 // Setting up my Jar File. In this case, adding all libraries into the main jar ('fat jar')
@@ -152,7 +140,7 @@ gversion {
     classPackage = "frc.robot"
     className    = "BuildConstants"
     dateFormat   = "yyyy-MM-dd HH:mm:ss z"
-    timeZone     = "America/Chicago"
+    timeZone     = "America/New_York"
     indent       = "  "
 }
 sourceSets.main.java.srcDirs += [
