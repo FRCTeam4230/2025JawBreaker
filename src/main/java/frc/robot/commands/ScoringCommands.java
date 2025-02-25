@@ -47,7 +47,9 @@ public class ScoringCommands {
   }
 
   public Command topLevel() {
-    return Commands.sequence(Commands.waitUntil(claw::hasCoral), arm.L2(), elevator.L4())
+    return Commands.sequence(
+            Commands.waitUntil(claw::hasCoral),
+            Commands.parallel(claw.hold().until(() -> !claw.hasCoral()), arm.L2(), elevator.L4()))
         .withName("topLevel");
 
     //    return new FunctionalCommand(

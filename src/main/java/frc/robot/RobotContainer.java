@@ -458,7 +458,7 @@ public class RobotContainer {
 
     // DRIVE TO REEF
     Pose3d reefBranch =
-        FieldConstants.Reef.branchPositions.get(2).get(FieldConstants.ReefHeight.L4);
+        FieldConstants.Reef.branchPositions.get(3).get(FieldConstants.ReefHeight.L4);
     controlScheme
         .getController()
         .rightTrigger()

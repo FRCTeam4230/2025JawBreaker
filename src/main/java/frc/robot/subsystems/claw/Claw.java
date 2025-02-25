@@ -61,8 +61,8 @@ public class Claw extends DefaultCurrentCommandLoggableSubsystem {
   }
 
   public Command intake() {
-    return Commands.startEnd(() -> io.setVolts(Volts.of(ClawConstants.INTAKE_VOLTAGE.get())),
-            () -> io.stop(), this);
+    return Commands.startEnd(
+        () -> io.setVolts(Volts.of(ClawConstants.INTAKE_VOLTAGE.get())), () -> io.stop(), this);
   }
   // TODO: smart current limit for motor, set hold mode to only enable when proximity gets too far
 
