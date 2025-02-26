@@ -1,8 +1,12 @@
 package frc.robot;
 
+import static frc.robot.Constants.*;
+
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 import com.ctre.phoenix6.swerve.SwerveRequest;
 import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.auto.NamedCommands;
+import com.pathplanner.lib.events.EventTrigger;
 import edu.wpi.first.math.geometry.*;
 import edu.wpi.first.units.measure.LinearVelocity;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -39,8 +43,6 @@ import frc.robot.utils.FieldConstants;
 import frc.robot.utils.TunableController;
 import frc.robot.utils.TunableController.TunableControllerType;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
-
-import static frc.robot.Constants.*;
 
 public class RobotContainer {
 
@@ -175,30 +177,35 @@ public class RobotContainer {
         DriveCommands.wheelRadiusCharacterization(drivetrain));
     scoreCommands = new ScoringCommands(elevator, arm, claw);
 
+    // Register Named Commands
+    NamedCommands.registerCommand("scoreCoral", scoreCommands.score());
+    NamedCommands.registerCommand("intake", scoreCommands.intakeCoral());
+    NamedCommands.registerCommand("topLevel", scoreCommands.topLevel());
+    new EventTrigger("topLevel").onTrue(scoreCommands.topLevel());
     configureBindings();
   }
 
   private void configureBindings() {
     // Note that X is defined as forward according to WPILib convention,
     // and Y is defined as to the left according to WPILib convention.
-        drivetrain.setDefaultCommand(
-            // Drivetrain will execute this command periodically
-            drivetrain.applyRequest(
-                () ->
-                    drivetrain
-                        .getSetpointGenerator()
-                        .withVelocityX(
-                            MaxSpeed.times(
-                                primaryController.customLeft().getY()
-                                    * -1)) // Drive forward with negative Y (forward)
-                        .withVelocityY(
-                            MaxSpeed.times(
-                                primaryController.customLeft().getX()
-                                    * -1)) // Drive left with negative X (left)
-                        .withRotationalRate(
-                            Constants.MaxAngularRate.times(
-                                primaryController.customRight().getX()
-                                    * -1)))); // Drive counterclockwise with negative X (left)
+    drivetrain.setDefaultCommand(
+        // Drivetrain will execute this command periodically
+        drivetrain.applyRequest(
+            () ->
+                drivetrain
+                    .getSetpointGenerator()
+                    .withVelocityX(
+                        MaxSpeed.times(
+                            primaryController.customLeft().getY()
+                                * -1)) // Drive forward with negative Y (forward)
+                    .withVelocityY(
+                        MaxSpeed.times(
+                            primaryController.customLeft().getX()
+                                * -1)) // Drive left with negative X (left)
+                    .withRotationalRate(
+                        Constants.MaxAngularRate.times(
+                            primaryController.customRight().getX()
+                                * -1)))); // Drive counterclockwise with negative X (left)
 
     primaryController.back().onTrue(Commands.runOnce(() -> drivetrain.resetPose(Pose2d.kZero)));
     //    joystick

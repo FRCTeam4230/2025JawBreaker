@@ -40,6 +40,10 @@ public class ClawIOREV implements ClawIO {
     motor.setVoltage(voltage);
   }
 
+  public void hold() {
+
+  }
+
   public void stop() {
     motor.set(0);
   }
