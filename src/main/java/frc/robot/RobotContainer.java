@@ -4,7 +4,6 @@ import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 import com.ctre.phoenix6.swerve.SwerveRequest;
 import com.pathplanner.lib.auto.AutoBuilder;
 import edu.wpi.first.math.geometry.*;
-import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.units.measure.LinearVelocity;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -28,8 +27,6 @@ import frc.robot.subsystems.counterweight.CounterWeightIOSIM;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.drive.DriveIO;
 import frc.robot.subsystems.drive.DriveIOCTRE;
-import frc.robot.subsystems.drive.requests.ProfiledFieldCentricFacingAngle;
-import frc.robot.subsystems.drive.requests.SwerveSetpointGen;
 import frc.robot.subsystems.elevator.Elevator;
 import frc.robot.subsystems.elevator.ElevatorIO;
 import frc.robot.subsystems.elevator.ElevatorIOREV;
@@ -184,24 +181,24 @@ public class RobotContainer {
   private void configureBindings() {
     // Note that X is defined as forward according to WPILib convention,
     // and Y is defined as to the left according to WPILib convention.
-    drivetrain.setDefaultCommand(
-        // Drivetrain will execute this command periodically
-        drivetrain.applyRequest(
-            () ->
-                drivetrain
-                    .getSetpointGenerator()
-                    .withVelocityX(
-                        MaxSpeed.times(
-                            primaryController.customLeft().getY()
-                                * -1)) // Drive forward with negative Y (forward)
-                    .withVelocityY(
-                        MaxSpeed.times(
-                            primaryController.customLeft().getX()
-                                * -1)) // Drive left with negative X (left)
-                    .withRotationalRate(
-                        Constants.MaxAngularRate.times(
-                            primaryController.customRight().getX()
-                                * -1)))); // Drive counterclockwise with negative X (left)
+        drivetrain.setDefaultCommand(
+            // Drivetrain will execute this command periodically
+            drivetrain.applyRequest(
+                () ->
+                    drivetrain
+                        .getSetpointGenerator()
+                        .withVelocityX(
+                            MaxSpeed.times(
+                                primaryController.customLeft().getY()
+                                    * -1)) // Drive forward with negative Y (forward)
+                        .withVelocityY(
+                            MaxSpeed.times(
+                                primaryController.customLeft().getX()
+                                    * -1)) // Drive left with negative X (left)
+                        .withRotationalRate(
+                            Constants.MaxAngularRate.times(
+                                primaryController.customRight().getX()
+                                    * -1)))); // Drive counterclockwise with negative X (left)
 
     primaryController.back().onTrue(Commands.runOnce(() -> drivetrain.resetPose(Pose2d.kZero)));
     //    joystick
@@ -215,14 +212,14 @@ public class RobotContainer {
     // Custom Swerve Request that use PathPlanner Setpoint Generator. Tuning NEEDED. Instructions
     // can be found here
     // https://hemlock5712.github.io/Swerve-Setup/talonfx-swerve-tuning.html
-    SwerveSetpointGen setpointGen =
-        new SwerveSetpointGen(
-                drivetrain.getChassisSpeeds(),
-                drivetrain.getModuleStates(),
-                drivetrain::getRotation)
-            .withDeadband(MaxSpeed.times(0.05))
-            .withRotationalDeadband(MaxAngularRate.times(0.05))
-            .withDriveRequestType(DriveRequestType.OpenLoopVoltage);
+    //    SwerveSetpointGen setpointGen =
+    //        new SwerveSetpointGen(
+    //                drivetrain.getChassisSpeeds(),
+    //                drivetrain.getModuleStates(),
+    //                drivetrain::getRotation)
+    //            .withDeadband(MaxSpeed.times(0.05))
+    //            .withRotationalDeadband(MaxAngularRate.times(0.05))
+    //            .withDriveRequestType(DriveRequestType.OpenLoopVoltage);
 
     //    joystick
     //        .x()
@@ -242,15 +239,15 @@ public class RobotContainer {
 
     // Custom Swerve Request that use ProfiledFieldCentricFacingAngle. Allows you to face specific
     // direction while driving
-    ProfiledFieldCentricFacingAngle driveFacingAngle =
-        new ProfiledFieldCentricFacingAngle(
-                new TrapezoidProfile.Constraints(
-                    MaxAngularRate.baseUnitMagnitude(),
-                    MaxAngularRate.div(0.25).baseUnitMagnitude()))
-            .withDeadband(MaxSpeed.times(0.05))
-            .withDriveRequestType(DriveRequestType.OpenLoopVoltage);
-    // Set PID for ProfiledFieldCentricFacingAngle
-    driveFacingAngle.HeadingController.setPID(7, 0, 0);
+    //    ProfiledFieldCentricFacingAngle driveFacingAngle =
+    //        new ProfiledFieldCentricFacingAngle(
+    //                new TrapezoidProfile.Constraints(
+    //                    MaxAngularRate.baseUnitMagnitude(),
+    //                    MaxAngularRate.div(0.25).baseUnitMagnitude()))
+    //            .withDeadband(MaxSpeed.times(0.05))
+    //            .withDriveRequestType(DriveRequestType.OpenLoopVoltage);
+    //    // Set PID for ProfiledFieldCentricFacingAngle
+    //    driveFacingAngle.HeadingController.setPID(7, 0, 0);
 
     //    joystick
     //        .start()
@@ -494,6 +491,7 @@ public class RobotContainer {
         .onTrue(Commands.runOnce(() -> chooseReefBranch(9)));
 
     // controlScheme.getController().start().onTrue(Commands.runOnce(DriveCommands::reconfigurePID));
+
   }
 
   public Command getAutonomousCommand() {

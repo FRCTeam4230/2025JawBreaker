@@ -134,9 +134,7 @@ public class ElevatorIOREV implements ElevatorIO {
 
     inputs.beamBreakTriggered = !beamBreakSensor.get();
 
-    if (inputs.lowerLimit
-        && inputs.leaderVelocity.magnitude() < 0
-        && !setpoint.isEquivalent(Rotations.of(0))) {
+    if (inputs.lowerLimit && inputs.leaderVelocity.magnitude() < 0) {
       stop();
     }
 
