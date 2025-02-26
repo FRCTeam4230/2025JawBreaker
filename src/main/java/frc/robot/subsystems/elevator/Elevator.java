@@ -6,20 +6,22 @@
 
 package frc.robot.subsystems.elevator;
 
-import static edu.wpi.first.units.Units.*;
-import static java.util.Optional.*;
-
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.Alert.AlertType;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SelectCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
-import java.util.Map;
 import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
+
+import java.util.Map;
+
+import static edu.wpi.first.units.Units.*;
+import static java.util.Optional.*;
 
 /**
  * The Elevator subsystem controls a dual-motor elevator mechanism for game piece manipulation. It
@@ -50,6 +52,7 @@ public class Elevator extends SubsystemBase {
   public Elevator(ElevatorIO io) {
     this.io = io;
     this.inputs = new ElevatorIOInputsAutoLogged();
+    SmartDashboard.putData(this);
   }
 
   @Override
