@@ -1,7 +1,5 @@
 package frc.robot;
 
-import static frc.robot.Constants.*;
-
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 import com.ctre.phoenix6.swerve.SwerveRequest;
 import com.pathplanner.lib.auto.AutoBuilder;
@@ -14,9 +12,6 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.commands.DriveCommands;
 import frc.robot.commands.ScoringCommands;
-import frc.robot.controls.ControlScheme;
-import frc.robot.controls.DefaultControlScheme;
-import frc.robot.controls.SimulationControlScheme;
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.arm.Arm;
 import frc.robot.subsystems.arm.ArmIOREV;
@@ -48,11 +43,15 @@ import frc.robot.utils.TunableController;
 import frc.robot.utils.TunableController.TunableControllerType;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
+import static frc.robot.Constants.*;
+
 public class RobotContainer {
 
   private LinearVelocity MaxSpeed = TunerConstants.kSpeedAt12Volts;
-  private final ControlScheme controlScheme;
+  // private final ControlScheme controlScheme;
 
+  private final TunableController primaryController =
+      new TunableController(0).withControllerType(TunableControllerType.QUADRATIC);
   private final TunableController secondController =
       new TunableController(1).withControllerType(TunableControllerType.QUADRATIC);
 
@@ -100,8 +99,6 @@ public class RobotContainer {
         climber = new Climber(new ClimberIOREV() {});
         counterWeight = new CounterWeight(new CounterWeightIOREV());
 
-        controlScheme = new DefaultControlScheme();
-
         break;
 
       case SIM:
@@ -140,7 +137,6 @@ public class RobotContainer {
         claw = new Claw(new ClawIOSIMREV());
         climber = new Climber(new ClimberIOSIM());
         counterWeight = new CounterWeight(new CounterWeightIOSIM());
-        controlScheme = new SimulationControlScheme();
 
         break;
 
@@ -160,7 +156,6 @@ public class RobotContainer {
         claw = new Claw(new ClawIOREV() {});
         climber = new Climber(new ClimberIOREV() {});
         counterWeight = new CounterWeight(new CounterWeightIOREV());
-        controlScheme = new DefaultControlScheme();
         break;
     }
 
@@ -197,22 +192,18 @@ public class RobotContainer {
                     .getSetpointGenerator()
                     .withVelocityX(
                         MaxSpeed.times(
-                            controlScheme
-                                .getFieldX()
-                                .get())) // Drive forward with negative Y (forward)
+                            primaryController.customLeft().getY()
+                                * -1)) // Drive forward with negative Y (forward)
                     .withVelocityY(
                         MaxSpeed.times(
-                            controlScheme.getFieldY().get())) // Drive left with negative X (left)
+                            primaryController.customLeft().getX()
+                                * -1)) // Drive left with negative X (left)
                     .withRotationalRate(
                         Constants.MaxAngularRate.times(
-                            controlScheme
-                                .getFieldRotation()
-                                .get())))); // Drive counterclockwise with negative X (left)
+                            primaryController.customRight().getX()
+                                * -1)))); // Drive counterclockwise with negative X (left)
 
-    controlScheme
-        .getController()
-        .back()
-        .onTrue(Commands.runOnce(() -> drivetrain.resetPose(Pose2d.kZero)));
+    primaryController.back().onTrue(Commands.runOnce(() -> drivetrain.resetPose(Pose2d.kZero)));
     //    joystick
     //        .b()
     //        .whileTrue(
@@ -433,20 +424,19 @@ public class RobotContainer {
     //    controlScheme.getController().leftBumper().whileTrue(claw.extake());
 
     // CHANGE SUPER STRUCTURE LEVEL
-    controlScheme.getIntake().onTrue(scoreCommands.intakeCoral()); // D-PAD RIGHT
-    controlScheme.getL1().onTrue(scoreCommands.bottomLevel()); // D-PAD DOWN
-    controlScheme.getL2().onTrue(scoreCommands.midLevel()); // D-PAD LEFT
-    controlScheme.getL4().onTrue(scoreCommands.topLevel()); // D-PAD UP
+    primaryController.povRight().onTrue(scoreCommands.intakeCoral()); // D-PAD RIGHT
+    primaryController.povDown().onTrue(scoreCommands.bottomLevel()); // D-PAD DOWN
+    primaryController.povLeft().onTrue(scoreCommands.midLevel()); // D-PAD LEFT
+    primaryController.povUp().onTrue(scoreCommands.topLevel()); // D-PAD UP
 
-    controlScheme.score().onTrue(scoreCommands.score());
+    primaryController.a().onTrue(scoreCommands.score());
 
     // MOVE ARM
-    controlScheme.getController().x().onTrue(arm.L1());
-    controlScheme.getController().b().onTrue(scoreCommands.stopAll());
+    primaryController.x().onTrue(arm.L1());
+    primaryController.b().onTrue(scoreCommands.stopAll());
 
     // DRIVE TO STATION
-    controlScheme
-        .getController()
+    primaryController
         .leftTrigger()
         .whileTrue(
             Commands.run(
@@ -460,8 +450,7 @@ public class RobotContainer {
 
     // DRIVE TO REEF
 
-    controlScheme
-        .getController()
+    primaryController
         .rightTrigger()
         .whileTrue(
             Commands.run(
@@ -504,7 +493,7 @@ public class RobotContainer {
         .and(secondController.povRight())
         .onTrue(Commands.runOnce(() -> chooseReefBranch(9)));
 
-    controlScheme.getController().start().onTrue(Commands.runOnce(DriveCommands::reconfigurePID));
+    // controlScheme.getController().start().onTrue(Commands.runOnce(DriveCommands::reconfigurePID));
   }
 
   public Command getAutonomousCommand() {
