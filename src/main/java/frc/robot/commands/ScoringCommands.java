@@ -34,7 +34,7 @@ public class ScoringCommands {
   }
 
   public Command midLevel() {
-    return Commands.sequence(arm.L2(), elevator.L3()).withName("midLevel");
+    return Commands.sequence(arm.L2(), elevator.L3(), claw.hold()).withName("midLevel");
 
     //    return new FunctionalCommand(
     //            () -> Commands.waitUntil(claw::hasCoral),
@@ -45,7 +45,7 @@ public class ScoringCommands {
   }
 
   public Command topLevel() {
-    return Commands.sequence(arm.L2().alongWith(claw.hold()), elevator.L4());
+    return Commands.sequence(arm.L2(), elevator.L4(), claw.hold());
     // claw.hold().until(() -> !claw.hasCoral())
     //    return new FunctionalCommand(
     //            () -> Commands.waitUntil(claw::hasCoral),

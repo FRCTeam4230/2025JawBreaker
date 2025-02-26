@@ -157,6 +157,12 @@ public class RobotContainer {
         counterWeight = new CounterWeight(new CounterWeightIOREV());
         break;
     }
+    scoreCommands = new ScoringCommands(elevator, arm, claw);
+
+    NamedCommands.registerCommand("scoreCoral", scoreCommands.score());
+    NamedCommands.registerCommand("intake", scoreCommands.intakeCoral());
+    NamedCommands.registerCommand("topLevel", scoreCommands.topLevel());
+    new EventTrigger("topLevel").onTrue(scoreCommands.topLevel());
 
     // Set up auto routines
     autoChooser = new LoggedDashboardChooser<>("Auto Choices", AutoBuilder.buildAutoChooser());
@@ -175,13 +181,7 @@ public class RobotContainer {
     autoChooser.addOption(
         "Drive Wheel Radius Characterization",
         DriveCommands.wheelRadiusCharacterization(drivetrain));
-    scoreCommands = new ScoringCommands(elevator, arm, claw);
 
-    // Register Named Commands
-    NamedCommands.registerCommand("scoreCoral", scoreCommands.score());
-    NamedCommands.registerCommand("intake", scoreCommands.intakeCoral());
-    NamedCommands.registerCommand("topLevel", scoreCommands.topLevel());
-    new EventTrigger("topLevel").onTrue(scoreCommands.topLevel());
     configureBindings();
   }
 
