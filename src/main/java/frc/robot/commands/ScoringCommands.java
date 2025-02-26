@@ -34,7 +34,7 @@ public class ScoringCommands {
   }
 
   public Command midLevel() {
-    return Commands.sequence(arm.L2(), elevator.L3(), claw.hold()).withName("midLevel");
+    return Commands.sequence(arm.L2(), elevator.L3()).withName("midLevel");
 
     //    return new FunctionalCommand(
     //            () -> Commands.waitUntil(claw::hasCoral),
@@ -45,7 +45,7 @@ public class ScoringCommands {
   }
 
   public Command topLevel() {
-    return Commands.sequence(arm.L2(), elevator.L4(), claw.hold());
+    return Commands.sequence(arm.L2(), elevator.L4());
     // claw.hold().until(() -> !claw.hasCoral())
     //    return new FunctionalCommand(
     //            () -> Commands.waitUntil(claw::hasCoral),
@@ -63,7 +63,12 @@ public class ScoringCommands {
         arm.intake(),
         Commands.waitUntil(elevator::hasCoral).withTimeout(7),
         elevator.park(),
-        claw.intake().until(claw::hasCoral).withTimeout(7));
+        claw.intake()
+            .raceWith(Commands.waitSeconds(7))
+            .until(claw::hasCoral)); // TODO: if command is continuously running .withTimeout is NOT
+    // running on
+    // the until, it is running on the claw run, 7 seconds pass and the run
+    // continues
     //            Commands.sequence(elevator.park(), claw.intake().until(claw::hasCoral))
     //                .onlyWhile(elevator::hasCoral))
     //                    claw.hold())

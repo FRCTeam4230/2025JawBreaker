@@ -196,15 +196,15 @@ public class RobotContainer {
                     .getSetpointGenerator()
                     .withVelocityX(
                         MaxSpeed.times(
-                            primaryController.customLeft().getY()
+                            primaryController.customRight().getY()
                                 * -1)) // Drive forward with negative Y (forward)
                     .withVelocityY(
                         MaxSpeed.times(
-                            primaryController.customLeft().getX()
+                            primaryController.customRight().getX()
                                 * -1)) // Drive left with negative X (left)
                     .withRotationalRate(
                         Constants.MaxAngularRate.times(
-                            primaryController.customRight().getX()
+                            primaryController.customLeft().getX()
                                 * -1)))); // Drive counterclockwise with negative X (left)
 
     primaryController.back().onTrue(Commands.runOnce(() -> drivetrain.resetPose(Pose2d.kZero)));
@@ -424,8 +424,8 @@ public class RobotContainer {
     //    controlScheme.getController().rightTrigger().whileTrue(climber.climberOut(Volts.of(8)));
 
     // CLAW
-    //    controlScheme.getController().rightBumper().whileTrue(claw.intake());
-    //    controlScheme.getController().leftBumper().whileTrue(claw.extake());
+    primaryController.rightBumper().whileTrue(claw.intake());
+    primaryController.leftBumper().whileTrue(claw.extake());
 
     // CHANGE SUPER STRUCTURE LEVEL
     primaryController.povRight().onTrue(scoreCommands.intakeCoral()); // D-PAD RIGHT
