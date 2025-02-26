@@ -62,7 +62,11 @@ public class ScoringCommands {
   public Command intakeCoral() {
     return Commands.sequence(
             // Still would want to wait for elevator to have game
-            elevator.intake(), arm.intake())
+
+            elevator.intake(), arm.intake(), Commands.waitUntil(elevatorHasGamePiece()))
+        //            Commands.sequence(elevator.park(), claw.intake().until(claw::hasCoral))
+        //                .onlyWhile(elevator::hasCoral))
+        //                    claw.hold())
         .withName("intake");
 
     //    return new FunctionalCommand(
@@ -78,7 +82,10 @@ public class ScoringCommands {
             arm.L1(),
             Commands.waitSeconds(0.25),
             claw.extake().until(() -> !claw.hasCoral()),
-            elevator.intake(),
+            elevator.intake(), // if this causes something to get stuck, we could do
+            // elevator.stop().andThen(elevator.intake()), this would unschedule the
+            // last command for 20ms and then reschedule the one we want, kind of
+            // resetting it so its less error prone
             arm.intake(),
             intakeCoral())
         .withName("scoreCoral");

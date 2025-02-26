@@ -8,6 +8,7 @@ import com.pathplanner.lib.auto.AutoBuilder;
 import edu.wpi.first.math.geometry.*;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.units.measure.LinearVelocity;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
@@ -52,7 +53,7 @@ public class RobotContainer {
   private LinearVelocity MaxSpeed = TunerConstants.kSpeedAt12Volts;
   private final ControlScheme controlScheme;
 
-  private final TunableController testJoystick =
+  private final TunableController secondController =
       new TunableController(1).withControllerType(TunableControllerType.QUADRATIC);
 
   private final LoggedDashboardChooser<Command> autoChooser;
@@ -73,6 +74,8 @@ public class RobotContainer {
 
   private final ScoringCommands scoreCommands;
 
+  Pose3d reefBranch = FieldConstants.Reef.branchPositions.get(0).get(FieldConstants.ReefHeight.L4);
+
   /* Setting up bindings for necessary control of the swerve drive platform */
   private final SwerveRequest.SwerveDriveBrake brake = new SwerveRequest.SwerveDriveBrake();
   private final SwerveRequest.PointWheelsAt point = new SwerveRequest.PointWheelsAt();
@@ -87,7 +90,7 @@ public class RobotContainer {
 
         new Vision(
             drivetrain::addVisionData,
-            new VisionIOLimelight("limelight-fr", drivetrain::getVisionParameters),
+            new VisionIOLimelight("limelight-fc", drivetrain::getVisionParameters),
             new VisionIOLimelight("limelight-fl", drivetrain::getVisionParameters),
             new VisionIOLimelight("limelight-back", drivetrain::getVisionParameters));
 
@@ -430,12 +433,12 @@ public class RobotContainer {
     //    controlScheme.getController().leftBumper().whileTrue(claw.extake());
 
     // CHANGE SUPER STRUCTURE LEVEL
-    /*controlScheme.getIntake().onTrue(scoreCommands.intakeCoral()); // D-PAD RIGHT
+    controlScheme.getIntake().onTrue(scoreCommands.intakeCoral()); // D-PAD RIGHT
     controlScheme.getL1().onTrue(scoreCommands.bottomLevel()); // D-PAD DOWN
     controlScheme.getL2().onTrue(scoreCommands.midLevel()); // D-PAD LEFT
     controlScheme.getL4().onTrue(scoreCommands.topLevel()); // D-PAD UP
 
-    controlScheme.score().onTrue(scoreCommands.score());*/
+    controlScheme.score().onTrue(scoreCommands.score());
 
     // MOVE ARM
     controlScheme.getController().x().onTrue(arm.L1());
@@ -456,8 +459,7 @@ public class RobotContainer {
                 drivetrain));
 
     // DRIVE TO REEF
-    Pose3d reefBranch =
-        FieldConstants.Reef.branchPositions.get(3).get(FieldConstants.ReefHeight.L4);
+
     controlScheme
         .getController()
         .rightTrigger()
@@ -469,10 +471,49 @@ public class RobotContainer {
                         drivetrain),
                 drivetrain));
 
+    // 2nd driver controller
+    secondController.a().onTrue(Commands.runOnce(() -> chooseReefBranch(0)));
+    secondController
+        .rightBumper()
+        .and(secondController.a())
+        .onTrue(Commands.runOnce(() -> chooseReefBranch(1)));
+    secondController.x().onTrue(Commands.runOnce(() -> chooseReefBranch(2)));
+    secondController
+        .rightBumper()
+        .and(secondController.x())
+        .onTrue(Commands.runOnce(() -> chooseReefBranch(3)));
+    secondController.b().onTrue(Commands.runOnce(() -> chooseReefBranch(10)));
+    secondController
+        .rightBumper()
+        .and(secondController.b())
+        .onTrue(Commands.runOnce(() -> chooseReefBranch(11)));
+
+    secondController.povUp().onTrue(Commands.runOnce(() -> chooseReefBranch(6)));
+    secondController
+        .rightBumper()
+        .and(secondController.povUp())
+        .onTrue(Commands.runOnce(() -> chooseReefBranch(7)));
+    secondController.povLeft().onTrue(Commands.runOnce(() -> chooseReefBranch(4)));
+    secondController
+        .rightBumper()
+        .and(secondController.povLeft())
+        .onTrue(Commands.runOnce(() -> chooseReefBranch(5)));
+    secondController.povRight().onTrue(Commands.runOnce(() -> chooseReefBranch(8)));
+    secondController
+        .rightBumper()
+        .and(secondController.povRight())
+        .onTrue(Commands.runOnce(() -> chooseReefBranch(9)));
+
     controlScheme.getController().start().onTrue(Commands.runOnce(DriveCommands::reconfigurePID));
   }
 
   public Command getAutonomousCommand() {
     return autoChooser.get();
+  }
+
+  private void chooseReefBranch(int branchNumber) {
+    reefBranch =
+        FieldConstants.Reef.branchPositions.get(branchNumber).get(FieldConstants.ReefHeight.L4);
+    SmartDashboard.putNumber("reefBranch", branchNumber);
   }
 }
