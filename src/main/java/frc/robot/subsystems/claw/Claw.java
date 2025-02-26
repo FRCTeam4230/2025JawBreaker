@@ -11,14 +11,14 @@
 
 package frc.robot.subsystems.claw;
 
-import static edu.wpi.first.units.Units.*;
-
 import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.Alert.AlertType;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import org.littletonrobotics.junction.Logger;
+
+import static edu.wpi.first.units.Units.*;
 
 /**
  * The Arm subsystem controls a dual-motor arm mechanism for game piece manipulation. It supports
@@ -52,10 +52,7 @@ public class Claw extends SubsystemBase {
   }
 
   public Command hold() {
-    return Commands.run(
-        () ->
-            Commands.waitUntil(this::hasCoral)
-                .andThen(() -> io.setVolts(Volts.of(ClawConstants.HOLD_VOLTAGE.get())), this));
+    return Commands.run(() -> io.setVolts(Volts.of(ClawConstants.HOLD_VOLTAGE.get())), this);
   }
 
   public Command intake() {
@@ -72,7 +69,7 @@ public class Claw extends SubsystemBase {
   }
 
   public Command stopClaw() {
-    return Commands.runOnce(() -> io.stop());
+    return Commands.runOnce(() -> io.stop(), this);
   }
 
   public boolean hasCoral() {
