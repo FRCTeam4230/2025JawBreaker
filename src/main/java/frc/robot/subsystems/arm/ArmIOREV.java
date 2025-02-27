@@ -8,6 +8,7 @@ package frc.robot.subsystems.arm;
 
 import static edu.wpi.first.units.Units.*;
 
+import com.revrobotics.AbsoluteEncoder;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.spark.ClosedLoopSlot;
 import com.revrobotics.spark.SparkBase.ControlType;
@@ -48,6 +49,8 @@ public class ArmIOREV implements ArmIO {
    */
   public final RelativeEncoder leaderEncoder = leader.getExternalEncoder();
 
+  public final AbsoluteEncoder absoluteEncoder = leader.getAbsoluteEncoder();
+
   private final SparkClosedLoopController closedLoopController = leader.getClosedLoopController();
   private final ArmFeedforward feedforward = new ArmFeedforward(0, 0.2, 0);
   // (leader.getAppliedOutput() * RobotController.getBatteryVoltage()) /
@@ -62,21 +65,17 @@ public class ArmIOREV implements ArmIO {
    * and applies example PID gains.
    */
   public ArmIOREV() {
-
     SparkFlexConfig leaderConfig = new SparkFlexConfig();
-    leaderConfig.idleMode(SparkBaseConfig.IdleMode.kBrake);
-    //    leaderConfig
-    //        .encoder
-    //        .velocityConversionFactor((1.0 / GEAR_RATIO) / 60.0) // Converts RPM to rotations per
-    // second
-    //        .positionConversionFactor(1.0 / GEAR_RATIO); // Converts motor rotations to arm
-    // rotations
     leaderConfig.limitSwitch.forwardLimitSwitchEnabled(false).reverseLimitSwitchEnabled(false);
 
+    leaderConfig.absoluteEncoder.inverted(true);
     leaderConfig.externalEncoder.countsPerRevolution(8192);
     leaderConfig.externalEncoder.inverted(true);
     leaderConfig
         .inverted(true)
+        .idleMode(SparkBaseConfig.IdleMode.kBrake)
+        .voltageCompensation(12.0)
+        .smartCurrentLimit(40)
         .closedLoop
         .outputRange(-1, 1)
         .feedbackSensor(FeedbackSensor.kAlternateOrExternalEncoder)
@@ -107,6 +106,7 @@ public class ArmIOREV implements ArmIO {
     double armVelRotPerSec = leaderEncoder.getVelocity();
 
     inputs.encoderPosition = Rotations.of(armRot);
+    inputs.absoluteEncoderPosition = Rotations.of(absoluteEncoder.getPosition());
     // For the motor’s rotor position we reconstruct the raw (pre–conversion) value.
     inputs.encoderVelocity = RotationsPerSecond.of(armVelRotPerSec);
 
@@ -151,7 +151,7 @@ public class ArmIOREV implements ArmIO {
     // The setpoint is in rotations.
     closedLoopController.setReference(angle.in(Rotations), ControlType.kPosition);
     feedforward.calculate(angle.in(Radians), 1);
-    this.setpoint = angle;
+    this.setpoint = Rotations.of(angle.in(Rotations));
   }
 
   /** Stops all arm movement. */
@@ -162,6 +162,11 @@ public class ArmIOREV implements ArmIO {
 
   public void resetPos() {
     closedLoopController.setReference(0, ControlType.kPosition, ClosedLoopSlot.kSlot3);
+  }
+
+  @Override
+  public void resetEncoder() {
+    leaderEncoder.setPosition(Degrees.of(-90).in(Rotations));
   }
 
   @Override

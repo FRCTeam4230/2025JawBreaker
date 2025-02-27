@@ -4,9 +4,13 @@ import static edu.wpi.first.units.Units.*;
 
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.spark.*;
-import com.revrobotics.spark.config.*;
+import com.revrobotics.spark.config.ClosedLoopConfig;
+import com.revrobotics.spark.config.MAXMotionConfig;
+import com.revrobotics.spark.config.SparkBaseConfig;
+import com.revrobotics.spark.config.SparkFlexConfig;
 import edu.wpi.first.math.controller.ElevatorFeedforward;
-import edu.wpi.first.units.measure.*;
+import edu.wpi.first.units.measure.Angle;
+import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.Encoder;
 
@@ -28,6 +32,9 @@ public class ElevatorIOREV implements ElevatorIO {
   private final RelativeEncoder leaderEncoder = leader.getEncoder();
 
   private final Encoder leaderExternalEncoder = new Encoder(5, 6);
+
+  protected final DigitalInput beamBreakSensor =
+      new DigitalInput(ElevatorConstants.beamBreakDIOPort);
 
   /*
   Encoder can take two ports, this gives the correct value in rotations for the elevator (when divided by -8192, which is how many ticks are in a rotation)
@@ -125,14 +132,19 @@ public class ElevatorIOREV implements ElevatorIO {
     inputs.lowerLimit = !lowerLimitSwitch.get();
     inputs.upperLimit = !upperLimitSwitch.get();
 
+    inputs.beamBreakTriggered = !beamBreakSensor.get();
+
     if (inputs.lowerLimit && inputs.leaderVelocity.magnitude() < 0) {
       stop();
     }
+
     if (inputs.upperLimit && inputs.leaderVelocity.magnitude() > 0) {
       pidController.setReference(
           inputs.leaderPosition.minus(Rotations.of(0.1)).in(Rotations),
           SparkBase.ControlType.kPosition);
     }
+
+    //
   }
 
   @Override

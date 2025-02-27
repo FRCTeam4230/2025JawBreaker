@@ -124,6 +124,9 @@ public class DriveIOCTRE extends TunerSwerveDrivetrain implements DriveIO {
   public void updateInputs(DriveIOInputs inputs) {
     // Update state-based inputs
     SwerveDriveState state = getState();
+
+    inputs.currentTimestamp = state.Timestamp;
+
     inputs.moduleStates = state.ModuleStates;
     inputs.moduleTargets = state.ModuleTargets;
     inputs.modulePositions = state.ModulePositions;

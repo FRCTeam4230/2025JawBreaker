@@ -28,15 +28,16 @@ import org.littletonrobotics.junction.Logger;
  * options.
  */
 public class Arm extends SubsystemBase {
+
   // Hardware interface and inputs
-  private ArmIO io = null;
+  private ArmIO io;
   private final ArmIOInputsAutoLogged inputs;
 
   public final PIDController pidController =
       new PIDController(ArmConstants.kP.get(), ArmConstants.kI.get(), ArmConstants.kD.get());
 
   // Current arm position mode
-  private ArmMode currentMode = ArmMode.INTAKE;
+  private ArmMode currentMode = ArmMode.STOP;
 
   // Alerts for motor connection status
   private final Alert motorMotorAlert =
@@ -54,12 +55,6 @@ public class Arm extends SubsystemBase {
     this.io = io;
     this.inputs = new ArmIOInputsAutoLogged();
     SmartDashboard.putData(this);
-
-    // TODO
-    //      if(inputs.motorPosition.gt(Rotations.of(0))){
-    //
-    //      }
-
   }
 
   @Override
@@ -102,6 +97,7 @@ public class Arm extends SubsystemBase {
   private enum ArmMode {
     STOP(Degrees.of(0)), // Stop the arm
     INTAKE(Degrees.of(-88)), // Arm tucked in
+    PARKED(Degrees.of(-90)), // try to hold
     L1(Degrees.of(16)), //  Position for scoring in L1
     L2(Degrees.of(55)), //  Position for scoring in L2
     L3(Degrees.of(45)), // Position for scoring in L3
@@ -116,7 +112,7 @@ public class Arm extends SubsystemBase {
     }
 
     ArmMode(Angle targetAngle) {
-      this(targetAngle, Rotations.of(Degrees.of(2).in(Rotations))); // 2 degree default tolerance
+      this(targetAngle, Rotations.of(Degrees.of(1).in(Rotations))); // 2 degree default tolerance
     }
   }
 
@@ -125,6 +121,7 @@ public class Arm extends SubsystemBase {
    *
    * @return The current ArmMode
    */
+  @AutoLogOutput
   public ArmMode getMode() {
     return currentMode;
   }
@@ -157,7 +154,9 @@ public class Arm extends SubsystemBase {
               ArmMode.L3,
               createPositionCommand(ArmMode.L3),
               ArmMode.L4,
-              createPositionCommand(ArmMode.L4)),
+              createPositionCommand(ArmMode.L4),
+              ArmMode.PARKED,
+              createPositionCommand(ArmMode.PARKED)),
           this::getMode);
 
   /**
@@ -168,7 +167,7 @@ public class Arm extends SubsystemBase {
    * @return A command that implements the arm movement
    */
   private Command createPositionCommand(ArmMode mode) {
-    return Commands.runOnce(() -> setPosition(mode.targetAngle))
+    return Commands.runOnce(() -> setPosition(mode.targetAngle), this)
         .withName("Move to " + mode.toString());
   }
 
@@ -180,7 +179,7 @@ public class Arm extends SubsystemBase {
   @AutoLogOutput
   public boolean isAtTarget() {
     if (currentMode == ArmMode.STOP) return true;
-    return getPosition().isNear(currentMode.targetAngle, Rotations.of(0.29));
+    return getPosition().isNear(currentMode.targetAngle, currentMode.angleTolerance);
   }
 
   /**
@@ -191,6 +190,11 @@ public class Arm extends SubsystemBase {
   @AutoLogOutput
   private Angle targetAngle() {
     return currentMode.targetAngle;
+  }
+
+  @AutoLogOutput
+  public boolean isParked() {
+    return inputs.lowerLimit;
   }
 
   /**
@@ -205,6 +209,12 @@ public class Arm extends SubsystemBase {
 
   /** Factory methods for common position commands */
 
+  /**
+   * @return Command to move the arm to L4 position
+   */
+  public final Command park() {
+    return setPositionCommand(ArmMode.PARKED);
+  }
   /**
    * @return Command to move the arm to L1 scoring position
    */
@@ -240,6 +250,14 @@ public class Arm extends SubsystemBase {
     return setPositionCommand(ArmMode.INTAKE);
   }
 
+  public Command resetEncoder() {
+    return Commands.sequence(
+        Commands.run(() -> io.setVoltage(Volts.of(-0.4))).until(this::isParked),
+        Commands.runOnce(() -> io.setVoltage(Volts.of(0)))
+            .andThen(Commands.waitSeconds(0.4))
+            .andThen(() -> io.resetEncoder()));
+  }
+
   public Command reconfigPID() {
     return Commands.runOnce(io::reconfigurePID);
   }
@@ -249,6 +267,8 @@ public class Arm extends SubsystemBase {
   public final Command stopCommand() {
     return setPositionCommand(ArmMode.STOP);
   }
+
+  // public final Command holdArmCommand(){ return () -> io.setVoltage(Volts.of(-0.5));}
 
   private SysIdRoutine armSysIdRoutine =
       new SysIdRoutine(

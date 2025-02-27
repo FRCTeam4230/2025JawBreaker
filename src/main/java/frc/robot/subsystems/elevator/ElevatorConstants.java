@@ -13,6 +13,7 @@ public class ElevatorConstants {
   public static final int LEADER_MOTOR_ID = 30;
   public static final int LEADER_MOTOR_ENCODER = 4; //
   public static final int FOLLOWER_MOTOR_ID = 31;
+  public static final int beamBreakDIOPort = 8;
 
   public static final double elevatorMaxVelocity = 9.42;
   public static final double elevatorMaxAcceleration = 2.2;

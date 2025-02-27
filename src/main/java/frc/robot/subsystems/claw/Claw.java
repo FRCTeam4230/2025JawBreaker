@@ -11,10 +11,11 @@
 
 package frc.robot.subsystems.claw;
 
-import static edu.wpi.first.units.Units.Volts;
+import static edu.wpi.first.units.Units.*;
 
 import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.Alert.AlertType;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -38,37 +39,55 @@ public class Claw extends SubsystemBase {
   public Claw(ClawIO io) {
     this.io = io;
     this.inputs = new ClawIOInputsAutoLogged();
+    setDefaultCommand(hold());
+    SmartDashboard.putData(this);
   }
 
   @Override
   public void periodic() {
     // Update and log inputs from hardware
     io.updateInputs(inputs);
-    Logger.processInputs("Claw", inputs);
 
+    Logger.processInputs("Claw", inputs);
     // Update motor connection status alerts
     motorAlert.set(!inputs.leaderConnected);
     encoderAlert.set(!inputs.encoderConnected);
   }
 
+  public Command hold() {
+    return Commands.runOnce(() -> shouldHold(), this);
+  }
+
+  private void shouldHold() {
+    if (hasCoral()) {
+      io.setVolts(Volts.of(ClawConstants.HOLD_VOLTAGE.get()));
+    } else {
+      io.setVolts(Volts.of(0));
+    }
+  }
+
   public Command intake() {
     return Commands.startEnd(
-        () -> io.setVolts(Volts.of(ClawConstants.INTAKE_VOLTAGE.get())),
-        () -> io.setVolts(Volts.of(0.5)));
+        () -> io.setVolts(Volts.of(ClawConstants.INTAKE_VOLTAGE.get())), () -> io.stop(), this);
   }
   // TODO: smart current limit for motor, set hold mode to only enable when proximity gets too far
 
   public Command extake() {
     return Commands.startEnd(
         () -> io.setVolts(Volts.of(ClawConstants.INTAKE_VOLTAGE.get()).times(-0.5)),
-        () -> io.stop());
+        () -> io.stop(),
+        this);
   }
 
   public Command stopClaw() {
-    return Commands.runOnce(() -> io.stop());
+    return Commands.runOnce(() -> io.stop(), this);
   }
 
-  //  public boolean hasCoral() {
-  //    return io.hasCoral();
-  //  }
+  public boolean hasCoral() {
+    return inputs.beamBreakTriggered;
+  }
+
+  public boolean doesNotHaveCoral() {
+    return !inputs.beamBreakTriggered;
+  }
 }

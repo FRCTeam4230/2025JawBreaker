@@ -6,16 +6,11 @@
 
 package frc.robot.subsystems.elevator;
 
-import static edu.wpi.first.units.Units.Amps;
-import static edu.wpi.first.units.Units.Inches;
-import static edu.wpi.first.units.Units.Rotations;
-import static edu.wpi.first.units.Units.RotationsPerSecond;
-import static edu.wpi.first.units.Units.Volts;
+import static edu.wpi.first.units.Units.*;
 
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Current;
-import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.units.measure.Voltage;
 import org.littletonrobotics.junction.AutoLog;
 
@@ -25,6 +20,7 @@ public interface ElevatorIO {
     public boolean leaderConnected = false;
     public boolean followerConnected = false;
     public boolean encoderConnected = false;
+    public boolean beamBreakTriggered = false;
 
     public Angle leaderPosition = Rotations.of(0);
     public Angle leaderRotorPosition = Rotations.of(0);
@@ -42,8 +38,6 @@ public interface ElevatorIO {
 
     public boolean lowerLimit = false;
     public boolean upperLimit = false;
-
-    public Distance elevatorDistance = Inches.of(0);
 
     public Angle setpoint;
 

@@ -6,10 +6,7 @@
 
 package frc.robot;
 
-import static edu.wpi.first.units.Units.Kilogram;
-import static edu.wpi.first.units.Units.KilogramSquareMeters;
-import static edu.wpi.first.units.Units.MetersPerSecond;
-import static edu.wpi.first.units.Units.RotationsPerSecond;
+import static edu.wpi.first.units.Units.*;
 
 import com.ctre.phoenix6.swerve.SwerveModuleConstants;
 import com.pathplanner.lib.config.ModuleConfig;
@@ -19,6 +16,7 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.units.measure.AngularVelocity;
+import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.units.measure.Mass;
 import edu.wpi.first.units.measure.MomentOfInertia;
 import edu.wpi.first.wpilibj.RobotBase;
@@ -37,6 +35,9 @@ public final class Constants {
 
   public static final AngularVelocity MaxAngularRate = RotationsPerSecond.of(1.5);
   public static final AngularVelocity MaxModuleRate = RotationsPerSecond.of(20.0);
+
+  public static final Distance robotScoringOffset = Inches.of(34.5).div(2.0);
+  public static final Distance maxDistanceReefLineup = Inches.of(48);
 
   // PathPlanner config constants
   private static final Mass ROBOT_MASS = Kilogram.of(69.78);

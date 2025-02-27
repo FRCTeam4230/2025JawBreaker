@@ -2,25 +2,24 @@ package frc.robot.subsystems.claw;
 
 import static edu.wpi.first.units.Units.*;
 
-import com.revrobotics.ColorSensorV3;
 import com.revrobotics.spark.SparkBase;
 import com.revrobotics.spark.SparkLowLevel;
 import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.config.SparkBaseConfig;
 import com.revrobotics.spark.config.SparkMaxConfig;
 import edu.wpi.first.units.measure.Voltage;
-import edu.wpi.first.wpilibj.I2C;
+import edu.wpi.first.wpilibj.DigitalInput;
 
 public class ClawIOREV implements ClawIO {
   protected final SparkMax motor =
       new SparkMax(ClawConstants.clawMotorID, SparkLowLevel.MotorType.kBrushless);
 
-  protected final ColorSensorV3 colorSensorV3 = new ColorSensorV3(I2C.Port.kOnboard);
+  protected final DigitalInput beamBreakSensor = new DigitalInput(ClawConstants.beamBreakDIOPort);
 
   public ClawIOREV() {
     motor.configure(
         new SparkMaxConfig()
-            .idleMode(SparkBaseConfig.IdleMode.kCoast)
+            .idleMode(SparkBaseConfig.IdleMode.kBrake)
             .voltageCompensation(12.0)
             .smartCurrentLimit(30)
             .closedLoopRampRate(ClawConstants.CLOSED_LOOP_RAMP_RATE)
@@ -41,20 +40,20 @@ public class ClawIOREV implements ClawIO {
     motor.setVoltage(voltage);
   }
 
-  @Override
-  public boolean hasCoral() {
-    return colorSensorV3.getProximity() > 1500;
-  }
+  public void hold() {}
 
   public void stop() {
     motor.set(0);
   }
 
   public void updateInputs(ClawIOInputs inputs) {
-    //    inputs.proximity = colorSensorV3.getProximity();
-    //    inputs.proximitySensor = hasCoral();
+    inputs.beamBreakTriggered = !beamBreakSensor.get();
+
+    inputs.leaderConnected = true;
+    inputs.encoderConnected = true;
+
     inputs.motorVelocity = RotationsPerSecond.of(motor.getEncoder().getVelocity());
-    inputs.appliedVoltage = Volts.of(motor.getBusVoltage());
+    inputs.appliedVoltage = Volts.of(motor.getAppliedOutput());
     inputs.supplyCurrent = Amps.of(motor.getOutputCurrent());
     inputs.motorTempCelsius = Celsius.of(motor.getMotorTemperature());
   }

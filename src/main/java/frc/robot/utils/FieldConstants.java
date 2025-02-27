@@ -8,8 +8,7 @@
 package frc.robot.utils;
 
 import static edu.wpi.first.apriltag.AprilTagFields.kDefaultField;
-import static edu.wpi.first.units.Units.Degrees;
-import static edu.wpi.first.units.Units.Inches;
+import static edu.wpi.first.units.Units.*;
 
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.math.geometry.*;
@@ -59,6 +58,9 @@ public class FieldConstants {
         new Pose2d(Inches.of(33.526), Inches.of(291.176), Rotation2d.fromDegrees(90 - 144.011));
     public static final Pose2d rightCenterFace =
         new Pose2d(Inches.of(33.526), Inches.of(25.824), Rotation2d.fromDegrees(144.011 - 90));
+
+    public static final Transform2d coralOffset =
+        new Transform2d(Meters.of(/*0.522*/ 0), Meters.of(0.0), Rotation2d.kZero);
   }
 
   public static class Reef {
@@ -68,6 +70,10 @@ public class FieldConstants {
     public static final Distance faceToZoneLine =
         Inches.of(12); // Side of the reef to the inside of the reef zone
     // line
+
+    public static final Transform2d reefOffset =
+        /*new Transform2d(Inches.of(10.25), Inches.of(5.0), Rotation2d.k180deg)*/
+        new Transform2d(Inches.of(1), Inches.of(1.8), Rotation2d.k180deg);
 
     public static final Pose2d[] centerFaces =
         new Pose2d[6]; // Starting facing the driver station in clockwise

@@ -8,6 +8,7 @@ package frc.robot.subsystems.drive;
 
 import static edu.wpi.first.units.Units.*;
 
+import com.ctre.phoenix6.swerve.SwerveModule;
 import com.ctre.phoenix6.swerve.SwerveRequest;
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.config.PIDConstants;
@@ -35,6 +36,8 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.Constants;
 import frc.robot.Constants.Mode;
+import frc.robot.generated.TunerConstants;
+import frc.robot.subsystems.drive.requests.SwerveSetpointGen;
 import frc.robot.subsystems.drive.requests.SysIdSwerveTranslation_Torque;
 import frc.robot.subsystems.vision.VisionConsts;
 import frc.robot.subsystems.vision.VisionUtil.VisionMeasurement;
@@ -112,6 +115,8 @@ public class Drive extends SubsystemBase {
               null,
               this));
 
+  private SwerveSetpointGen setpointGen;
+
   /* SysId routine for characterizing translation. This is used to find PID gains for the drive motors. */
   private final SysIdRoutine m_sysIdRoutineTranslation =
       new SysIdRoutine(
@@ -162,12 +167,18 @@ public class Drive extends SubsystemBase {
               this));
 
   /* The SysId routine to test */
-  private SysIdRoutine m_sysIdRoutineToApply = m_sysIdRoutineSteer;
+  private SysIdRoutine m_sysIdRoutineToApply = m_sysIdRoutineTranslation;
 
   public Drive(DriveIO io) {
 
     this.io = io;
     inputs = new DriveIOInputsAutoLogged();
+
+    setpointGen =
+        new SwerveSetpointGen(getChassisSpeeds(), getModuleStates(), this::getRotation)
+            .withDeadband(TunerConstants.kSpeedAt12Volts.times(0.1))
+            .withRotationalDeadband(Constants.MaxAngularRate.times(0.1))
+            .withDriveRequestType(SwerveModule.DriveRequestType.OpenLoopVoltage);
 
     configureAutoBuilder();
   }
@@ -245,7 +256,6 @@ public class Drive extends SubsystemBase {
      * Otherwise, only check and apply the operator perspective if the DS is disabled.
      * This ensures driving behavior doesn't change until an explicit disable event occurs during testing.
      */
-
     io.updateInputs(inputs);
     Logger.processInputs("Drive", inputs);
     gyroDisconnectedAlert.set(!inputs.gyroConnected);
@@ -409,6 +419,42 @@ public class Drive extends SubsystemBase {
     }
   }
 
+  private void alignToScore() {
+    Pose2d targetPose =
+        this.getClosestBranch(false, false); // THESE ARE INTENTS that are passed to getClosesBranch
+
+    double rotTarget = targetPose.getRotation().getDegrees();
+    double rotSpeed = this.getRotControl(rotTarget, inputs.gyroYaw[0].getDegrees());
+    // xPower = xPower * 0.5 + this.getAlignX(targetPose.getTranslation());
+    var xPower = this.getAlignX(targetPose.getTranslation());
+    // yPower = yPower * 0.5 + this.getAlignY(targetPose.getTranslation());
+    var yPower = this.getAlignY(targetPose.getTranslation());
+
+    // this.swerveSignal = swerveHelper.setDrive(xPower, yPower, rotSpeed, getGyroAngle());
+  }
+
+  /**
+   * automatically creates a rotational joystick value to rotate the robot towards a specific target
+   *
+   * @param i_target target direction for the robot to face, field centric, bearing degrees
+   * @param i_gyro the gyro value, field centric, in bearing degrees
+   * @return double that indicates what the rotational joystick value should be
+   */
+  private double getRotControl(double i_target, double i_gyro) {
+    var rotDelta = i_target - i_gyro;
+    var rotPID = 0.0;
+    if (rotDelta > 180) {
+      rotPID = (rotDelta - 360) / 180;
+    } else if (Math.abs(rotDelta) <= 180.0) {
+      rotPID = rotDelta / 180.0;
+    } else {
+      rotPID = (rotDelta + 360) / 180;
+    }
+    return Math.signum(rotPID)
+        * Math.min(
+            Math.abs(rotPID * DriveConstants.PID_ROTATION), 1.0 / DriveConstants.ROTATION_SPEED);
+  }
+
   public Pose2d getClosestBranch(boolean right, boolean topTriangle) {
     if (right) {
       if (topTriangle) {
@@ -466,5 +512,13 @@ public class Drive extends SubsystemBase {
     double offsetX = target.getX() - getPose().getX();
     double offsetY = target.getY() - getPose().getY();
     return (360 - Math.toDegrees(Math.atan2(offsetY, offsetX)) % 360);
+  }
+
+  public SwerveSetpointGen getSetpointGenerator() {
+    return setpointGen;
+  }
+
+  public double getCurrentTimestamp() {
+    return inputs.currentTimestamp;
   }
 }

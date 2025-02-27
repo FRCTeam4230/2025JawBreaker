@@ -1,18 +1,18 @@
 package frc.robot;
 
-import static edu.wpi.first.units.Units.*;
+import static edu.wpi.first.units.Units.Volts;
 import static frc.robot.Constants.*;
 
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 import com.ctre.phoenix6.swerve.SwerveRequest;
 import com.pathplanner.lib.auto.AutoBuilder;
-import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation3d;
-import edu.wpi.first.math.geometry.Transform3d;
-import edu.wpi.first.math.geometry.Translation3d;
-import edu.wpi.first.math.trajectory.TrapezoidProfile;
+import com.pathplanner.lib.auto.NamedCommands;
+import com.pathplanner.lib.events.EventTrigger;
+import edu.wpi.first.math.geometry.*;
 import edu.wpi.first.units.measure.LinearVelocity;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.commands.DriveCommands;
@@ -33,8 +33,6 @@ import frc.robot.subsystems.counterweight.CounterWeightIOSIM;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.drive.DriveIO;
 import frc.robot.subsystems.drive.DriveIOCTRE;
-import frc.robot.subsystems.drive.requests.ProfiledFieldCentricFacingAngle;
-import frc.robot.subsystems.drive.requests.SwerveSetpointGen;
 import frc.robot.subsystems.elevator.Elevator;
 import frc.robot.subsystems.elevator.ElevatorIO;
 import frc.robot.subsystems.elevator.ElevatorIOREV;
@@ -43,6 +41,7 @@ import frc.robot.subsystems.vision.Vision;
 import frc.robot.subsystems.vision.VisionIO;
 import frc.robot.subsystems.vision.VisionIOLimelight;
 import frc.robot.subsystems.vision.VisionIOPhotonVisionSIM;
+import frc.robot.utils.FieldConstants;
 import frc.robot.utils.TunableController;
 import frc.robot.utils.TunableController.TunableControllerType;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
@@ -50,9 +49,11 @@ import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 public class RobotContainer {
 
   private LinearVelocity MaxSpeed = TunerConstants.kSpeedAt12Volts;
-  private final TunableController joystick =
+  // private final ControlScheme controlScheme;
+
+  private final TunableController primaryController =
       new TunableController(0).withControllerType(TunableControllerType.QUADRATIC);
-  private final TunableController testJoystick =
+  private final TunableController secondController =
       new TunableController(1).withControllerType(TunableControllerType.QUADRATIC);
 
   private final LoggedDashboardChooser<Command> autoChooser;
@@ -73,6 +74,8 @@ public class RobotContainer {
 
   private final ScoringCommands scoreCommands;
 
+  Pose3d reefBranch = FieldConstants.Reef.branchPositions.get(0).get(FieldConstants.ReefHeight.L4);
+
   /* Setting up bindings for necessary control of the swerve drive platform */
   private final SwerveRequest.SwerveDriveBrake brake = new SwerveRequest.SwerveDriveBrake();
   private final SwerveRequest.PointWheelsAt point = new SwerveRequest.PointWheelsAt();
@@ -87,18 +90,16 @@ public class RobotContainer {
 
         new Vision(
             drivetrain::addVisionData,
-            new VisionIOLimelight("limelight-bl", drivetrain::getVisionParameters),
-            new VisionIOLimelight("limelight-fr", drivetrain::getVisionParameters));
-
-        /*
-        new VisionIOLimelight("limelight-bl", drivetrain::getVisionParameters),
-        new VisionIOLimelight("limelight-br", drivetrain::getVisionParameters));*/
+            new VisionIOLimelight("limelight-fc", drivetrain::getVisionParameters),
+            new VisionIOLimelight("limelight-fl", drivetrain::getVisionParameters),
+            new VisionIOLimelight("limelight-back", drivetrain::getVisionParameters));
 
         elevator = new Elevator(new ElevatorIOREV() {});
         arm = new Arm(new ArmIOREV() {});
         claw = new Claw(new ClawIOREV() {});
         climber = new Climber(new ClimberIOREV() {});
         counterWeight = new CounterWeight(new CounterWeightIOREV());
+
         break;
 
       case SIM:
@@ -158,6 +159,13 @@ public class RobotContainer {
         counterWeight = new CounterWeight(new CounterWeightIOREV());
         break;
     }
+    scoreCommands = new ScoringCommands(elevator, arm, claw);
+
+    NamedCommands.registerCommand("scoreCoral", scoreCommands.score());
+    NamedCommands.registerCommand("intake", scoreCommands.intakeCoral());
+    NamedCommands.registerCommand("topLevel", scoreCommands.topLevel());
+    new EventTrigger("topLevel").onTrue(scoreCommands.topLevel());
+    new EventTrigger("scoreCoral").onTrue(scoreCommands.score());
 
     // Set up auto routines
     autoChooser = new LoggedDashboardChooser<>("Auto Choices", AutoBuilder.buildAutoChooser());
@@ -176,7 +184,6 @@ public class RobotContainer {
     autoChooser.addOption(
         "Drive Wheel Radius Characterization",
         DriveCommands.wheelRadiusCharacterization(drivetrain));
-    scoreCommands = new ScoringCommands(elevator, arm, claw);
 
     configureBindings();
   }
@@ -188,22 +195,22 @@ public class RobotContainer {
         // Drivetrain will execute this command periodically
         drivetrain.applyRequest(
             () ->
-                drive
+                drivetrain
+                    .getSetpointGenerator()
                     .withVelocityX(
                         MaxSpeed.times(
-                            joystick
-                                .customRight()
-                                .getY())) // Drive forward with negative Y (forward)
+                            primaryController.customRight().getY()
+                                * -1)) // Drive forward with negative Y (forward)
                     .withVelocityY(
                         MaxSpeed.times(
-                            joystick.customRight().getX())) // Drive left with negative X (left)
+                            primaryController.customRight().getX()
+                                * -1)) // Drive left with negative X (left)
                     .withRotationalRate(
-                        MaxAngularRate.times(
-                            -joystick
-                                .customLeft()
-                                .getX())))); // Drive counterclockwise with negative X (left)
+                        Constants.MaxAngularRate.times(
+                            primaryController.customLeft().getX()
+                                * -1)))); // Drive counterclockwise with negative X (left)
 
-    joystick.back().onTrue(Commands.runOnce(() -> drivetrain.resetPose(Pose2d.kZero)));
+//    primaryController.back().onTrue(Commands.runOnce(() -> drivetrain.resetPose(Pose2d.kZero)));
     //    joystick
     //        .b()
     //        .whileTrue(
@@ -215,14 +222,15 @@ public class RobotContainer {
     // Custom Swerve Request that use PathPlanner Setpoint Generator. Tuning NEEDED. Instructions
     // can be found here
     // https://hemlock5712.github.io/Swerve-Setup/talonfx-swerve-tuning.html
-    SwerveSetpointGen setpointGen =
-        new SwerveSetpointGen(
-                drivetrain.getChassisSpeeds(),
-                drivetrain.getModuleStates(),
-                drivetrain::getRotation)
-            .withDeadband(MaxSpeed.times(0.05))
-            .withRotationalDeadband(MaxAngularRate.times(0.05))
-            .withDriveRequestType(DriveRequestType.OpenLoopVoltage);
+    //    SwerveSetpointGen setpointGen =
+    //        new SwerveSetpointGen(
+    //                drivetrain.getChassisSpeeds(),
+    //                drivetrain.getModuleStates(),
+    //                drivetrain::getRotation)
+    //            .withDeadband(MaxSpeed.times(0.05))
+    //            .withRotationalDeadband(MaxAngularRate.times(0.05))
+    //            .withDriveRequestType(DriveRequestType.OpenLoopVoltage);
+
     //    joystick
     //        .x()
     //        .whileTrue(
@@ -241,15 +249,16 @@ public class RobotContainer {
 
     // Custom Swerve Request that use ProfiledFieldCentricFacingAngle. Allows you to face specific
     // direction while driving
-    ProfiledFieldCentricFacingAngle driveFacingAngle =
-        new ProfiledFieldCentricFacingAngle(
-                new TrapezoidProfile.Constraints(
-                    MaxAngularRate.baseUnitMagnitude(),
-                    MaxAngularRate.div(0.25).baseUnitMagnitude()))
-            .withDeadband(MaxSpeed.times(0.05))
-            .withDriveRequestType(DriveRequestType.OpenLoopVoltage);
-    // Set PID for ProfiledFieldCentricFacingAngle
-    driveFacingAngle.HeadingController.setPID(7, 0, 0);
+    //    ProfiledFieldCentricFacingAngle driveFacingAngle =
+    //        new ProfiledFieldCentricFacingAngle(
+    //                new TrapezoidProfile.Constraints(
+    //                    MaxAngularRate.baseUnitMagnitude(),
+    //                    MaxAngularRate.div(0.25).baseUnitMagnitude()))
+    //            .withDeadband(MaxSpeed.times(0.05))
+    //            .withDriveRequestType(DriveRequestType.OpenLoopVoltage);
+    //    // Set PID for ProfiledFieldCentricFacingAngle
+    //    driveFacingAngle.HeadingController.setPID(7, 0, 0);
+
     //    joystick
     //        .start()
     //        .whileTrue(
@@ -271,57 +280,260 @@ public class RobotContainer {
 
     // Run SysId routines when holding back/start and X/Y.
     // Note that each routine should be run exactly once in a single log.
-    //    joystick.back().and(joystick.y()).whileTrue(drivetrain.sysIdDynamic(Direction.kForward));
-    //    joystick.back().and(joystick.x()).whileTrue(drivetrain.sysIdDynamic(Direction.kReverse));
+    //    joystick
+    //        .back()
+    //        .and(joystick.y())
+    //        .whileTrue(drivetrain.sysIdDynamic(SysIdRoutine.Direction.kForward));
+    //    joystick
+    //        .back()
+    //        .and(joystick.x())
+    //        .whileTrue(drivetrain.sysIdDynamic(SysIdRoutine.Direction.kReverse));
     //
-    joystick
-        .start()
-        .and(joystick.y())
-        .whileTrue(drivetrain.sysIdQuasistatic(SysIdRoutine.Direction.kForward));
-
-    joystick
-        .start()
-        .and(joystick.x())
-        .whileTrue(drivetrain.sysIdQuasistatic(SysIdRoutine.Direction.kReverse));
-
-    arm.setDefaultCommand(arm.intake());
-
-    joystick.leftTrigger().whileTrue(climber.climberOut(Volts.of(-12)));
-    joystick.rightTrigger().whileTrue(climber.climberOut(Volts.of(8)));
-
-    // joystick.rightBumper().onTrue(claw.intake().onlyWhile(() -> !claw.hasCoral()));
-    joystick.rightBumper().whileTrue(claw.intake());
-    joystick.leftBumper().whileTrue(claw.extake());
-
-    joystick.x().onTrue(arm.L1());
-    joystick.y().onTrue(arm.L2());
-    joystick.b().onTrue(scoreCommands.stopAll().andThen(counterWeight.counterWeightStop()));
-
-    //     joystick.a().onTrue(scoreCommands.extakeCoral().until(() ->
-    //     !claw.hasCoral()).andThen(scoreCommands.intakeCoral())));
-
-    joystick.povDown().onTrue(scoreCommands.intakeCoral());
-
-    joystick.povLeft().onTrue(scoreCommands.midLevel());
-    joystick.povUp().onTrue(scoreCommands.topLevel());
-
-    joystick
-        .povRight()
-        .onTrue(arm.intake().andThen(Commands.waitSeconds(0.25)).andThen(elevator.L2()));
+    //    joystick
+    //        .start()
+    //        .and(joystick.y())
+    //        .whileTrue(drivetrain.sysIdQuasistatic(SysIdRoutine.Direction.kForward));
+    //
+    //    joystick
+    //        .start()
+    //        .and(joystick.x())
+    //        .whileTrue(drivetrain.sysIdQuasistatic(SysIdRoutine.Direction.kReverse));
 
     // reset the field-centric heading on left bumper press
     // joystick.leftBumper().onTrue(drivetrain.runOnce(drivetrain::seedFieldCentric));
 
     // testJoystick.back().onTrue(arm.reconfigPID());
 
-    /**** COUNTER WEIGHT TEST ********/
-    //    joystick
-    //        .rightBumper()
-    //        .whileTrue(counterWeight.counterWeightOut()); // TODO: CONSTANTS and change this.
-    //    joystick.leftBumper().whileTrue(counterWeight.counterWeightIn());
+    /****** ASSISTED DRIVE **** /
+     *
+     */
+    // reset the field-centric heading on left bumper press
+    // joystick.leftBumper().onTrue(drivetrain.runOnce(drivetrain::seedFieldCentric));
+    // controlScheme.getL1().onTrue(superstructure.CORAL_PLACE_L1());
+    // controlScheme.getL2().onTrue(superstructure.CORAL_PLACE_L2());
+    // controlScheme.getL3().onTrue(superstructure.CORAL_PLACE_L3());
+    // controlScheme.getL4().onTrue(superstructure.CORAL_PLACE_L4());
+
+    /*
+      controlScheme
+          .getL4()
+          .onTrue(
+              Commands.runOnce(
+                  () -> SmartController.targetReefHeight = FieldConstants.ReefHeight.L4));
+      controlScheme
+          .getL3()
+          .onTrue(
+              Commands.runOnce(
+                  () -> SmartController.targetReefHeight = FieldConstants.ReefHeight.L3));
+      controlScheme
+          .getL2()
+          .onTrue(
+              Commands.runOnce(
+                  () -> SmartController.targetReefHeight = FieldConstants.ReefHeight.L2));
+      controlScheme
+          .getL1()
+          .onTrue(
+              Commands.runOnce(
+                  () -> SmartController.targetReefHeight = FieldConstants.ReefHeight.L1));
+
+      coralWrist.hasGamePiece().onFalse(superstructure.INTAKE()).onTrue(coralWrist.FRONT());
+
+      coralWrist
+          .hasGamePiece()
+          .and(() -> SmartController.targetReefHeight == FieldConstants.ReefHeight.L2)
+          .onTrue(superstructure.TRANSIT());
+      coralWrist
+          .hasGamePiece()
+          .and(() -> SmartController.targetReefHeight != FieldConstants.ReefHeight.L2)
+          .onTrue(superstructure.CORAL_PLACE_L3());
+
+      controlScheme.setLoadGamePiece().onTrue(coralWrist.gamePieceLoaded());
+      controlScheme.setUnloadGamePiece().onTrue(coralWrist.gamePieceUnloaded());
+
+      controlScheme
+          .driveToCoralStation()
+          .whileTrue(
+              Commands.run(
+                  () ->
+                      DriveCommands.driveToPointMA(
+                          FieldConstants.CoralStation.leftCenterFace.transformBy(
+                              new Transform2d(
+                                  new Translation2d(Constants.robotScoringOffset, Inches.of(1.8)),
+                                  Rotation2d.kZero)),
+                          drivetrain,
+                          true),
+                  drivetrain));
+
+      Trigger autoReefHeight =
+          new Trigger(
+              () ->
+                  drivetrain.getPose().getTranslation().getDistance(FieldConstants.Reef.center)
+                      < 3.0);
+
+      autoReefHeight.whileTrue(
+          Commands.runOnce(
+              () -> {
+                switch (SmartController.targetReefHeight) {
+                  case L1:
+                    superstructure.CORAL_PLACE_L1().schedule();
+                    break;
+                  case L2:
+                    superstructure.CORAL_PLACE_L2().schedule();
+                    break;
+                  case L3:
+                    superstructure.CORAL_PLACE_L3().schedule();
+                    break;
+                  case L4:
+                    superstructure.CORAL_PLACE_L4().schedule();
+                    break;
+                  default:
+                    break;
+                }
+              }));
+
+      Pose3d reefBranch =
+          FieldConstants.Reef.branchPositions.get(4).get(FieldConstants.ReefHeight.L1);
+      controlScheme
+          .driveToReef()
+          .whileTrue(
+              Commands.run(
+                  () ->
+                      DriveCommands.driveToPointMA(
+                          reefBranch
+                              .toPose2d()
+                              .transformBy(
+                                  new Transform2d(
+                                      Inches.of(2.25).plus(Constants.robotScoringOffset),
+                                      Inches.of(1.8),
+                                      Rotation2d.k180deg)),
+                          drivetrain),
+                  drivetrain));
+    }
+    */
+    // RESET ENCODER
+    //    controlScheme
+    //        .getController()
+    //        .b()
+    //        .onTrue(
+    //            arm.resetEncoder()
+    //                .andThen(
+    //                    Commands.waitUntil(
+    //                        () -> arm.getPosition() ==
+    // Rotations.of(Degrees.of(-90).in(Rotations))))
+    //                .andThen(arm.park()));
+
+    // CLIMBER
+    //    controlScheme.getController().leftTrigger().whileTrue(climber.climberOut(Volts.of(-12)));
+    //    controlScheme.getController().rightTrigger().whileTrue(climber.climberOut(Volts.of(8)));
+
+    primaryController.start().whileTrue(climber.climberOut(Volts.of(6)));
+    primaryController.back().whileTrue(climber.climberOut(Volts.of(-6)));
+
+    // CLAW
+    primaryController.y().whileTrue(claw.intake());
+    primaryController.a().whileTrue(claw.extake());
+
+    // CHANGE SUPER STRUCTURE LEVEL
+    primaryController.povRight().onTrue(scoreCommands.intakeCoral()); // D-PAD RIGHT
+    primaryController.povDown().onTrue(scoreCommands.bottomLevel()); // D-PAD DOWN
+    primaryController.povLeft().onTrue(scoreCommands.midLevel()); // D-PAD LEFT
+    
+    var topLevel = scoreCommands.topLevel();
+    SmartDashboard.putData("topLevel", topLevel);
+    primaryController.povUp().onTrue(scoreCommands.topLevel()); // D-PAD UP
+
+    var score = scoreCommands.score();
+    SmartDashboard.putData("scoreCommand", score);
+    primaryController.leftBumper().onTrue(scoreCommands.score());
+
+    // MOVE ARM
+    primaryController.x().onTrue(arm.L1());
+    primaryController.b().onTrue(Commands.runOnce(() -> CommandScheduler.getInstance().cancelAll()));
+
+    // DRIVE TO STATION
+    primaryController
+        .leftTrigger()
+        .whileTrue(
+            Commands.run(
+                () ->
+                    DriveCommands.driveToPointMA(
+                        FieldConstants.CoralStation.leftCenterFace.transformBy(
+                            FieldConstants.CoralStation.coralOffset),
+                        drivetrain,
+                        true),
+                drivetrain));
+
+    primaryController
+            .rightTrigger()
+            .whileTrue(
+                    Commands.run(
+                            () ->
+                                    DriveCommands.driveToPointMA(
+                                            FieldConstants.CoralStation.rightCenterFace.transformBy(
+                                                    FieldConstants.CoralStation.coralOffset),
+                                            drivetrain,
+                                            true),
+                            drivetrain));
+
+    // DRIVE TO REEF
+
+    primaryController
+        .rightBumper()
+        .whileTrue(
+            Commands.run(
+                () ->
+                    DriveCommands.driveToPointMA(
+                        reefBranch.toPose2d().transformBy(FieldConstants.Reef.reefOffset),
+                        drivetrain),
+                drivetrain));
+
+    // 2nd driver controller
+    secondController.a().onTrue(Commands.runOnce(() -> chooseReefBranch(0)));
+    secondController
+        .rightBumper()
+        .and(secondController.a())
+        .onTrue(Commands.runOnce(() -> chooseReefBranch(1)));
+    secondController.x().onTrue(Commands.runOnce(() -> chooseReefBranch(2)));
+    secondController
+        .rightBumper()
+        .and(secondController.x())
+        .onTrue(Commands.runOnce(() -> chooseReefBranch(3)));
+    secondController.b().onTrue(Commands.runOnce(() -> chooseReefBranch(10)));
+    secondController
+        .rightBumper()
+        .and(secondController.b())
+        .onTrue(Commands.runOnce(() -> chooseReefBranch(11)));
+
+    secondController.povUp().onTrue(Commands.runOnce(() -> chooseReefBranch(6)));
+    secondController
+        .rightBumper()
+        .and(secondController.povUp())
+        .onTrue(Commands.runOnce(() -> chooseReefBranch(7)));
+    secondController.povLeft().onTrue(Commands.runOnce(() -> chooseReefBranch(4)));
+    secondController
+        .rightBumper()
+        .and(secondController.povLeft())
+        .onTrue(Commands.runOnce(() -> chooseReefBranch(5)));
+    secondController.povRight().onTrue(Commands.runOnce(() -> chooseReefBranch(8)));
+    secondController
+        .rightBumper()
+        .and(secondController.povRight())
+        .onTrue(Commands.runOnce(() -> chooseReefBranch(9)));
+
+    secondController.leftTrigger().whileTrue(counterWeight.counterWeightIn());
+    secondController.rightTrigger().whileTrue(counterWeight.counterWeightOut());
+
+    // controlScheme.getController().start().onTrue(Commands.runOnce(DriveCommands::reconfigurePID));
+
   }
 
   public Command getAutonomousCommand() {
     return autoChooser.get();
+  }
+
+  private void chooseReefBranch(int branchNumber) {
+    reefBranch =
+        FieldConstants.Reef.branchPositions.get(branchNumber).get(FieldConstants.ReefHeight.L4);
+    SmartDashboard.putNumber("reefBranch", branchNumber);
   }
 }
