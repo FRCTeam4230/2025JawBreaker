@@ -15,6 +15,7 @@ import edu.wpi.first.math.geometry.*;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.Distance;
 import java.io.IOException;
+import java.lang.invoke.MethodHandles;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -25,6 +26,9 @@ import java.util.Map;
  * and poses have a blue alliance origin.
  */
 public class FieldConstants {
+  private static final TunableNumberWrapper tunableTable =
+          new TunableNumberWrapper(MethodHandles.lookup().lookupClass());
+
   public static final Distance fieldLength = Inches.of(690.876);
   public static final Distance fieldWidth = Inches.of(317);
   public static final Distance startingLineX =
@@ -59,8 +63,11 @@ public class FieldConstants {
     public static final Pose2d rightCenterFace =
         new Pose2d(Inches.of(33.526), Inches.of(25.824), Rotation2d.fromDegrees(144.011 - 90));
 
+    public static final LoggedTunableNumber offsetOneCoral = tunableTable.makeField("offsetOneReef", 0.0);
+    public static final LoggedTunableNumber offsetTwoCoral = tunableTable.makeField("offsetTwoReef", 0.0);
+
     public static final Transform2d coralOffset =
-        new Transform2d(Meters.of(/*0.522*/ 0), Meters.of(0.0), Rotation2d.kZero);
+        new Transform2d(Meters.of(offsetOneCoral.get()), Meters.of(offsetTwoCoral.get()), Rotation2d.kZero);
   }
 
   public static class Reef {
@@ -70,10 +77,11 @@ public class FieldConstants {
     public static final Distance faceToZoneLine =
         Inches.of(12); // Side of the reef to the inside of the reef zone
     // line
-
+  public static final LoggedTunableNumber offsetOneReef = tunableTable.makeField("offsetOneReef", 1.0);
+  public static final LoggedTunableNumber offsetTwoReef = tunableTable.makeField("offsetTwoReef", 1.8);
     public static final Transform2d reefOffset =
         /*new Transform2d(Inches.of(10.25), Inches.of(5.0), Rotation2d.k180deg)*/
-        new Transform2d(Inches.of(1), Inches.of(1.8), Rotation2d.k180deg);
+        new Transform2d(Inches.of(offsetOneReef.get()), Inches.of(offsetTwoReef.get()), Rotation2d.k180deg);
 
     public static final Pose2d[] centerFaces =
         new Pose2d[6]; // Starting facing the driver station in clockwise

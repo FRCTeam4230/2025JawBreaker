@@ -449,6 +449,7 @@ public class RobotContainer {
     // MOVE ARM
     primaryController.x().onTrue(arm.L1());
     primaryController.b().onTrue(Commands.runOnce(() -> CommandScheduler.getInstance().cancelAll()));
+    //CommandScheduler.getInstance().printWatchdogEpochs();
 
     // DRIVE TO STATION
     primaryController
