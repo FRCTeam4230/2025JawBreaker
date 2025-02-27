@@ -1,5 +1,6 @@
 package frc.robot;
 
+import static edu.wpi.first.units.Units.Volts;
 import static frc.robot.Constants.*;
 
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
@@ -11,6 +12,7 @@ import edu.wpi.first.math.geometry.*;
 import edu.wpi.first.units.measure.LinearVelocity;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.commands.DriveCommands;
@@ -163,6 +165,7 @@ public class RobotContainer {
     NamedCommands.registerCommand("intake", scoreCommands.intakeCoral());
     NamedCommands.registerCommand("topLevel", scoreCommands.topLevel());
     new EventTrigger("topLevel").onTrue(scoreCommands.topLevel());
+    new EventTrigger("scoreCoral").onTrue(scoreCommands.score());
 
     // Set up auto routines
     autoChooser = new LoggedDashboardChooser<>("Auto Choices", AutoBuilder.buildAutoChooser());
@@ -207,7 +210,7 @@ public class RobotContainer {
                             primaryController.customLeft().getX()
                                 * -1)))); // Drive counterclockwise with negative X (left)
 
-    primaryController.back().onTrue(Commands.runOnce(() -> drivetrain.resetPose(Pose2d.kZero)));
+//    primaryController.back().onTrue(Commands.runOnce(() -> drivetrain.resetPose(Pose2d.kZero)));
     //    joystick
     //        .b()
     //        .whileTrue(
@@ -423,21 +426,29 @@ public class RobotContainer {
     //    controlScheme.getController().leftTrigger().whileTrue(climber.climberOut(Volts.of(-12)));
     //    controlScheme.getController().rightTrigger().whileTrue(climber.climberOut(Volts.of(8)));
 
+    primaryController.start().whileTrue(climber.climberOut(Volts.of(6)));
+    primaryController.back().whileTrue(climber.climberOut(Volts.of(-6)));
+
     // CLAW
-    primaryController.rightBumper().whileTrue(claw.intake());
-    primaryController.leftBumper().whileTrue(claw.extake());
+    primaryController.y().whileTrue(claw.intake());
+    primaryController.a().whileTrue(claw.extake());
 
     // CHANGE SUPER STRUCTURE LEVEL
     primaryController.povRight().onTrue(scoreCommands.intakeCoral()); // D-PAD RIGHT
     primaryController.povDown().onTrue(scoreCommands.bottomLevel()); // D-PAD DOWN
     primaryController.povLeft().onTrue(scoreCommands.midLevel()); // D-PAD LEFT
+    
+    var topLevel = scoreCommands.topLevel();
+    SmartDashboard.putData("topLevel", topLevel);
     primaryController.povUp().onTrue(scoreCommands.topLevel()); // D-PAD UP
 
-    primaryController.a().onTrue(scoreCommands.score());
+    var score = scoreCommands.score();
+    SmartDashboard.putData("scoreCommand", score);
+    primaryController.leftBumper().onTrue(scoreCommands.score());
 
     // MOVE ARM
     primaryController.x().onTrue(arm.L1());
-    primaryController.b().onTrue(scoreCommands.stopAll());
+    primaryController.b().onTrue(Commands.runOnce(() -> CommandScheduler.getInstance().cancelAll()));
 
     // DRIVE TO STATION
     primaryController
@@ -452,10 +463,22 @@ public class RobotContainer {
                         true),
                 drivetrain));
 
+    primaryController
+            .rightTrigger()
+            .whileTrue(
+                    Commands.run(
+                            () ->
+                                    DriveCommands.driveToPointMA(
+                                            FieldConstants.CoralStation.rightCenterFace.transformBy(
+                                                    FieldConstants.CoralStation.coralOffset),
+                                            drivetrain,
+                                            true),
+                            drivetrain));
+
     // DRIVE TO REEF
 
     primaryController
-        .rightTrigger()
+        .rightBumper()
         .whileTrue(
             Commands.run(
                 () ->
@@ -496,6 +519,9 @@ public class RobotContainer {
         .rightBumper()
         .and(secondController.povRight())
         .onTrue(Commands.runOnce(() -> chooseReefBranch(9)));
+
+    secondController.leftTrigger().whileTrue(counterWeight.counterWeightIn());
+    secondController.rightTrigger().whileTrue(counterWeight.counterWeightOut());
 
     // controlScheme.getController().start().onTrue(Commands.runOnce(DriveCommands::reconfigurePID));
 

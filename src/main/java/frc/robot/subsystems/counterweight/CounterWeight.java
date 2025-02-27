@@ -4,6 +4,7 @@ import static edu.wpi.first.units.Units.*;
 
 import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
@@ -16,6 +17,7 @@ public class CounterWeight extends SubsystemBase {
   public CounterWeight(CounterWeightIO io) {
     this.io = io;
     this.inputs = new CounterWeightIOInputsAutoLogged();
+    CommandScheduler.getInstance().setDefaultCommand(this, Commands.run(() -> setPosition(Volts.of(-0.1))));
   }
 
   @Override

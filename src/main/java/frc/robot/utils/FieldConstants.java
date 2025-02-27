@@ -73,7 +73,7 @@ public class FieldConstants {
 
     public static final Transform2d reefOffset =
         /*new Transform2d(Inches.of(10.25), Inches.of(5.0), Rotation2d.k180deg)*/
-        new Transform2d(Inches.of(1), Inches.of(1.4), Rotation2d.k180deg);
+        new Transform2d(Inches.of(1), Inches.of(1.8), Rotation2d.k180deg);
 
     public static final Pose2d[] centerFaces =
         new Pose2d[6]; // Starting facing the driver station in clockwise
