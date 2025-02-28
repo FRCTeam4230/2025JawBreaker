@@ -3,29 +3,45 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 7.5855316558441555,
-        "y": 6.660349025974026
+        "x": 7.5282786885245905,
+        "y": 6.140829918032787
       },
       "prevControl": null,
       "nextControl": {
-        "x": 5.544952691826728,
-        "y": 6.011684270134519
+        "x": 6.019794704114035,
+        "y": 4.090764076272448
       },
       "isLocked": false,
       "linkedName": null
     },
     {
       "anchor": {
-        "x": 3.8444908098197987,
-        "y": 5.462570037678704
+        "x": 6.041803278688524,
+        "y": 4.138883196721311
       },
       "prevControl": {
-        "x": 3.5624760895285883,
-        "y": 5.37443946297851
+        "x": 6.291569864815005,
+        "y": 4.14968377331346
       },
-      "nextControl": null,
+      "nextControl": {
+        "x": 5.789058989242222,
+        "y": 4.127953856256968
+      },
       "isLocked": false,
       "linkedName": "Start Score End"
+    },
+    {
+      "anchor": {
+        "x": 6.041803278688524,
+        "y": 4.138883196721311
+      },
+      "prevControl": {
+        "x": 6.291593719707041,
+        "y": 4.149117236772755
+      },
+      "nextControl": null,
+      "isLocked": true,
+      "linkedName": "Score 4"
     }
   ],
   "rotationTargets": [],
@@ -34,14 +50,20 @@
   "eventMarkers": [
     {
       "name": "topLevel",
-      "waypointRelativePos": 0.599015990159903,
+      "waypointRelativePos": 0.5,
+      "endWaypointRelativePos": null,
+      "command": null
+    },
+    {
+      "name": "scoreCoral",
+      "waypointRelativePos": 1.0,
       "endWaypointRelativePos": null,
       "command": null
     }
   ],
   "globalConstraints": {
-    "maxVelocity": 0.5,
-    "maxAcceleration": 1.0,
+    "maxVelocity": 1.0,
+    "maxAcceleration": 1.5,
     "maxAngularVelocity": 385.714,
     "maxAngularAcceleration": 2016.0,
     "nominalVoltage": 12.0,
@@ -49,13 +71,13 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": -60.5
+    "rotation": 180.0
   },
   "reversed": false,
   "folder": "2025 Paths",
   "idealStartingState": {
     "velocity": 0,
-    "rotation": -90.0
+    "rotation": 180.0
   },
   "useDefaultConstraints": true
 }

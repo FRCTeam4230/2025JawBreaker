@@ -60,7 +60,6 @@ public class Robot extends LoggedRobot {
 
     FollowPathCommand.warmupCommand().schedule();
     // PathfindingCommand.warmupCommand().schedule();
-
     SmartDashboard.putData(CommandScheduler.getInstance());
     m_robotContainer = new RobotContainer();
   }

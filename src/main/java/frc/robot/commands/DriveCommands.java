@@ -195,8 +195,13 @@ public class DriveCommands extends Command {
     driveToPoint(target, drive, Constants.robotScoringOffset);
   }
 
+  //  public Pose2d getTargetPose(Pose2d target) {
+  //
+  //  }
+
   public static void driveToPoint(Pose2d target, Drive drive, Distance offset) {
     Pose2d current = drive.getPose();
+
     double currentTimestamp = drive.getCurrentTimestamp();
     // double pidX = translationController.calculate(current.getX(), target.getX(),
     // currentTimestamp);

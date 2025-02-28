@@ -27,9 +27,6 @@ import frc.robot.subsystems.claw.ClawIOSIMREV;
 import frc.robot.subsystems.climber.Climber;
 import frc.robot.subsystems.climber.ClimberIOREV;
 import frc.robot.subsystems.climber.ClimberIOSIM;
-import frc.robot.subsystems.counterweight.CounterWeight;
-import frc.robot.subsystems.counterweight.CounterWeightIOREV;
-import frc.robot.subsystems.counterweight.CounterWeightIOSIM;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.drive.DriveIO;
 import frc.robot.subsystems.drive.DriveIOCTRE;
@@ -70,7 +67,7 @@ public class RobotContainer {
   private final Arm arm;
   private final Claw claw;
   private final Climber climber;
-  private final CounterWeight counterWeight;
+  //  private final CounterWeight counterWeight;
 
   private final ScoringCommands scoreCommands;
 
@@ -98,7 +95,7 @@ public class RobotContainer {
         arm = new Arm(new ArmIOREV() {});
         claw = new Claw(new ClawIOREV() {});
         climber = new Climber(new ClimberIOREV() {});
-        counterWeight = new CounterWeight(new CounterWeightIOREV());
+        //        counterWeight = new CounterWeight(new CounterWeightIOREV());
 
         break;
 
@@ -137,7 +134,7 @@ public class RobotContainer {
         arm = new Arm(new ArmIOREVSIM());
         claw = new Claw(new ClawIOSIMREV());
         climber = new Climber(new ClimberIOSIM());
-        counterWeight = new CounterWeight(new CounterWeightIOSIM());
+        //        counterWeight = new CounterWeight(new CounterWeightIOSIM());
 
         break;
 
@@ -156,7 +153,7 @@ public class RobotContainer {
         arm = new Arm(new ArmIOREV() {});
         claw = new Claw(new ClawIOREV() {});
         climber = new Climber(new ClimberIOREV() {});
-        counterWeight = new CounterWeight(new CounterWeightIOREV());
+        //        counterWeight = new CounterWeight(new CounterWeightIOREV());
         break;
     }
     scoreCommands = new ScoringCommands(elevator, arm, claw);
@@ -210,7 +207,8 @@ public class RobotContainer {
                             primaryController.customLeft().getX()
                                 * -1)))); // Drive counterclockwise with negative X (left)
 
-//    primaryController.back().onTrue(Commands.runOnce(() -> drivetrain.resetPose(Pose2d.kZero)));
+    //    primaryController.back().onTrue(Commands.runOnce(() ->
+    // drivetrain.resetPose(Pose2d.kZero)));
     //    joystick
     //        .b()
     //        .whileTrue(
@@ -426,8 +424,8 @@ public class RobotContainer {
     //    controlScheme.getController().leftTrigger().whileTrue(climber.climberOut(Volts.of(-12)));
     //    controlScheme.getController().rightTrigger().whileTrue(climber.climberOut(Volts.of(8)));
 
-    primaryController.start().whileTrue(climber.climberOut(Volts.of(6)));
-    primaryController.back().whileTrue(climber.climberOut(Volts.of(-6)));
+    primaryController.start().whileTrue(climber.climberOut(Volts.of(8)));
+    primaryController.back().whileTrue(climber.climberOut(Volts.of(-8)));
 
     // CLAW
     primaryController.y().whileTrue(claw.intake());
@@ -437,19 +435,23 @@ public class RobotContainer {
     primaryController.povRight().onTrue(scoreCommands.intakeCoral()); // D-PAD RIGHT
     primaryController.povDown().onTrue(scoreCommands.bottomLevel()); // D-PAD DOWN
     primaryController.povLeft().onTrue(scoreCommands.midLevel()); // D-PAD LEFT
-    
-    var topLevel = scoreCommands.topLevel();
-    SmartDashboard.putData("topLevel", topLevel);
+
+    //    var topLevel = scoreCommands.topLevel();
+    //    SmartDashboard.putData("topLevel", topLevel);
     primaryController.povUp().onTrue(scoreCommands.topLevel()); // D-PAD UP
 
-    var score = scoreCommands.score();
-    SmartDashboard.putData("scoreCommand", score);
+    //    var score = scoreCommands.score();
+    //    SmartDashboard.putData("scoreCommand", score);
     primaryController.leftBumper().onTrue(scoreCommands.score());
 
     // MOVE ARM
     primaryController.x().onTrue(arm.L1());
-    primaryController.b().onTrue(Commands.runOnce(() -> CommandScheduler.getInstance().cancelAll()));
-    //CommandScheduler.getInstance().printWatchdogEpochs();
+    primaryController
+        .b()
+        .onTrue(Commands.runOnce(() -> CommandScheduler.getInstance().cancelAll()));
+    // CommandScheduler.getInstance().printWatchdogEpochs();
+
+    // TODO: MAKE EVERYTHING INTERRUPTABLE
 
     // DRIVE TO STATION
     primaryController
@@ -465,16 +467,16 @@ public class RobotContainer {
                 drivetrain));
 
     primaryController
-            .rightTrigger()
-            .whileTrue(
-                    Commands.run(
-                            () ->
-                                    DriveCommands.driveToPointMA(
-                                            FieldConstants.CoralStation.rightCenterFace.transformBy(
-                                                    FieldConstants.CoralStation.coralOffset),
-                                            drivetrain,
-                                            true),
-                            drivetrain));
+        .rightTrigger()
+        .whileTrue(
+            Commands.run(
+                () ->
+                    DriveCommands.driveToPointMA(
+                        FieldConstants.CoralStation.rightCenterFace.transformBy(
+                            FieldConstants.CoralStation.coralOffset),
+                        drivetrain,
+                        true),
+                drivetrain));
 
     // DRIVE TO REEF
 
@@ -491,38 +493,38 @@ public class RobotContainer {
     // 2nd driver controller
     secondController.a().onTrue(Commands.runOnce(() -> chooseReefBranch(0)));
     secondController
-        .rightBumper()
+        .leftBumper()
         .and(secondController.a())
         .onTrue(Commands.runOnce(() -> chooseReefBranch(1)));
     secondController.x().onTrue(Commands.runOnce(() -> chooseReefBranch(2)));
     secondController
-        .rightBumper()
+        .leftBumper()
         .and(secondController.x())
         .onTrue(Commands.runOnce(() -> chooseReefBranch(3)));
     secondController.b().onTrue(Commands.runOnce(() -> chooseReefBranch(10)));
     secondController
-        .rightBumper()
+        .leftBumper()
         .and(secondController.b())
         .onTrue(Commands.runOnce(() -> chooseReefBranch(11)));
 
     secondController.povUp().onTrue(Commands.runOnce(() -> chooseReefBranch(6)));
     secondController
-        .rightBumper()
+        .leftBumper()
         .and(secondController.povUp())
         .onTrue(Commands.runOnce(() -> chooseReefBranch(7)));
     secondController.povLeft().onTrue(Commands.runOnce(() -> chooseReefBranch(4)));
     secondController
-        .rightBumper()
+        .leftBumper()
         .and(secondController.povLeft())
         .onTrue(Commands.runOnce(() -> chooseReefBranch(5)));
     secondController.povRight().onTrue(Commands.runOnce(() -> chooseReefBranch(8)));
     secondController
-        .rightBumper()
+        .leftBumper()
         .and(secondController.povRight())
         .onTrue(Commands.runOnce(() -> chooseReefBranch(9)));
 
-    secondController.leftTrigger().whileTrue(counterWeight.counterWeightIn());
-    secondController.rightTrigger().whileTrue(counterWeight.counterWeightOut());
+    //    secondController.leftTrigger().whileTrue(counterWeight.counterWeightIn());
+    //    secondController.rightTrigger().whileTrue(counterWeight.counterWeightOut());
 
     // controlScheme.getController().start().onTrue(Commands.runOnce(DriveCommands::reconfigurePID));
 

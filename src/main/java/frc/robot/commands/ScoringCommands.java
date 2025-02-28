@@ -63,7 +63,8 @@ public class ScoringCommands {
         arm.intake(),
         Commands.waitUntil(elevator::hasCoral),
         elevator.park(),
-        claw.intake().until(claw::hasCoral)); // TODO: if command is continuously running .withTimeout is NOT
+        claw.intake()
+            .until(claw::hasCoral)); // TODO: if command is continuously running .withTimeout is NOT
     // running on
     // the until, it is running on the claw run, 7 seconds pass and the run
     // continues

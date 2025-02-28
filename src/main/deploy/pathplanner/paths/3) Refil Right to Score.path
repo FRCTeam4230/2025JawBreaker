@@ -3,13 +3,13 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 1.2678165584415584,
-        "y": 7.037844967532467
+        "x": 5.38247950819672,
+        "y": 6.248719262295082
       },
       "prevControl": null,
       "nextControl": {
-        "x": 2.2904284123621608,
-        "y": 5.349106137867387
+        "x": 6.405091362117322,
+        "y": 4.5599804326300015
       },
       "isLocked": false,
       "linkedName": "Refil Right"
@@ -40,8 +40,8 @@
     }
   ],
   "globalConstraints": {
-    "maxVelocity": 0.5,
-    "maxAcceleration": 1.0,
+    "maxVelocity": 1.0,
+    "maxAcceleration": 1.5,
     "maxAngularVelocity": 385.714,
     "maxAngularAcceleration": 2016.0,
     "nominalVoltage": 12.0,

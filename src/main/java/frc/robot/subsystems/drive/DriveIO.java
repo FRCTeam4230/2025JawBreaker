@@ -41,6 +41,7 @@ public interface DriveIO {
 
     // Position and motion state
     public Pose2d pose = Pose2d.kZero;
+    public Pose2d targetPose = Pose2d.kZero;
     public ChassisSpeeds speeds = new ChassisSpeeds();
     public Rotation2d operatorForwardDirection = Rotation2d.kZero;
 

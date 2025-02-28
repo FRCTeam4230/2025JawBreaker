@@ -27,7 +27,7 @@ import java.util.Map;
  */
 public class FieldConstants {
   private static final TunableNumberWrapper tunableTable =
-          new TunableNumberWrapper(MethodHandles.lookup().lookupClass());
+      new TunableNumberWrapper(MethodHandles.lookup().lookupClass());
 
   public static final Distance fieldLength = Inches.of(690.876);
   public static final Distance fieldWidth = Inches.of(317);
@@ -63,11 +63,14 @@ public class FieldConstants {
     public static final Pose2d rightCenterFace =
         new Pose2d(Inches.of(33.526), Inches.of(25.824), Rotation2d.fromDegrees(144.011 - 90));
 
-    public static final LoggedTunableNumber offsetOneCoral = tunableTable.makeField("offsetOneReef", 0.0);
-    public static final LoggedTunableNumber offsetTwoCoral = tunableTable.makeField("offsetTwoReef", 0.0);
+    public static final LoggedTunableNumber offsetOneCoral =
+        tunableTable.makeField("offsetOneReef", 0.0);
+    public static final LoggedTunableNumber offsetTwoCoral =
+        tunableTable.makeField("offsetTwoReef", 0.0);
 
     public static final Transform2d coralOffset =
-        new Transform2d(Meters.of(offsetOneCoral.get()), Meters.of(offsetTwoCoral.get()), Rotation2d.kZero);
+        new Transform2d(
+            Meters.of(offsetOneCoral.get()), Meters.of(offsetTwoCoral.get()), Rotation2d.kZero);
   }
 
   public static class Reef {
@@ -77,11 +80,14 @@ public class FieldConstants {
     public static final Distance faceToZoneLine =
         Inches.of(12); // Side of the reef to the inside of the reef zone
     // line
-  public static final LoggedTunableNumber offsetOneReef = tunableTable.makeField("offsetOneReef", 1.0);
-  public static final LoggedTunableNumber offsetTwoReef = tunableTable.makeField("offsetTwoReef", 1.8);
+    public static final LoggedTunableNumber offsetOneReef =
+        tunableTable.makeField("offsetOneReef", 0.0); // forward back offset
+    public static final LoggedTunableNumber offsetTwoReef =
+        tunableTable.makeField("offsetTwoReef", 0.0); // left right offset
     public static final Transform2d reefOffset =
         /*new Transform2d(Inches.of(10.25), Inches.of(5.0), Rotation2d.k180deg)*/
-        new Transform2d(Inches.of(offsetOneReef.get()), Inches.of(offsetTwoReef.get()), Rotation2d.k180deg);
+        new Transform2d(
+            Inches.of(offsetOneReef.get()), Inches.of(offsetTwoReef.get()), Rotation2d.k180deg);
 
     public static final Pose2d[] centerFaces =
         new Pose2d[6]; // Starting facing the driver station in clockwise
@@ -120,8 +126,8 @@ public class FieldConstants {
         Map<ReefHeight, Pose3d> fillLeft = new HashMap<>();
         for (var level : ReefHeight.values()) {
           Pose2d poseDirection = new Pose2d(center, Rotation2d.fromDegrees(180 - (60 * face)));
-          Distance adjustX = Inches.of(30.738);
-          Distance adjustY = Inches.of(6.469);
+          Distance adjustX = Inches.of(32.738); // was 30.738
+          Distance adjustY = Inches.of(5.469); // was 6.469
 
           fillRight.put(
               level,
