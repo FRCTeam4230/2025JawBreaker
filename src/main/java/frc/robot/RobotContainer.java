@@ -1,14 +1,14 @@
 package frc.robot;
 
-import static edu.wpi.first.units.Units.Volts;
-import static frc.robot.Constants.*;
-
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 import com.ctre.phoenix6.swerve.SwerveRequest;
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
 import com.pathplanner.lib.events.EventTrigger;
-import edu.wpi.first.math.geometry.*;
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation3d;
+import edu.wpi.first.math.geometry.Transform3d;
+import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.units.measure.LinearVelocity;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -38,10 +38,14 @@ import frc.robot.subsystems.vision.Vision;
 import frc.robot.subsystems.vision.VisionIO;
 import frc.robot.subsystems.vision.VisionIOLimelight;
 import frc.robot.subsystems.vision.VisionIOPhotonVisionSIM;
+import frc.robot.utils.AllianceFlipUtil;
 import frc.robot.utils.FieldConstants;
 import frc.robot.utils.TunableController;
 import frc.robot.utils.TunableController.TunableControllerType;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
+
+import static edu.wpi.first.units.Units.*;
+import static frc.robot.Constants.*;
 
 public class RobotContainer {
 
@@ -71,7 +75,9 @@ public class RobotContainer {
 
   private final ScoringCommands scoreCommands;
 
-  Pose3d reefBranch = FieldConstants.Reef.branchPositions.get(0).get(FieldConstants.ReefHeight.L4);
+  Pose2d reefBranch =
+      AllianceFlipUtil.apply(
+          FieldConstants.Reef.branchPositions.get(0).get(FieldConstants.ReefHeight.L4).toPose2d());
 
   /* Setting up bindings for necessary control of the swerve drive platform */
   private final SwerveRequest.SwerveDriveBrake brake = new SwerveRequest.SwerveDriveBrake();
@@ -486,8 +492,7 @@ public class RobotContainer {
             Commands.run(
                 () ->
                     DriveCommands.driveToPointMA(
-                        reefBranch.toPose2d().transformBy(FieldConstants.Reef.reefOffset),
-                        drivetrain),
+                        reefBranch.transformBy(FieldConstants.Reef.reefOffset), drivetrain),
                 drivetrain));
 
     // 2nd driver controller
@@ -536,7 +541,11 @@ public class RobotContainer {
 
   private void chooseReefBranch(int branchNumber) {
     reefBranch =
-        FieldConstants.Reef.branchPositions.get(branchNumber).get(FieldConstants.ReefHeight.L4);
+        AllianceFlipUtil.apply(
+            FieldConstants.Reef.branchPositions
+                .get(branchNumber)
+                .get(FieldConstants.ReefHeight.L4)
+                .toPose2d());
     SmartDashboard.putNumber("reefBranch", branchNumber);
   }
 }
