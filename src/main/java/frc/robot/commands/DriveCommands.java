@@ -161,6 +161,7 @@ public class DriveCommands extends Command {
   private static Pose2d getDriveTarget(
       Pose2d robot, Pose2d goal, Distance robotOffset, boolean isBackOfRobot) {
 
+    goal = AllianceFlipUtil.apply(goal);
     if (isBackOfRobot) {
       goal = GeomUtil.flipRotation(goal);
     }
@@ -190,6 +191,8 @@ public class DriveCommands extends Command {
       goalPose = GeomUtil.flipRotation(goalPose);
     }
 
+    Logger.recordOutput("Drive/TargetPose", goalPose);
+
     return goalPose;
   }
 
@@ -217,14 +220,13 @@ public class DriveCommands extends Command {
     // drive.getCurrentTimestamp());
     ChassisSpeeds speeds = new ChassisSpeeds(pidX, pidY, Rotations.of(pidRot).in(Radians));
 
-    SwerveSetpointGen setpointGenerator = drive.getSetpointGenerator();
-
+    SwerveSetpointGen setpointGenerator =
+        drive.getSetpointGenerator().withOperatorForwardDirection(Rotation2d.kZero);
     setpointGenerator
         .withVelocityX(speeds.vxMetersPerSecond)
         .withVelocityY(speeds.vyMetersPerSecond)
         .withRotationalRate(speeds.omegaRadiansPerSecond);
     drive.setControl(setpointGenerator);
-    Logger.recordOutput("Drive/TargetPose", target);
   }
 
   public static class AprilTagToBranch {

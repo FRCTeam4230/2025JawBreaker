@@ -41,7 +41,6 @@ import frc.robot.subsystems.vision.Vision;
 import frc.robot.subsystems.vision.VisionIO;
 import frc.robot.subsystems.vision.VisionIOLimelight;
 import frc.robot.subsystems.vision.VisionIOPhotonVisionSIM;
-import frc.robot.utils.AllianceFlipUtil;
 import frc.robot.utils.FieldConstants;
 import frc.robot.utils.TunableController;
 import frc.robot.utils.TunableController.TunableControllerType;
@@ -79,8 +78,7 @@ public class RobotContainer {
 
   @AutoLogOutput
   Pose2d reefBranch =
-      AllianceFlipUtil.apply(
-          FieldConstants.Reef.branchPositions.get(0).get(FieldConstants.ReefHeight.L4).toPose2d());
+      FieldConstants.Reef.branchPositions.get(0).get(FieldConstants.ReefHeight.L4).toPose2d();
 
   /* Setting up bindings for necessary control of the swerve drive platform */
   private final SwerveRequest.SwerveDriveBrake brake = new SwerveRequest.SwerveDriveBrake();
@@ -213,9 +211,9 @@ public class RobotContainer {
                             primaryController.customRight().getX()
                                 * -1)) // Drive left with negative X (left)
                     .withRotationalRate(
-                        Constants.MaxAngularRate.times(primaryController.customLeft().getX() * -1))
-                    .withOperatorForwardDirection(
-                        drivetrain.getOperatorForwardDirection()))); // Drive counterclockwise with
+                        Constants.MaxAngularRate.times(
+                            primaryController.customLeft().getX()
+                                * -1)))); // Drive counterclockwise with
     // negative X (left)
 
     //    primaryController.back().onTrue(Commands.runOnce(() ->
@@ -533,11 +531,10 @@ public class RobotContainer {
 
   private void chooseReefBranch(int branchNumber) {
     reefBranch =
-        AllianceFlipUtil.apply(
-            FieldConstants.Reef.branchPositions
-                .get(branchNumber)
-                .get(FieldConstants.ReefHeight.L4)
-                .toPose2d());
+        FieldConstants.Reef.branchPositions
+            .get(branchNumber)
+            .get(FieldConstants.ReefHeight.L4)
+            .toPose2d();
     SmartDashboard.putNumber("reefBranch", branchNumber);
   }
 }
