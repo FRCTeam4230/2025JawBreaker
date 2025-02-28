@@ -213,9 +213,10 @@ public class RobotContainer {
                             primaryController.customRight().getX()
                                 * -1)) // Drive left with negative X (left)
                     .withRotationalRate(
-                        Constants.MaxAngularRate.times(
-                            primaryController.customLeft().getX()
-                                * -1)))); // Drive counterclockwise with negative X (left)
+                        Constants.MaxAngularRate.times(primaryController.customLeft().getX() * -1))
+                    .withOperatorForwardDirection(
+                        drivetrain.getOperatorForwardDirection()))); // Drive counterclockwise with
+    // negative X (left)
 
     //    primaryController.back().onTrue(Commands.runOnce(() ->
     // drivetrain.resetPose(Pose2d.kZero)));
@@ -438,7 +439,7 @@ public class RobotContainer {
     primaryController.back().whileTrue(climber.climberOut(Volts.of(-8)));
 
     // CLAW
-//    primaryController.a().whileTrue(claw.extake());
+    //    primaryController.a().whileTrue(claw.extake());
 
     // CHANGE SUPER STRUCTURE LEVEL
     primaryController.povRight().onTrue(scoreCommands.intakeCoral()); // D-PAD RIGHT
@@ -491,29 +492,33 @@ public class RobotContainer {
 
     // DRIVE TO REEF
 
-//    primaryController
-//        .rightBumper()
-//        .whileTrue(
-//            Commands.run(
-//                () ->
-//                    DriveCommands.driveToPointMA(
-//                        reefBranch.transformBy(FieldConstants.Reef.reefOffset), drivetrain),
-//                drivetrain));
+    //    primaryController
+    //        .rightBumper()
+    //        .whileTrue(
+    //            Commands.run(
+    //                () ->
+    //                    DriveCommands.driveToPointMA(
+    //                        reefBranch.transformBy(FieldConstants.Reef.reefOffset), drivetrain),
+    //                drivetrain));
 
-
-
-    secondController.rightBumper().onTrue(Commands.runOnce(() -> chooseReefBranch(aprilTagToBranch.aprilTagToBranch(true)))).whileTrue(
+    secondController
+        .rightBumper()
+        .onTrue(Commands.runOnce(() -> chooseReefBranch(aprilTagToBranch.aprilTagToBranch(true))))
+        .whileTrue(
             Commands.run(
-                    () ->
-                            DriveCommands.driveToPointMA(
-                                    reefBranch.transformBy(FieldConstants.Reef.reefOffset), drivetrain),
-                    drivetrain));
-    secondController.leftBumper().onTrue(Commands.runOnce(() -> chooseReefBranch(aprilTagToBranch.aprilTagToBranch(false)))).whileTrue(
+                () ->
+                    DriveCommands.driveToPointMA(
+                        reefBranch.transformBy(FieldConstants.Reef.reefOffset), drivetrain),
+                drivetrain));
+    secondController
+        .leftBumper()
+        .onTrue(Commands.runOnce(() -> chooseReefBranch(aprilTagToBranch.aprilTagToBranch(false))))
+        .whileTrue(
             Commands.run(
-                    () ->
-                            DriveCommands.driveToPointMA(
-                                    reefBranch.transformBy(FieldConstants.Reef.reefOffset), drivetrain),
-                    drivetrain));
+                () ->
+                    DriveCommands.driveToPointMA(
+                        reefBranch.transformBy(FieldConstants.Reef.reefOffset), drivetrain),
+                drivetrain));
 
     //    secondController.leftTrigger().whileTrue(counterWeight.counterWeightIn());
     //    secondController.rightTrigger().whileTrue(counterWeight.counterWeightOut());

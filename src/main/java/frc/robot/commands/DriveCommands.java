@@ -26,13 +26,11 @@ import frc.robot.Constants;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.drive.requests.SwerveSetpointGen;
 import frc.robot.utils.*;
-
 import java.lang.invoke.MethodHandles;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.HashMap;
 import java.util.Map;
-
 import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
 
@@ -228,6 +226,7 @@ public class DriveCommands extends Command {
     drive.setControl(setpointGenerator);
     Logger.recordOutput("Drive/TargetPose", target);
   }
+
   public static class AprilTagToBranch {
     private static final Map<Integer, Integer> TAG_TO_BRANCH_MAP = new HashMap<>();
     private final NetworkTable limelightTable;
@@ -236,10 +235,11 @@ public class DriveCommands extends Command {
     public AprilTagToBranch(Drive drivetrain) {
       limelightTable = NetworkTableInstance.getDefault().getTable("limelight-fc");
       drive = drivetrain;
-        }
-        private final boolean isRed = AllianceFlipUtil.shouldFlip();
-    {
+    }
 
+    private final boolean isRed = AllianceFlipUtil.shouldFlip();
+
+    {
       TAG_TO_BRANCH_MAP.put(isRed ? 7 : 18, 0);
       TAG_TO_BRANCH_MAP.put(isRed ? 6 : 19, 2);
       TAG_TO_BRANCH_MAP.put(isRed ? 11 : 20, 4);
@@ -247,6 +247,7 @@ public class DriveCommands extends Command {
       TAG_TO_BRANCH_MAP.put(isRed ? 9 : 22, 8);
       TAG_TO_BRANCH_MAP.put(isRed ? 8 : 17, 10);
     }
+
     @AutoLogOutput
     private boolean isValidTag(int tagId) {
       // Check if the tag ID is in our mapping
@@ -254,7 +255,8 @@ public class DriveCommands extends Command {
     }
 
     private void stop() {
-      drive.setControl(drive.getSetpointGenerator().withVelocityX(0).withVelocityY(0).withRotationalRate(0));
+      drive.setControl(
+          drive.getSetpointGenerator().withVelocityX(0).withVelocityY(0).withRotationalRate(0));
     }
 
     public int aprilTagToBranch(boolean isRight) {
@@ -268,7 +270,6 @@ public class DriveCommands extends Command {
       }
       int tagID = (int) tid;
       int branchBase = TAG_TO_BRANCH_MAP.getOrDefault(tagID, -1);
-
 
       return branchBase + (isRight ? 0 : 1);
     }
