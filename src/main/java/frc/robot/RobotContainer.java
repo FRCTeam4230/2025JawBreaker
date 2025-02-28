@@ -1,5 +1,8 @@
 package frc.robot;
 
+import static edu.wpi.first.units.Units.*;
+import static frc.robot.Constants.*;
+
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 import com.ctre.phoenix6.swerve.SwerveRequest;
 import com.pathplanner.lib.auto.AutoBuilder;
@@ -42,10 +45,8 @@ import frc.robot.utils.AllianceFlipUtil;
 import frc.robot.utils.FieldConstants;
 import frc.robot.utils.TunableController;
 import frc.robot.utils.TunableController.TunableControllerType;
+import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
-
-import static edu.wpi.first.units.Units.*;
-import static frc.robot.Constants.*;
 
 public class RobotContainer {
 
@@ -76,6 +77,7 @@ public class RobotContainer {
   private final ScoringCommands scoreCommands;
   private final DriveCommands.AprilTagToBranch aprilTagToBranch;
 
+  @AutoLogOutput
   Pose2d reefBranch =
       AllianceFlipUtil.apply(
           FieldConstants.Reef.branchPositions.get(0).get(FieldConstants.ReefHeight.L4).toPose2d());
