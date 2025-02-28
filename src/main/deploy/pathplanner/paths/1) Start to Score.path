@@ -32,15 +32,15 @@
     },
     {
       "anchor": {
-        "x": 6.041803278688524,
-        "y": 4.138883196721311
+        "x": 5.972,
+        "y": 4.165
       },
       "prevControl": {
-        "x": 6.291593719707041,
-        "y": 4.149117236772755
+        "x": 6.221790441018518,
+        "y": 4.175234040051444
       },
       "nextControl": null,
-      "isLocked": true,
+      "isLocked": false,
       "linkedName": "Score 4"
     }
   ],
@@ -50,7 +50,7 @@
   "eventMarkers": [
     {
       "name": "topLevel",
-      "waypointRelativePos": 0.5,
+      "waypointRelativePos": 0.45,
       "endWaypointRelativePos": null,
       "command": null
     },

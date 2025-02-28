@@ -39,7 +39,7 @@ public class DriveCommands extends Command {
   private static final TunableNumberWrapper tunableTable =
       new TunableNumberWrapper(MethodHandles.lookup().lookupClass());
 
-  public static final LoggedTunableNumber kP = tunableTable.makeField("kP", 1.2);
+  public static final LoggedTunableNumber kP = tunableTable.makeField("kP", 2.0);
   public static final LoggedTunableNumber kI = tunableTable.makeField("kI", 0.0);
   public static final LoggedTunableNumber kD = tunableTable.makeField("kD", 0.0);
 
