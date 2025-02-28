@@ -100,6 +100,9 @@ public class DriveIOCTRE extends TunerSwerveDrivetrain implements DriveIO {
   /** Sets up the DriveIOCTRE with telemetry and simulation support if needed. */
   private void setup() {
     initializeQueues();
+    // Set the priority of the odometry thread to ensure it's running at
+    // full priority and doesn't lag behind
+    super.getOdometryThread().setThreadPriority(2);
     // This pulls data from our Odometry thread or in this case at 250 Hz
     registerTelemetry(this::updateTelemetry);
     setupSimulation();
