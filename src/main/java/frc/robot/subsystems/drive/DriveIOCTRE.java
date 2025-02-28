@@ -267,4 +267,10 @@ public class DriveIOCTRE extends TunerSwerveDrivetrain implements DriveIO {
 
     return inputs;
   }
+
+  @Override
+  void setOperatorPerspectiveForward(Rotation2d fieldDirection) {
+
+  }
+
 }

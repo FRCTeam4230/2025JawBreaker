@@ -42,6 +42,7 @@ import frc.robot.utils.AllianceFlipUtil;
 import frc.robot.utils.FieldConstants;
 import frc.robot.utils.TunableController;
 import frc.robot.utils.TunableController.TunableControllerType;
+import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
 import static edu.wpi.first.units.Units.*;
@@ -75,6 +76,7 @@ public class RobotContainer {
 
   private final ScoringCommands scoreCommands;
 
+  @AutoLogOutput
   Pose2d reefBranch =
       AllianceFlipUtil.apply(
           FieldConstants.Reef.branchPositions.get(0).get(FieldConstants.ReefHeight.L4).toPose2d());
