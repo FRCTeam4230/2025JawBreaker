@@ -16,6 +16,8 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.networktables.NetworkTable;
+import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -23,13 +25,15 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.Constants;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.drive.requests.SwerveSetpointGen;
-import frc.robot.utils.FieldConstants;
-import frc.robot.utils.GeomUtil;
-import frc.robot.utils.LoggedTunableNumber;
-import frc.robot.utils.TunableNumberWrapper;
+import frc.robot.utils.*;
+
 import java.lang.invoke.MethodHandles;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
+import java.util.HashMap;
+import java.util.Map;
+
+import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
 
 public class DriveCommands extends Command {
@@ -223,6 +227,51 @@ public class DriveCommands extends Command {
         .withRotationalRate(speeds.omegaRadiansPerSecond);
     drive.setControl(setpointGenerator);
     Logger.recordOutput("Drive/TargetPose", target);
+  }
+  public static class AprilTagToBranch {
+    private static final Map<Integer, Integer> TAG_TO_BRANCH_MAP = new HashMap<>();
+    private final NetworkTable limelightTable;
+    private final Drive drive;
+
+    public AprilTagToBranch(Drive drivetrain) {
+      limelightTable = NetworkTableInstance.getDefault().getTable("limelight-fc");
+      drive = drivetrain;
+        }
+        private final boolean isRed = AllianceFlipUtil.shouldFlip();
+    {
+
+      TAG_TO_BRANCH_MAP.put(isRed ? 7 : 18, 0);
+      TAG_TO_BRANCH_MAP.put(isRed ? 6 : 19, 2);
+      TAG_TO_BRANCH_MAP.put(isRed ? 11 : 20, 4);
+      TAG_TO_BRANCH_MAP.put(isRed ? 10 : 21, 6);
+      TAG_TO_BRANCH_MAP.put(isRed ? 9 : 22, 8);
+      TAG_TO_BRANCH_MAP.put(isRed ? 8 : 17, 10);
+    }
+    @AutoLogOutput
+    private boolean isValidTag(int tagId) {
+      // Check if the tag ID is in our mapping
+      return TAG_TO_BRANCH_MAP.containsKey(tagId);
+    }
+
+    private void stop() {
+      drive.setControl(drive.getSetpointGenerator().withVelocityX(0).withVelocityY(0).withRotationalRate(0));
+    }
+
+    public int aprilTagToBranch(boolean isRight) {
+      double tv = limelightTable.getEntry("tv").getDouble(0);
+      double tid = limelightTable.getEntry("tid").getDouble(-1);
+
+      if (tv < 1 || !isValidTag((int) tid)) {
+        Logger.recordOutput("isValidTagForAlign", "No valid tag found");
+        stop();
+        return 0;
+      }
+      int tagID = (int) tid;
+      int branchBase = TAG_TO_BRANCH_MAP.getOrDefault(tagID, -1);
+
+
+      return branchBase + (isRight ? 0 : 1);
+    }
   }
 
   public static void reconfigurePID() {

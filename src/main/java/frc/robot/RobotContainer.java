@@ -74,6 +74,7 @@ public class RobotContainer {
   //  private final CounterWeight counterWeight;
 
   private final ScoringCommands scoreCommands;
+  private final DriveCommands.AprilTagToBranch aprilTagToBranch;
 
   Pose2d reefBranch =
       AllianceFlipUtil.apply(
@@ -162,6 +163,7 @@ public class RobotContainer {
         //        counterWeight = new CounterWeight(new CounterWeightIOREV());
         break;
     }
+    aprilTagToBranch = new DriveCommands.AprilTagToBranch(drivetrain);
     scoreCommands = new ScoringCommands(elevator, arm, claw);
 
     NamedCommands.registerCommand("scoreCoral", scoreCommands.score());
@@ -434,8 +436,7 @@ public class RobotContainer {
     primaryController.back().whileTrue(climber.climberOut(Volts.of(-8)));
 
     // CLAW
-    primaryController.y().whileTrue(claw.intake());
-    primaryController.a().whileTrue(claw.extake());
+//    primaryController.a().whileTrue(claw.extake());
 
     // CHANGE SUPER STRUCTURE LEVEL
     primaryController.povRight().onTrue(scoreCommands.intakeCoral()); // D-PAD RIGHT
@@ -448,10 +449,12 @@ public class RobotContainer {
 
     //    var score = scoreCommands.score();
     //    SmartDashboard.putData("scoreCommand", score);
-    primaryController.leftBumper().onTrue(scoreCommands.score());
+    primaryController.a().onTrue(scoreCommands.score());
 
     // MOVE ARM
+    primaryController.y().onTrue(arm.L2());
     primaryController.x().onTrue(arm.L1());
+
     primaryController
         .b()
         .onTrue(Commands.runOnce(() -> CommandScheduler.getInstance().cancelAll()));
@@ -486,47 +489,29 @@ public class RobotContainer {
 
     // DRIVE TO REEF
 
-    primaryController
-        .rightBumper()
-        .whileTrue(
+//    primaryController
+//        .rightBumper()
+//        .whileTrue(
+//            Commands.run(
+//                () ->
+//                    DriveCommands.driveToPointMA(
+//                        reefBranch.transformBy(FieldConstants.Reef.reefOffset), drivetrain),
+//                drivetrain));
+
+
+
+    secondController.rightBumper().onTrue(Commands.runOnce(() -> chooseReefBranch(aprilTagToBranch.aprilTagToBranch(true)))).whileTrue(
             Commands.run(
-                () ->
-                    DriveCommands.driveToPointMA(
-                        reefBranch.transformBy(FieldConstants.Reef.reefOffset), drivetrain),
-                drivetrain));
-
-    // 2nd driver controller
-    secondController.a().onTrue(Commands.runOnce(() -> chooseReefBranch(0)));
-    secondController
-        .leftBumper()
-        .and(secondController.a())
-        .onTrue(Commands.runOnce(() -> chooseReefBranch(1)));
-    secondController.x().onTrue(Commands.runOnce(() -> chooseReefBranch(2)));
-    secondController
-        .leftBumper()
-        .and(secondController.x())
-        .onTrue(Commands.runOnce(() -> chooseReefBranch(3)));
-    secondController.b().onTrue(Commands.runOnce(() -> chooseReefBranch(10)));
-    secondController
-        .leftBumper()
-        .and(secondController.b())
-        .onTrue(Commands.runOnce(() -> chooseReefBranch(11)));
-
-    secondController.povUp().onTrue(Commands.runOnce(() -> chooseReefBranch(6)));
-    secondController
-        .leftBumper()
-        .and(secondController.povUp())
-        .onTrue(Commands.runOnce(() -> chooseReefBranch(7)));
-    secondController.povLeft().onTrue(Commands.runOnce(() -> chooseReefBranch(4)));
-    secondController
-        .leftBumper()
-        .and(secondController.povLeft())
-        .onTrue(Commands.runOnce(() -> chooseReefBranch(5)));
-    secondController.povRight().onTrue(Commands.runOnce(() -> chooseReefBranch(8)));
-    secondController
-        .leftBumper()
-        .and(secondController.povRight())
-        .onTrue(Commands.runOnce(() -> chooseReefBranch(9)));
+                    () ->
+                            DriveCommands.driveToPointMA(
+                                    reefBranch.transformBy(FieldConstants.Reef.reefOffset), drivetrain),
+                    drivetrain));
+    secondController.leftBumper().onTrue(Commands.runOnce(() -> chooseReefBranch(aprilTagToBranch.aprilTagToBranch(false)))).whileTrue(
+            Commands.run(
+                    () ->
+                            DriveCommands.driveToPointMA(
+                                    reefBranch.transformBy(FieldConstants.Reef.reefOffset), drivetrain),
+                    drivetrain));
 
     //    secondController.leftTrigger().whileTrue(counterWeight.counterWeightIn());
     //    secondController.rightTrigger().whileTrue(counterWeight.counterWeightOut());
