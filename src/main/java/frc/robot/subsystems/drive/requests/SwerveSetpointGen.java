@@ -6,6 +6,7 @@ import com.ctre.phoenix6.StatusCode;
 import com.ctre.phoenix6.swerve.SwerveDrivetrain.SwerveControlParameters;
 import com.ctre.phoenix6.swerve.SwerveModule;
 import com.ctre.phoenix6.swerve.SwerveRequest.NativeSwerveRequest;
+import com.pathplanner.lib.path.PathConstraints;
 import com.pathplanner.lib.util.DriveFeedforwards;
 import com.pathplanner.lib.util.swerve.SwerveSetpoint;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -83,6 +84,8 @@ public class SwerveSetpointGen implements NativeSwerveRequest {
 
   private SwerveSetpoint previousSetpoint;
 
+  public PathConstraints constraints = null;
+
   /* The current rotation of the robot */
   public Supplier<Rotation2d> currentRotation;
 
@@ -136,6 +139,7 @@ public class SwerveSetpointGen implements NativeSwerveRequest {
         Constants.setpointGenerator.generateSetpoint(
             previousSetpoint, // Last setpoint
             speeds, // The desired target speeds
+            constraints, // The constraints for the path
             0.02 // The loop time of the robot code, in seconds
             );
 
@@ -363,6 +367,11 @@ public class SwerveSetpointGen implements NativeSwerveRequest {
    */
   public SwerveSetpointGen withOperatorForwardDirection(Rotation2d newForwardDirection) {
     this.ForwardDirection = newForwardDirection;
+    return this;
+  }
+
+  public SwerveSetpointGen withPathConstraints(PathConstraints constraints) {
+    this.constraints = constraints;
     return this;
   }
 }

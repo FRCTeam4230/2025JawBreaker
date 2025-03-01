@@ -8,6 +8,7 @@ import com.ctre.phoenix6.swerve.SwerveRequest;
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
 import com.pathplanner.lib.events.EventTrigger;
+import com.pathplanner.lib.path.PathConstraints;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
@@ -479,14 +480,22 @@ public class RobotContainer {
     primaryController
         .rightTrigger()
         .whileTrue(
-            Commands.run(
+            drivetrain.applyRequest(
                 () ->
-                    DriveCommands.driveToPointMA(
-                        FieldConstants.CoralStation.rightCenterFace.transformBy(
-                            FieldConstants.CoralStation.coralOffset),
-                        drivetrain,
-                        true),
-                drivetrain));
+                    drivetrain
+                        .getSetpointGenerator()
+                        .withVelocityX(
+                            MaxSpeed.times(
+                                primaryController.customRight().getY()
+                                    * -1)) // Drive forward with negative Y (forward)
+                        .withVelocityY(
+                            MaxSpeed.times(
+                                primaryController.customRight().getX()
+                                    * -1)) // Drive left with negative X (left)
+                        .withRotationalRate(
+                            Constants.MaxAngularRate.times(
+                                primaryController.customLeft().getX() * -1))
+                        .withPathConstraints(new PathConstraints(2, 999, 540 / 2, 9999))));
 
     // DRIVE TO REEF
 
