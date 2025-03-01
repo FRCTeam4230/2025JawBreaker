@@ -1,0 +1,31 @@
+{
+  "version": "2025.0",
+  "command": {
+    "type": "sequential",
+    "data": {
+      "commands": [
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Start Left to Score Left"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Score Left to Refill Left"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "New Refill Right to Score again"
+          }
+        }
+      ]
+    }
+  },
+  "resetOdom": false,
+  "folder": "2025 Autos",
+  "choreoAuto": false
+}

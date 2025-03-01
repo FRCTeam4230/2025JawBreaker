@@ -171,6 +171,7 @@ public class RobotContainer {
     NamedCommands.registerCommand("topLevel", scoreCommands.topLevel());
     new EventTrigger("topLevel").onTrue(scoreCommands.topLevel());
     new EventTrigger("scoreCoral").onTrue(scoreCommands.score());
+    new EventTrigger("waitForCoral").onTrue(Commands.waitUntil(() -> elevator.hasCoral()));
 
     // Set up auto routines
     autoChooser = new LoggedDashboardChooser<>("Auto Choices", AutoBuilder.buildAutoChooser());
@@ -453,7 +454,7 @@ public class RobotContainer {
     primaryController.a().onTrue(scoreCommands.score());
 
     // MOVE ARM
-    primaryController.y().onTrue(arm.L2());
+    primaryController.y().onTrue(arm.L4());
     primaryController.x().onTrue(arm.L1());
 
     primaryController
@@ -499,7 +500,7 @@ public class RobotContainer {
     //                        reefBranch.transformBy(FieldConstants.Reef.reefOffset), drivetrain),
     //                drivetrain));
 
-    secondController
+    primaryController
         .rightBumper()
         .onTrue(Commands.runOnce(() -> chooseReefBranch(aprilTagToBranch.aprilTagToBranch(true))))
         .whileTrue(
@@ -508,7 +509,7 @@ public class RobotContainer {
                     DriveCommands.driveToPointMA(
                         reefBranch.transformBy(FieldConstants.Reef.reefOffset), drivetrain),
                 drivetrain));
-    secondController
+    primaryController
         .leftBumper()
         .onTrue(Commands.runOnce(() -> chooseReefBranch(aprilTagToBranch.aprilTagToBranch(false))))
         .whileTrue(
@@ -517,6 +518,13 @@ public class RobotContainer {
                     DriveCommands.driveToPointMA(
                         reefBranch.transformBy(FieldConstants.Reef.reefOffset), drivetrain),
                 drivetrain));
+
+    secondController.povRight().onTrue(scoreCommands.intakeCoral()); // D-PAD RIGHT
+    secondController.povDown().onTrue(scoreCommands.bottomLevel()); // D-PAD DOWN
+    secondController.povLeft().onTrue(scoreCommands.midLevel()); // D-PAD LEFT
+    secondController.povUp().onTrue(scoreCommands.topLevel()); // D-PAD UP
+
+    secondController.b().onTrue(Commands.runOnce(() -> CommandScheduler.getInstance().cancelAll()));
 
     //    secondController.leftTrigger().whileTrue(counterWeight.counterWeightIn());
     //    secondController.rightTrigger().whileTrue(counterWeight.counterWeightOut());

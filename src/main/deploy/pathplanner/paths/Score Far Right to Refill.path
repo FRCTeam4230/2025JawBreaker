@@ -3,45 +3,29 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 7.5282786885245905,
-        "y": 6.140829918032787
+        "x": 5.33452868852459,
+        "y": 2.736321721311475
       },
       "prevControl": null,
       "nextControl": {
-        "x": 6.019794704114035,
-        "y": 4.090764076272448
+        "x": 5.95269821531477,
+        "y": 2.9814061162477548
       },
       "isLocked": false,
-      "linkedName": null
+      "linkedName": "Score Far Right"
     },
     {
       "anchor": {
-        "x": 6.041803278688524,
-        "y": 4.138883196721311
+        "x": 1.2227459016393443,
+        "y": 1.058043032786885
       },
       "prevControl": {
-        "x": 6.291569864815005,
-        "y": 4.14968377331346
-      },
-      "nextControl": {
-        "x": 5.789058989242222,
-        "y": 4.127953856256968
-      },
-      "isLocked": false,
-      "linkedName": "Start Score End"
-    },
-    {
-      "anchor": {
-        "x": 5.972,
-        "y": 4.165
-      },
-      "prevControl": {
-        "x": 6.221790441018518,
-        "y": 4.175234040051444
+        "x": 0.9886065818598027,
+        "y": 0.9704143905905487
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": "Score 4"
+      "linkedName": null
     }
   ],
   "rotationTargets": [],
@@ -49,13 +33,7 @@
   "pointTowardsZones": [],
   "eventMarkers": [
     {
-      "name": "topLevel",
-      "waypointRelativePos": 0.45,
-      "endWaypointRelativePos": null,
-      "command": null
-    },
-    {
-      "name": "scoreCoral",
+      "name": "waitForCoral",
       "waypointRelativePos": 1.0,
       "endWaypointRelativePos": null,
       "command": null
@@ -71,13 +49,13 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": 180.0
+    "rotation": 55.0
   },
   "reversed": false,
   "folder": "2025 Paths",
   "idealStartingState": {
     "velocity": 0,
-    "rotation": 180.0
+    "rotation": 119.99999999999999
   },
   "useDefaultConstraints": true
 }

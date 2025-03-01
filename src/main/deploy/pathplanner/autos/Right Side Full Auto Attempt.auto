@@ -1,0 +1,31 @@
+{
+  "version": "2025.0",
+  "command": {
+    "type": "sequential",
+    "data": {
+      "commands": [
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Start Far Right Score"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Score Far Right to Refill"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "5) Refil Left to Score"
+          }
+        }
+      ]
+    }
+  },
+  "resetOdom": false,
+  "folder": "2025 Autos",
+  "choreoAuto": false
+}

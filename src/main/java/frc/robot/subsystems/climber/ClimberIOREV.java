@@ -36,7 +36,7 @@ public class ClimberIOREV implements ClimberIO {
         .positionConversionFactor(1.0 / GEAR_RATIO);
     motorConfig
         .closedLoop
-        .outputRange(-0.5, 0.5)
+        .outputRange(-0.8, 0.8)
         .feedbackSensor(ClosedLoopConfig.FeedbackSensor.kPrimaryEncoder)
         .p(ClimberConstants.kP.get())
         .i(ClimberConstants.kI.get())

@@ -8,24 +8,24 @@
       },
       "prevControl": null,
       "nextControl": {
-        "x": 7.981202313994556,
-        "y": 1.9946985641055328
+        "x": 7.885999983891047,
+        "y": 2.1538470924249578
       },
       "isLocked": false,
       "linkedName": null
     },
     {
       "anchor": {
-        "x": 5.38247950819672,
-        "y": 2.748309426229507
+        "x": 5.33452868852459,
+        "y": 2.736321721311475
       },
       "prevControl": {
-        "x": 4.976301081983357,
-        "y": 2.809600189853742
+        "x": 4.883114870830277,
+        "y": 2.8001643138472656
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": null
+      "linkedName": "Score Far Right"
     }
   ],
   "rotationTargets": [],
@@ -34,7 +34,7 @@
   "eventMarkers": [
     {
       "name": "topLevel",
-      "waypointRelativePos": 0.5,
+      "waypointRelativePos": 0.45,
       "endWaypointRelativePos": null,
       "command": null
     },

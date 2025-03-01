@@ -81,9 +81,9 @@ public class FieldConstants {
         Inches.of(12); // Side of the reef to the inside of the reef zone
     // line
     public static final LoggedTunableNumber offsetOneReef =
-        tunableTable.makeField("offsetOneReef", 0.0); // forward back offset
+        tunableTable.makeField("offsetOneReef", 18.0); // forward back offset
     public static final LoggedTunableNumber offsetTwoReef =
-        tunableTable.makeField("offsetTwoReef", 0.0); // left right offset
+        tunableTable.makeField("offsetTwoReef", -5.4); // left right offset
     public static final Transform2d reefOffset =
         /*new Transform2d(Inches.of(10.25), Inches.of(5.0), Rotation2d.k180deg)*/
         new Transform2d(
@@ -126,8 +126,8 @@ public class FieldConstants {
         Map<ReefHeight, Pose3d> fillLeft = new HashMap<>();
         for (var level : ReefHeight.values()) {
           Pose2d poseDirection = new Pose2d(center, Rotation2d.fromDegrees(180 - (60 * face)));
-          Distance adjustX = Inches.of(32.738); // was 30.738
-          Distance adjustY = Inches.of(5.469); // was 6.469
+          Distance adjustX = Inches.of(27.738); // was 30.738
+          Distance adjustY = Inches.of(14.469); // was 6.469
 
           fillRight.put(
               level,
