@@ -39,15 +39,19 @@ public class DriveCommands extends Command {
   private static final TunableNumberWrapper tunableTable =
       new TunableNumberWrapper(MethodHandles.lookup().lookupClass());
 
-  public static final LoggedTunableNumber kP = tunableTable.makeField("kP", 2.0);
+  public static final LoggedTunableNumber kP = tunableTable.makeField("kP", 5);
   public static final LoggedTunableNumber kI = tunableTable.makeField("kI", 0.0);
   public static final LoggedTunableNumber kD = tunableTable.makeField("kD", 0.0);
+
+  public static final LoggedTunableNumber kPRotation = tunableTable.makeField("kPRotation", 12.7);
+  public static final LoggedTunableNumber kDRotation = tunableTable.makeField("kDRotation", 0.1);
 
   // private static PhoenixPIDController translationController =
   private static PIDController translationController =
       new PIDController(kP.get(), kI.get(), kD.get());
 
-  private static PIDController rotationController = new PIDController(12, 0, 0.5);
+  private static PIDController rotationController =
+      new PIDController(kPRotation.get(), 0, kDRotation.get());
 
   static {
     rotationController.enableContinuousInput(-0.5, 0.5);
