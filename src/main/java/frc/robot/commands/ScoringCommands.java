@@ -23,7 +23,7 @@ public class ScoringCommands {
   }
 
   public Command bottomLevel() {
-    return Commands.sequence(arm.L1(), elevator.intake()).withName("bottomLevel");
+    return Commands.sequence(arm.L1(), elevator.intake()).withName("bottomLevel").withInterruptBehavior(Command.InterruptionBehavior.kCancelSelf);
 
     //    return new FunctionalCommand(
     //            () -> Commands.waitUntil(claw::hasCoral),
@@ -34,7 +34,7 @@ public class ScoringCommands {
   }
 
   public Command midLevel() {
-    return Commands.sequence(arm.L2(), elevator.L3()).withName("midLevel");
+    return Commands.sequence(arm.L2(), elevator.L3()).withName("midLevel").withInterruptBehavior(Command.InterruptionBehavior.kCancelSelf);
 
     //    return new FunctionalCommand(
     //            () -> Commands.waitUntil(claw::hasCoral),
@@ -45,7 +45,7 @@ public class ScoringCommands {
   }
 
   public Command topLevel() {
-    return Commands.sequence(arm.L2(), elevator.L4());
+    return Commands.sequence(arm.L2(), elevator.L4()).withInterruptBehavior(Command.InterruptionBehavior.kCancelSelf);
     // claw.hold().until(() -> !claw.hasCoral())
     //    return new FunctionalCommand(
     //            () -> Commands.waitUntil(claw::hasCoral),
@@ -64,10 +64,8 @@ public class ScoringCommands {
         Commands.waitUntil(elevator::hasCoral),
         elevator.park(),
         claw.intake()
-            .until(claw::hasCoral)); // TODO: if command is continuously running .withTimeout is NOT
-    // running on
-    // the until, it is running on the claw run, 7 seconds pass and the run
-    // continues
+            .until(claw::hasCoral)).withInterruptBehavior(Command.InterruptionBehavior.kCancelSelf);
+
     //            Commands.sequence(elevator.park(), claw.intake().until(claw::hasCoral))
     //                .onlyWhile(elevator::hasCoral))
     //                    claw.hold())
@@ -90,7 +88,7 @@ public class ScoringCommands {
         // last command for 20ms and then reschedule the one we want, kind of
         // resetting it so its less error prone
         arm.intake(),
-        intakeCoral());
+        intakeCoral()).withInterruptBehavior(Command.InterruptionBehavior.kCancelSelf);
     //    return new FunctionalCommand(
     //            () -> claw.stopClaw(),
     //            () ->
