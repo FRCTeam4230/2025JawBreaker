@@ -43,7 +43,7 @@ public class DriveCommands extends Command {
   public static final LoggedTunableNumber kI = tunableTable.makeField("kI", 0.0);
   public static final LoggedTunableNumber kD = tunableTable.makeField("kD", 0.0);
 
-  public static final LoggedTunableNumber kPRotation = tunableTable.makeField("kPRotation", 12.7);
+  public static final LoggedTunableNumber kPRotation = tunableTable.makeField("kPRotation", 11.5);
   public static final LoggedTunableNumber kDRotation = tunableTable.makeField("kDRotation", 0.1);
 
   // private static PhoenixPIDController translationController =
@@ -211,7 +211,7 @@ public class DriveCommands extends Command {
   public static void driveToPoint(Pose2d target, Drive drive, Distance offset) {
     Pose2d current = drive.getPose();
 
-    double currentTimestamp = drive.getCurrentTimestamp();
+    //    double currentTimestamp = drive.getCurrentTimestamp();
     // double pidX = translationController.calculate(current.getX(), target.getX(),
     // currentTimestamp);
     // double pidY = translationController.calculate(current.getY(), target.getY(),

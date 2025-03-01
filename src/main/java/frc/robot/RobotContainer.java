@@ -8,10 +8,7 @@ import com.ctre.phoenix6.swerve.SwerveRequest;
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
 import com.pathplanner.lib.events.EventTrigger;
-import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation3d;
-import edu.wpi.first.math.geometry.Transform3d;
-import edu.wpi.first.math.geometry.Translation3d;
+import edu.wpi.first.math.geometry.*;
 import edu.wpi.first.units.measure.LinearVelocity;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -433,8 +430,7 @@ public class RobotContainer {
     // CLIMBER
     //    controlScheme.getController().leftTrigger().whileTrue(climber.climberOut(Volts.of(-12)));
     //    controlScheme.getController().rightTrigger().whileTrue(climber.climberOut(Volts.of(8)));
-
-    primaryController.start().whileTrue(climber.climberOut(Volts.of(8)));
+    primaryController.start().whileTrue(climber.climberOut(Volts.of(12)));
     primaryController.back().whileTrue(climber.climberOut(Volts.of(-8)));
 
     // CLAW
@@ -516,8 +512,32 @@ public class RobotContainer {
             Commands.run(
                 () ->
                     DriveCommands.driveToPointMA(
-                        reefBranch.transformBy(FieldConstants.Reef.reefOffset), drivetrain),
+                        reefBranch.transformBy(FieldConstants.Reef.leftReefOffset), drivetrain),
                 drivetrain));
+
+    //    primaryController
+    //        .start()
+    //        .and(primaryController.rightBumper())
+    //        .onTrue(Commands.runOnce(() ->
+    // chooseReefBranch(aprilTagToBranch.aprilTagToBranch(false))))
+    //        .whileTrue(
+    //            Commands.run(
+    //                () ->
+    //                    DriveCommands.driveToPointMA(
+    //                        reefBranch.transformBy(FieldConstants.Reef.reefOffsetForward),
+    //                        drivetrain)));
+    //
+    //    primaryController
+    //        .start()
+    //        .and(primaryController.leftBumper())
+    //        .onTrue(Commands.runOnce(() ->
+    // chooseReefBranch(aprilTagToBranch.aprilTagToBranch(false))))
+    //        .whileTrue(
+    //            Commands.run(
+    //                () ->
+    //                    DriveCommands.driveToPointMA(
+    //                        reefBranch.transformBy(FieldConstants.Reef.leftReefOffsetForward),
+    //                        drivetrain)));
 
     secondController.povRight().onTrue(scoreCommands.intakeCoral()); // D-PAD RIGHT
     secondController.povDown().onTrue(scoreCommands.bottomLevel()); // D-PAD DOWN

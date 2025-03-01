@@ -219,7 +219,8 @@ public class Arm extends SubsystemBase {
    * @return Command to move the arm to L1 scoring position
    */
   public final Command L1() {
-    return setPositionCommand(ArmMode.L1).withInterruptBehavior(Command.InterruptionBehavior.kCancelSelf);
+    return setPositionCommand(ArmMode.L1)
+        .withInterruptBehavior(Command.InterruptionBehavior.kCancelSelf);
   }
 
   /**
@@ -240,7 +241,8 @@ public class Arm extends SubsystemBase {
    * @return Command to move the arm to L4 position
    */
   public final Command L4() {
-    return setPositionCommand(ArmMode.L4).withInterruptBehavior(Command.InterruptionBehavior.kCancelSelf);
+    return setPositionCommand(ArmMode.L4)
+        .withInterruptBehavior(Command.InterruptionBehavior.kCancelSelf);
   }
 
   /**

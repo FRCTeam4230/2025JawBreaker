@@ -16,12 +16,12 @@
     },
     {
       "anchor": {
-        "x": 3.9199795081967217,
-        "y": 5.42156762295082
+        "x": 3.943954918032787,
+        "y": 5.397592213114754
       },
       "prevControl": {
-        "x": 3.593033704606551,
-        "y": 5.632054468247113
+        "x": 3.617009114442616,
+        "y": 5.608079058411047
       },
       "nextControl": null,
       "isLocked": false,
@@ -35,6 +35,12 @@
     {
       "name": "topLevel",
       "waypointRelativePos": 0.45061728395060957,
+      "endWaypointRelativePos": null,
+      "command": null
+    },
+    {
+      "name": "scoreCoral",
+      "waypointRelativePos": 1.0,
       "endWaypointRelativePos": null,
       "command": null
     }

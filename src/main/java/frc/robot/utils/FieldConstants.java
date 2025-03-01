@@ -64,13 +64,13 @@ public class FieldConstants {
         new Pose2d(Inches.of(33.526), Inches.of(25.824), Rotation2d.fromDegrees(144.011 - 90));
 
     public static final LoggedTunableNumber offsetOneCoral =
-        tunableTable.makeField("offsetOneReef", 0.0);
+        tunableTable.makeField("offsetOneReef", 8.0);
     public static final LoggedTunableNumber offsetTwoCoral =
         tunableTable.makeField("offsetTwoReef", 0.0);
 
     public static final Transform2d coralOffset =
         new Transform2d(
-            Meters.of(offsetOneCoral.get()), Meters.of(offsetTwoCoral.get()), Rotation2d.kZero);
+            Inches.of(offsetOneCoral.get()), Inches.of(offsetTwoCoral.get()), Rotation2d.kZero);
   }
 
   public static class Reef {
@@ -80,14 +80,48 @@ public class FieldConstants {
     public static final Distance faceToZoneLine =
         Inches.of(12); // Side of the reef to the inside of the reef zone
     // line
+    public static final LoggedTunableNumber leftOffsetOneReef =
+        tunableTable.makeField("leftOffsetOneReef", 25.4);
+    public static final LoggedTunableNumber leftOffsetTwoReef =
+        tunableTable.makeField("leftOffsetTwoReef", 8.4);
+
+    public static final Transform2d leftReefOffset =
+        new Transform2d(
+            Inches.of(leftOffsetOneReef.get()),
+            Inches.of(leftOffsetTwoReef.get()),
+            Rotation2d.k180deg);
+
+    public static final LoggedTunableNumber leftOffsetOneReefForward =
+        tunableTable.makeField("leftOffsetOneReefForward", 23.4);
+    public static final LoggedTunableNumber leftOffsetTwoReefForward =
+        tunableTable.makeField("leftOffsetTwoReefForward", 8.4);
+    public static final Transform2d leftReefOffsetForward =
+        new Transform2d(
+            Inches.of(leftOffsetOneReefForward.get()),
+            Inches.of(leftOffsetTwoReefForward.get()),
+            Rotation2d.k180deg);
+
     public static final LoggedTunableNumber offsetOneReef =
-        tunableTable.makeField("offsetOneReef", 18.0); // forward back offset
+        tunableTable.makeField("offsetOneReef", 25.3); // forward back offset
     public static final LoggedTunableNumber offsetTwoReef =
-        tunableTable.makeField("offsetTwoReef", -5.4); // left right offset
+        tunableTable.makeField("offsetTwoReef", -8.4); // left right offset
+
     public static final Transform2d reefOffset =
         /*new Transform2d(Inches.of(10.25), Inches.of(5.0), Rotation2d.k180deg)*/
         new Transform2d(
             Inches.of(offsetOneReef.get()), Inches.of(offsetTwoReef.get()), Rotation2d.k180deg);
+
+    public static final LoggedTunableNumber offsetOneReefForward =
+        tunableTable.makeField("offsetOneReefForward", 23.3); // forward back offset
+    public static final LoggedTunableNumber offsetTwoReefForward =
+        tunableTable.makeField("offsetTwoReefForward", -8.4); // left right offset
+
+    public static final Transform2d reefOffsetForward =
+        /*new Transform2d(Inches.of(10.25), Inches.of(5.0), Rotation2d.k180deg)*/
+        new Transform2d(
+            Inches.of(offsetOneReefForward.get()),
+            Inches.of(offsetTwoReefForward.get()),
+            Rotation2d.k180deg);
 
     public static final Pose2d[] centerFaces =
         new Pose2d[6]; // Starting facing the driver station in clockwise

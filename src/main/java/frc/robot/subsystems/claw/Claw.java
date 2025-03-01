@@ -15,7 +15,6 @@ import static edu.wpi.first.units.Units.*;
 
 import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.Alert.AlertType;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -40,7 +39,6 @@ public class Claw extends SubsystemBase {
     this.io = io;
     this.inputs = new ClawIOInputsAutoLogged();
     setDefaultCommand(hold());
-    SmartDashboard.putData(this);
   }
 
   @Override
@@ -55,7 +53,18 @@ public class Claw extends SubsystemBase {
   }
 
   public Command hold() {
-    return Commands.runOnce(() -> shouldHold(), this);
+
+    //    Command command = null;
+    //    if (hasCoral()) {
+    //      command = Commands.runOnce(this::shouldHold, this);
+    //    } else {
+    //      command = Commands.none();
+    //      command.addRequirements(this);
+    //    }
+
+    //  return command;
+
+    return Commands.runOnce(this::shouldHold, this);
   }
 
   private void shouldHold() {
@@ -68,14 +77,14 @@ public class Claw extends SubsystemBase {
 
   public Command intake() {
     return Commands.startEnd(
-        () -> io.setVolts(Volts.of(ClawConstants.INTAKE_VOLTAGE.get())), () -> io.stop(), this);
+        () -> io.setVolts(Volts.of(ClawConstants.INTAKE_VOLTAGE.get())), io::stop, this);
   }
   // TODO: smart current limit for motor, set hold mode to only enable when proximity gets too far
 
   public Command extake() {
     return Commands.startEnd(
         () -> io.setVolts(Volts.of(ClawConstants.INTAKE_VOLTAGE.get()).times(-0.5)),
-        () -> io.stop(),
+        io::stop,
         this);
   }
 
