@@ -7,7 +7,7 @@
 
 package frc.robot.utils;
 
-import static edu.wpi.first.apriltag.AprilTagFields.kDefaultField;
+import static edu.wpi.first.apriltag.AprilTagFields.*;
 import static edu.wpi.first.units.Units.*;
 
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
@@ -64,9 +64,9 @@ public class FieldConstants {
         new Pose2d(Inches.of(33.526), Inches.of(25.824), Rotation2d.fromDegrees(144.011 - 90));
 
     public static final LoggedTunableNumber offsetOneCoral =
-        tunableTable.makeField("offsetOneReef", 8.0);
+        tunableTable.makeField("offsetOneCoral", 12.8);
     public static final LoggedTunableNumber offsetTwoCoral =
-        tunableTable.makeField("offsetTwoReef", 0.0);
+        tunableTable.makeField("offsetTwoCoral", 0.0);
 
     public static final Transform2d coralOffset =
         new Transform2d(

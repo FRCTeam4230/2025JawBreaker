@@ -10,6 +10,7 @@ import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.Alert.AlertType;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Constants;
 import frc.robot.LimelightHelpers.PoseObservation;
 import frc.robot.subsystems.vision.VisionIO.VisionIOInputs;
 import frc.robot.subsystems.vision.VisionUtil.VisionData;
@@ -38,7 +39,20 @@ public class Vision extends SubsystemBase {
   private final Alert[] disconnectedAlerts;
 
   /**
-   * Creates a new Vision subsystem. itp
+   * Lists to store vision measurements and poses. These are maintained at the class level to allow
+   * for logging during both real and simulation operation.
+   */
+  private List<VisionMeasurement> measurements = new ArrayList<>();
+
+  private List<Pose3d> tagPoses = new ArrayList<>();
+  private List<Pose3d> acceptedTagPoses = new ArrayList<>();
+  private List<Pose3d> rejectedTagPoses = new ArrayList<>();
+  private List<Pose3d> robotPoses = new ArrayList<>();
+  private List<Pose3d> acceptedPoses = new ArrayList<>();
+  private List<Pose3d> rejectedPoses = new ArrayList<>();
+
+  /**
+   * Creates a new Vision subsystem.
    *
    * @param consumer Callback interface for processed vision measurements
    * @param io Array of VisionIO interfaces for each camera
@@ -115,14 +129,46 @@ public class Vision extends SubsystemBase {
    * @return Processed VisionData for this observation
    */
   private VisionData processObservation(int cameraIndex, PoseObservation observation) {
-    List<VisionMeasurement> measurements = new ArrayList<>();
-    List<Pose3d> tagPoses = new ArrayList<>();
-    List<Pose3d> acceptedTagPoses = new ArrayList<>();
-    List<Pose3d> rejectedTagPoses = new ArrayList<>();
-    List<Pose3d> robotPoses = new ArrayList<>();
-    List<Pose3d> acceptedPoses = new ArrayList<>();
-    List<Pose3d> rejectedPoses = new ArrayList<>();
+    // Clear previous data
+    measurements.clear();
+    tagPoses.clear();
+    acceptedTagPoses.clear();
+    rejectedTagPoses.clear();
+    robotPoses.clear();
+    acceptedPoses.clear();
+    rejectedPoses.clear();
 
+    if (Constants.currentMode == Constants.Mode.REAL) {
+      return realObservation(cameraIndex, observation);
+    } else {
+      return simObservation(cameraIndex, observation);
+    }
+  }
+
+  private VisionData realObservation(int cameraIndex, PoseObservation observation) {
+    // Validate measurement against current vision mode criteria
+    boolean acceptedVisionMeasurement = MODE.acceptVisionMeasurement(observation);
+
+    // Add to appropriate accepted/rejected lists
+    if (acceptedVisionMeasurement) {
+      measurements.add(MODE.getVisionMeasurement(observation.poseEstimate()));
+    }
+
+    // Create and log vision data
+    VisionData data =
+        new VisionData(
+            measurements,
+            tagPoses,
+            acceptedTagPoses,
+            rejectedTagPoses,
+            robotPoses,
+            acceptedPoses,
+            rejectedPoses);
+
+    return data;
+  }
+
+  private VisionData simObservation(int cameraIndex, PoseObservation observation) {
     Pose3d robotPose = observation.poseEstimate().pose();
     robotPoses.add(robotPose);
 
