@@ -8,7 +8,10 @@ import com.ctre.phoenix6.swerve.SwerveRequest;
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
 import com.pathplanner.lib.events.EventTrigger;
-import edu.wpi.first.math.geometry.*;
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation3d;
+import edu.wpi.first.math.geometry.Transform3d;
+import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.units.measure.LinearVelocity;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -227,22 +230,24 @@ public class RobotContainer {
     // Custom Swerve Request that use PathPlanner Setpoint Generator. Tuning NEEDED. Instructions
     // can be found here
     // https://hemlock5712.github.io/Swerve-Setup/talonfx-swerve-tuning.html
-    SwerveSetpointGen setpointGen =
-        new SwerveSetpointGen(
-                drivetrain.getChassisSpeeds(),
-                drivetrain.getModuleStates(),
-                drivetrain::getRotation)
-            .withDriveRequestType(DriveRequestType.OpenLoopVoltage);
-    joystick
-        .x()
-        .whileTrue(
-            drivetrain.applyRequest(
-                () ->
-                    setpointGen
-                        .withVelocityX(MaxSpeed.times(-joystick.getLeftY()))
-                        .withVelocityY(MaxSpeed.times(-joystick.getLeftX()))
-                        .withRotationalRate(Constants.MaxAngularRate.times(-joystick.getRightX()))
-                        .withOperatorForwardDirection(drivetrain.getOperatorForwardDirection())));
+    //    SwerveSetpointGen setpointGen =
+    //        new SwerveSetpointGen(
+    //                drivetrain.getChassisSpeeds(),
+    //                drivetrain.getModuleStates(),
+    //                drivetrain::getRotation)
+    //            .withDriveRequestType(DriveRequestType.OpenLoopVoltage);
+    //    joystick
+    //        .x()
+    //        .whileTrue(
+    //            drivetrain.applyRequest(
+    //                () ->
+    //                    setpointGen
+    //                        .withVelocityX(MaxSpeed.times(-joystick.getLeftY()))
+    //                        .withVelocityY(MaxSpeed.times(-joystick.getLeftX()))
+    //
+    // .withRotationalRate(Constants.MaxAngularRate.times(-joystick.getRightX()))
+    //
+    // .withOperatorForwardDirection(drivetrain.getOperatorForwardDirection())));
 
     //    joystick
     //        .x()
@@ -522,6 +527,8 @@ public class RobotContainer {
                     DriveCommands.driveToPointMA(
                         reefBranch.transformBy(FieldConstants.Reef.leftReefOffset), drivetrain),
                 drivetrain));
+
+    primaryController.rightStick().onTrue(Commands.runOnce(() -> DriveCommands.reconfigurePID()));
 
     //    primaryController
     //        .start()

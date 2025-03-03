@@ -4,8 +4,6 @@
 
 package frc.robot.commands;
 
-import static edu.wpi.first.units.Units.*;
-
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 import com.ctre.phoenix6.swerve.SwerveModule.SteerRequestType;
 import com.ctre.phoenix6.swerve.SwerveRequest;
@@ -26,13 +24,16 @@ import frc.robot.Constants;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.drive.requests.SwerveSetpointGen;
 import frc.robot.utils.*;
+import org.littletonrobotics.junction.AutoLogOutput;
+import org.littletonrobotics.junction.Logger;
+
 import java.lang.invoke.MethodHandles;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.HashMap;
 import java.util.Map;
-import org.littletonrobotics.junction.AutoLogOutput;
-import org.littletonrobotics.junction.Logger;
+
+import static edu.wpi.first.units.Units.*;
 
 public class DriveCommands extends Command {
 
@@ -43,8 +44,8 @@ public class DriveCommands extends Command {
   public static final LoggedTunableNumber kI = tunableTable.makeField("kI", 0.0);
   public static final LoggedTunableNumber kD = tunableTable.makeField("kD", 0.0);
 
-  public static final LoggedTunableNumber kPRotation = tunableTable.makeField("kPRotation", 11.5);
-  public static final LoggedTunableNumber kDRotation = tunableTable.makeField("kDRotation", 0.1);
+  public static final LoggedTunableNumber kPRotation = tunableTable.makeField("kPRotation", 18.0);
+  public static final LoggedTunableNumber kDRotation = tunableTable.makeField("kDRotation", 1.0);
 
   // private static PhoenixPIDController translationController =
   private static PIDController translationController =
@@ -282,6 +283,8 @@ public class DriveCommands extends Command {
   }
 
   public static void reconfigurePID() {
+    rotationController.setP(kPRotation.get());
+    rotationController.setD(kDRotation.get());
     translationController.setPID(kP.get(), kI.get(), kD.get());
   }
 }
