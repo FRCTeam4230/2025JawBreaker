@@ -227,14 +227,22 @@ public class RobotContainer {
     // Custom Swerve Request that use PathPlanner Setpoint Generator. Tuning NEEDED. Instructions
     // can be found here
     // https://hemlock5712.github.io/Swerve-Setup/talonfx-swerve-tuning.html
-    //    SwerveSetpointGen setpointGen =
-    //        new SwerveSetpointGen(
-    //                drivetrain.getChassisSpeeds(),
-    //                drivetrain.getModuleStates(),
-    //                drivetrain::getRotation)
-    //            .withDeadband(MaxSpeed.times(0.05))
-    //            .withRotationalDeadband(MaxAngularRate.times(0.05))
-    //            .withDriveRequestType(DriveRequestType.OpenLoopVoltage);
+    SwerveSetpointGen setpointGen =
+        new SwerveSetpointGen(
+                drivetrain.getChassisSpeeds(),
+                drivetrain.getModuleStates(),
+                drivetrain::getRotation)
+            .withDriveRequestType(DriveRequestType.OpenLoopVoltage);
+    joystick
+        .x()
+        .whileTrue(
+            drivetrain.applyRequest(
+                () ->
+                    setpointGen
+                        .withVelocityX(MaxSpeed.times(-joystick.getLeftY()))
+                        .withVelocityY(MaxSpeed.times(-joystick.getLeftX()))
+                        .withRotationalRate(Constants.MaxAngularRate.times(-joystick.getRightX()))
+                        .withOperatorForwardDirection(drivetrain.getOperatorForwardDirection())));
 
     //    joystick
     //        .x()

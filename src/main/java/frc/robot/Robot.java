@@ -17,6 +17,8 @@ import org.littletonrobotics.junction.wpilog.WPILOGWriter;
 
 public class Robot extends LoggedRobot {
   private Command m_autonomousCommand;
+  // Configuration constants
+  public static volatile boolean BEFORE_MATCH = true; // Controls MT1-only usage before match
 
   private final RobotContainer m_robotContainer;
 
@@ -58,16 +60,13 @@ public class Robot extends LoggedRobot {
     // Warmup the PPLib library
 
     FollowPathCommand.warmupCommand().schedule();
-    // PathfindingCommand.warmupCommand().schedule();
-    // SmartDashboard.putData(CommandScheduler.getInstance());
+
     m_robotContainer = new RobotContainer();
   }
 
   @Override
   public void robotPeriodic() {
-    // Threads.setCurrentThreadPriority(true, 99);
     CommandScheduler.getInstance().run();
-    // Threads.setCurrentThreadPriority(false, 10);
   }
 
   @Override
@@ -81,6 +80,7 @@ public class Robot extends LoggedRobot {
 
   @Override
   public void autonomousInit() {
+    BEFORE_MATCH = false;
     m_autonomousCommand = m_robotContainer.getAutonomousCommand();
 
     if (m_autonomousCommand != null) {
@@ -96,6 +96,7 @@ public class Robot extends LoggedRobot {
 
   @Override
   public void teleopInit() {
+    BEFORE_MATCH = false;
     if (m_autonomousCommand != null) {
       m_autonomousCommand.cancel();
     }
