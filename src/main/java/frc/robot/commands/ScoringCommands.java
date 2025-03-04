@@ -66,7 +66,8 @@ public class ScoringCommands {
         arm.intake(),
         Commands.waitUntil(elevator::hasCoral),
         elevator.park(),
-        claw.intake().until(claw::hasCoral));
+        claw.intake().until(claw::hasCoral),
+        arm.L4());
     // .withInterruptBehavior(Command.InterruptionBehavior.kCancelSelf);
 
     //            Commands.sequence(elevator.park(), claw.intake().until(claw::hasCoral))

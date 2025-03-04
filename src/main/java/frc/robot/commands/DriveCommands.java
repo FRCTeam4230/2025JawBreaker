@@ -39,7 +39,7 @@ public class DriveCommands extends Command {
   private static final TunableNumberWrapper tunableTable =
       new TunableNumberWrapper(MethodHandles.lookup().lookupClass());
 
-  public static final LoggedTunableNumber kP = tunableTable.makeField("kP", 4);
+  public static final LoggedTunableNumber kP = tunableTable.makeField("kP", 4.5);
   public static final LoggedTunableNumber kI = tunableTable.makeField("kI", 0.0);
   public static final LoggedTunableNumber kD = tunableTable.makeField("kD", 0.0);
 
@@ -235,14 +235,11 @@ public class DriveCommands extends Command {
 
   public static class AprilTagToBranch {
     private static final Map<Integer, Integer> TAG_TO_BRANCH_MAP = new HashMap<>();
-    private final NetworkTable limelightTableRight;
-    private final NetworkTable limelightTableLeft;
+    private final NetworkTable limelightTable;
     private final Drive drive;
 
     public AprilTagToBranch(Drive drivetrain) {
-      limelightTableRight = NetworkTableInstance.getDefault().getTable("limelight-fc");
-      limelightTableLeft = NetworkTableInstance.getDefault().getTable("limelight-fl");
-
+      limelightTable = NetworkTableInstance.getDefault().getTable("limelight-fc");
       drive = drivetrain;
     }
 
@@ -269,27 +266,17 @@ public class DriveCommands extends Command {
     }
 
     public int aprilTagToBranch(boolean isRight) {
-      double tvRight = limelightTableRight.getEntry("tv").getDouble(0);
-      double tidRight = limelightTableRight.getEntry("tid").getDouble(-2);
+      double tv = limelightTable.getEntry("tv").getDouble(0);
+      double tid = limelightTable.getEntry("tid").getDouble(-1);
 
-      double tvLeft = limelightTableLeft.getEntry("tv").getDouble(0);
-      double tidLeft = limelightTableLeft.getEntry("tid").getDouble(-2);
-
-      int tagID = -2;
-//      if (tvRight < 1 || !isValidTag((int) tidRight)) {
-//        Logger.recordOutput("isValidTagForAlign", "No valid tag found");
-//        stop();
-//        return -2;
-//      }
-      if (tvLeft < 0) {
-        tagID = (int) tidRight;
+      if (tv < 1 || !isValidTag((int) tid)) {
+        Logger.recordOutput("isValidTagForAlign", "No valid tag found");
+        stop();
+        return -1;
       }
 
-      if (tvRight < 0) {
-        tagID = (int) tidLeft;
-
-      }
-      int branchBase = TAG_TO_BRANCH_MAP.getOrDefault(tagID, -2);
+      int tagID = (int) tid;
+      int branchBase = TAG_TO_BRANCH_MAP.getOrDefault(tagID, -1);
 
       return branchBase + (isRight ? 0 : 1);
     }

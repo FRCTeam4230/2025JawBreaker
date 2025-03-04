@@ -463,7 +463,7 @@ public class RobotContainer {
     primaryController.a().onTrue(scoreCommands.score());
 
     // MOVE ARM
-    primaryController.y().onTrue(arm.L4());
+    primaryController.y().onTrue(arm.L2());
     primaryController.x().onTrue(arm.L1());
 
     primaryController
@@ -573,6 +573,9 @@ public class RobotContainer {
   }
 
   private void chooseReefBranch(int branchNumber) {
+    if (branchNumber < 0) {
+      return;
+    }
     reefBranch =
         FieldConstants.Reef.branchPositions
             .get(branchNumber)

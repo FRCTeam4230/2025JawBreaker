@@ -8,7 +8,6 @@ package frc.robot.subsystems.arm;
 
 import static edu.wpi.first.units.Units.*;
 
-import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.Alert.AlertType;
@@ -32,9 +31,6 @@ public class Arm extends SubsystemBase {
   // Hardware interface and inputs
   private ArmIO io;
   private final ArmIOInputsAutoLogged inputs;
-
-  public final PIDController pidController =
-      new PIDController(ArmConstants.kP.get(), ArmConstants.kI.get(), ArmConstants.kD.get());
 
   // Current arm position mode
   private ArmMode currentMode = ArmMode.STOP;
@@ -101,7 +97,7 @@ public class Arm extends SubsystemBase {
     L1(Degrees.of(16)), //  Position for scoring in L1
     L2(Degrees.of(55)), //  Position for scoring in L2
     L3(Degrees.of(45)), // Position for scoring in L3
-    L4(Degrees.of(56)); // Position for scoring in L4
+    L4(Degrees.of(70)); // Position for scoring in L4
 
     private final Angle targetAngle;
     private final Angle angleTolerance;
