@@ -235,11 +235,14 @@ public class DriveCommands extends Command {
 
   public static class AprilTagToBranch {
     private static final Map<Integer, Integer> TAG_TO_BRANCH_MAP = new HashMap<>();
-    private final NetworkTable limelightTable;
+    private final NetworkTable limelightTableRight;
+    private final NetworkTable limelightTableLeft;
     private final Drive drive;
 
     public AprilTagToBranch(Drive drivetrain) {
-      limelightTable = NetworkTableInstance.getDefault().getTable("limelight-fc");
+      limelightTableRight = NetworkTableInstance.getDefault().getTable("limelight-fc");
+      limelightTableLeft = NetworkTableInstance.getDefault().getTable("limelight-fl");
+
       drive = drivetrain;
     }
 
@@ -266,16 +269,27 @@ public class DriveCommands extends Command {
     }
 
     public int aprilTagToBranch(boolean isRight) {
-      double tv = limelightTable.getEntry("tv").getDouble(0);
-      double tid = limelightTable.getEntry("tid").getDouble(-1);
+      double tvRight = limelightTableRight.getEntry("tv").getDouble(0);
+      double tidRight = limelightTableRight.getEntry("tid").getDouble(-2);
 
-      if (tv < 1 || !isValidTag((int) tid)) {
-        Logger.recordOutput("isValidTagForAlign", "No valid tag found");
-        stop();
-        return 0;
+      double tvLeft = limelightTableLeft.getEntry("tv").getDouble(0);
+      double tidLeft = limelightTableLeft.getEntry("tid").getDouble(-2);
+
+      int tagID = -2;
+//      if (tvRight < 1 || !isValidTag((int) tidRight)) {
+//        Logger.recordOutput("isValidTagForAlign", "No valid tag found");
+//        stop();
+//        return -2;
+//      }
+      if (tvLeft < 0) {
+        tagID = (int) tidRight;
       }
-      int tagID = (int) tid;
-      int branchBase = TAG_TO_BRANCH_MAP.getOrDefault(tagID, -1);
+
+      if (tvRight < 0) {
+        tagID = (int) tidLeft;
+
+      }
+      int branchBase = TAG_TO_BRANCH_MAP.getOrDefault(tagID, -2);
 
       return branchBase + (isRight ? 0 : 1);
     }
