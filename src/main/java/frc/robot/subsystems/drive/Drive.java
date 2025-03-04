@@ -521,4 +521,9 @@ public class Drive extends SubsystemBase {
   public double getCurrentTimestamp() {
     return inputs.currentTimestamp;
   }
+
+  @AutoLogOutput(key = "Drive/TotalSpeed")
+  private double totalSpeed() {
+    return Math.hypot(inputs.speeds.vxMetersPerSecond, inputs.speeds.vyMetersPerSecond);
+  }
 }

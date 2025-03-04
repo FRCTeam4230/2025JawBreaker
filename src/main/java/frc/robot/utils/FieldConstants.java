@@ -64,7 +64,7 @@ public class FieldConstants {
         new Pose2d(Inches.of(33.526), Inches.of(25.824), Rotation2d.fromDegrees(144.011 - 90));
 
     public static final LoggedTunableNumber offsetOneCoral =
-        tunableTable.makeField("offsetOneCoral", 12.8);
+        tunableTable.makeField("offsetOneCoral", 21.8);
     public static final LoggedTunableNumber offsetTwoCoral =
         tunableTable.makeField("offsetTwoCoral", 0.0);
 
