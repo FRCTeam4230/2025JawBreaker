@@ -4,8 +4,6 @@
 
 package frc.robot.commands;
 
-import static edu.wpi.first.units.Units.*;
-
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 import com.ctre.phoenix6.swerve.SwerveModule.SteerRequestType;
 import com.ctre.phoenix6.swerve.SwerveRequest;
@@ -23,16 +21,23 @@ import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.Constants;
+import frc.robot.LimelightHelpers;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.drive.requests.SwerveSetpointGen;
 import frc.robot.utils.*;
+import org.littletonrobotics.junction.AutoLogOutput;
+import org.littletonrobotics.junction.Logger;
+
 import java.lang.invoke.MethodHandles;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.HashMap;
 import java.util.Map;
-import org.littletonrobotics.junction.AutoLogOutput;
-import org.littletonrobotics.junction.Logger;
+import java.util.Set;
+import java.util.function.Function;
+import java.util.stream.Collectors;
+
+import static edu.wpi.first.units.Units.*;
 
 public class DriveCommands extends Command {
 
@@ -235,11 +240,14 @@ public class DriveCommands extends Command {
 
   public static class AprilTagToBranch {
     private static final Map<Integer, Integer> TAG_TO_BRANCH_MAP = new HashMap<>();
-    private final NetworkTable limelightTable;
+    private final NetworkTable flLimelightTable;
+    private final NetworkTable frLimelightTable;
+
     private final Drive drive;
 
     public AprilTagToBranch(Drive drivetrain) {
-      limelightTable = NetworkTableInstance.getDefault().getTable("limelight-fc");
+      flLimelightTable = NetworkTableInstance.getDefault().getTable("limelight-fl");
+      frLimelightTable = NetworkTableInstance.getDefault().getTable("limelight-fr");
       drive = drivetrain;
     }
 
@@ -265,19 +273,61 @@ public class DriveCommands extends Command {
           drive.getSetpointGenerator().withVelocityX(0).withVelocityY(0).withRotationalRate(0));
     }
 
-    public int aprilTagToBranch(boolean isRight) {
-      double tv = limelightTable.getEntry("tv").getDouble(0);
-      double tid = limelightTable.getEntry("tid").getDouble(-1);
 
-      if (tv < 1 || !isValidTag((int) tid)) {
+    public int getClosestTag(){
+
+      Function<String,Double> getTag =  (camera) -> {
+        if (LimelightHelpers.getTV(camera)){
+          return LimelightHelpers.getFiducialID(camera);
+        }
+        return -1.0;
+      };
+
+
+      Set<Double> tags = Set.of("limelight-fl","limelight-fr").stream().map(getTag::apply).filter(val -> val != -1.0).collect(Collectors.toSet());
+
+      if (tags.size() == 1){ // they match or we see 1 tag and not on the other
+        return tags.iterator().next().intValue();
+      }
+
+      // at this point we have more than 1 unique tag and need to discover the closet tag
+
+
+/*
+
+      NetworkTableEntry ty = table.getEntry("ty");
+      double targetOffsetAngle_Vertical = ty.getDouble(0.0);
+
+      // how many degrees back is your limelight rotated from perfectly vertical?
+      double limelightMountAngleDegrees = 25.0;
+
+      // distance from the center of the Limelight lens to the floor
+      double limelightLensHeightInches = 20.0;
+
+      // distance from the target to the floor
+      double goalHeightInches = 60.0;
+
+      double angleToGoalDegrees = limelightMountAngleDegrees + targetOffsetAngle_Vertical;
+      double angleToGoalRadians = angleToGoalDegrees * (3.14159 / 180.0);
+
+      //calculate distance
+      double distanceFromLimelightToGoalInches = (goalHeightInches - limelightLensHeightInches) / Math.tan(angleToGoalRadians);LimelightHelpers.
+*/
+    return -1;
+    }
+
+    public int aprilTagToBranch(boolean isRight) {
+
+      var tid = getClosestTag();
+
+      if (!isValidTag(tid)) {
         Logger.recordOutput("isValidTagForAlign", "No valid tag found");
         stop();
         return -1;
       }
+      int branchBase = TAG_TO_BRANCH_MAP.getOrDefault(tid, -1);
 
-      int tagID = (int) tid;
-      int branchBase = TAG_TO_BRANCH_MAP.getOrDefault(tagID, -1);
-
+      Logger.recordOutput("Vision/SelectedTag", tid);
       return branchBase + (isRight ? 0 : 1);
     }
   }
