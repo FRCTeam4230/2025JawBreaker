@@ -23,6 +23,7 @@ import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.RobotController;
+import org.littletonrobotics.junction.Logger;
 
 import static edu.wpi.first.units.Units.*;
 
@@ -148,9 +149,13 @@ public class ArmIOREV implements ArmIO {
    */
   @Override
   public void setPosition(Angle angle) {
+
+    var ff = feedforward.calculate(angle.in(Radians), 0);
+
+    Logger.recordOutput("Arm/FF", ff);
     // The setpoint is in rotations.
-    closedLoopController.setReference(angle.in(Rotations), ControlType.kPosition);
-    feedforward.calculate(angle.in(Radians), 1);
+    closedLoopController.setReference(angle.in(Rotations), ControlType.kPosition, ClosedLoopSlot.kSlot0, ff );
+
     this.setpoint = Rotations.of(angle.in(Rotations));
   }
 

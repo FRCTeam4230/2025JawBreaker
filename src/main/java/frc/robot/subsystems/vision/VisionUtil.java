@@ -6,6 +6,8 @@
 
 package frc.robot.subsystems.vision;
 
+import static edu.wpi.first.units.Units.*;
+
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.Vector;
 import edu.wpi.first.math.geometry.Pose3d;
@@ -17,11 +19,8 @@ import frc.robot.LimelightHelpers.PoseEstimate;
 import frc.robot.LimelightHelpers.PoseObservation;
 import frc.robot.Robot;
 import frc.robot.utils.FieldConstants;
-
 import java.util.ArrayList;
 import java.util.List;
-
-import static edu.wpi.first.units.Units.*;
 
 /**
  * Utility class for vision processing that provides different vision modes, measurement validation,
@@ -263,8 +262,6 @@ public class VisionUtil {
           && !invalidRotationVelocity(poseEst)
           && !invalidAmbiguity(poseEst);
     }
-
-
   }
 
   /** Record containing a pose estimate and its associated standard deviations. */

@@ -273,47 +273,49 @@ public class DriveCommands extends Command {
           drive.getSetpointGenerator().withVelocityX(0).withVelocityY(0).withRotationalRate(0));
     }
 
+    public int getClosestTag() {
 
-    public int getClosestTag(){
+      Function<String, Double> getTag =
+          (camera) -> {
+            if (LimelightHelpers.getTV(camera)) {
+              return LimelightHelpers.getFiducialID(camera);
+            }
+            return -1.0;
+          };
 
-      Function<String,Double> getTag =  (camera) -> {
-        if (LimelightHelpers.getTV(camera)){
-          return LimelightHelpers.getFiducialID(camera);
-        }
-        return -1.0;
-      };
+      Set<Double> tags =
+          Set.of("limelight-fl", "limelight-fr").stream()
+              .map(getTag::apply)
+              .filter(val -> val != -1.0)
+              .collect(Collectors.toSet());
 
-
-      Set<Double> tags = Set.of("limelight-fl","limelight-fr").stream().map(getTag::apply).filter(val -> val != -1.0).collect(Collectors.toSet());
-
-      if (tags.size() == 1){ // they match or we see 1 tag and not on the other
+      if (tags.size() == 1) { // they match or we see 1 tag and not on the other
         return tags.iterator().next().intValue();
       }
 
       // at this point we have more than 1 unique tag and need to discover the closet tag
 
+      /*
 
-/*
+            NetworkTableEntry ty = table.getEntry("ty");
+            double targetOffsetAngle_Vertical = ty.getDouble(0.0);
 
-      NetworkTableEntry ty = table.getEntry("ty");
-      double targetOffsetAngle_Vertical = ty.getDouble(0.0);
+            // how many degrees back is your limelight rotated from perfectly vertical?
+            double limelightMountAngleDegrees = 25.0;
 
-      // how many degrees back is your limelight rotated from perfectly vertical?
-      double limelightMountAngleDegrees = 25.0;
+            // distance from the center of the Limelight lens to the floor
+            double limelightLensHeightInches = 20.0;
 
-      // distance from the center of the Limelight lens to the floor
-      double limelightLensHeightInches = 20.0;
+            // distance from the target to the floor
+            double goalHeightInches = 60.0;
 
-      // distance from the target to the floor
-      double goalHeightInches = 60.0;
+            double angleToGoalDegrees = limelightMountAngleDegrees + targetOffsetAngle_Vertical;
+            double angleToGoalRadians = angleToGoalDegrees * (3.14159 / 180.0);
 
-      double angleToGoalDegrees = limelightMountAngleDegrees + targetOffsetAngle_Vertical;
-      double angleToGoalRadians = angleToGoalDegrees * (3.14159 / 180.0);
-
-      //calculate distance
-      double distanceFromLimelightToGoalInches = (goalHeightInches - limelightLensHeightInches) / Math.tan(angleToGoalRadians);LimelightHelpers.
-*/
-    return -1;
+            //calculate distance
+            double distanceFromLimelightToGoalInches = (goalHeightInches - limelightLensHeightInches) / Math.tan(angleToGoalRadians);LimelightHelpers.
+      */
+      return -1;
     }
 
     public int aprilTagToBranch(boolean isRight) {
