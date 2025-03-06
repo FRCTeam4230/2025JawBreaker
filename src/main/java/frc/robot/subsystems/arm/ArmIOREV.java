@@ -6,6 +6,8 @@
 
 package frc.robot.subsystems.arm;
 
+import static edu.wpi.first.units.Units.*;
+
 import com.revrobotics.AbsoluteEncoder;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.spark.ClosedLoopSlot;
@@ -24,8 +26,6 @@ import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.RobotController;
 import org.littletonrobotics.junction.Logger;
-
-import static edu.wpi.first.units.Units.*;
 
 /**
  * REV-based implementation of the ArmIO interface. This class uses two SparkFlex motor controllers
@@ -53,7 +53,7 @@ public class ArmIOREV implements ArmIO {
   public final AbsoluteEncoder absoluteEncoder = leader.getAbsoluteEncoder();
 
   private final SparkClosedLoopController closedLoopController = leader.getClosedLoopController();
-  private final ArmFeedforward feedforward = new ArmFeedforward(0, 0.2, 0);
+  private final ArmFeedforward feedforward = new ArmFeedforward(0, 1.71, 2.12, 0.39);
   // (leader.getAppliedOutput() * RobotController.getBatteryVoltage()) /
   // Math.cos(Rotations.of(leaderEncoder.getPosition()).in(Degrees))
 
@@ -154,7 +154,8 @@ public class ArmIOREV implements ArmIO {
 
     Logger.recordOutput("Arm/FF", ff);
     // The setpoint is in rotations.
-    closedLoopController.setReference(angle.in(Rotations), ControlType.kPosition, ClosedLoopSlot.kSlot0, ff );
+    closedLoopController.setReference(
+        angle.in(Rotations), ControlType.kPosition, ClosedLoopSlot.kSlot0, ff);
 
     this.setpoint = Rotations.of(angle.in(Rotations));
   }

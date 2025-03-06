@@ -1,6 +1,6 @@
 package frc.robot.subsystems.arm;
 
-import static edu.wpi.first.units.Units.Rotations;
+import static edu.wpi.first.units.Units.*;
 
 import edu.wpi.first.units.measure.Angle;
 import frc.robot.utils.LoggedTunableNumber;
@@ -17,6 +17,7 @@ public class ArmConstants {
   public static final LoggedTunableNumber kD = tunableTable.makeField("kD", 0.5);
   public static final LoggedTunableNumber setpointToleranceRad =
       tunableTable.makeField("setpoint tolerance rad", 0.0);
+
   public static final Angle ARM_ENCODER_OFFSET_RAD = Rotations.of(4.45 / 6.275);
   public static final int DUTY_CYCLE_ENCODER_PORT = 4;
 
