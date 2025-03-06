@@ -53,7 +53,7 @@ public class ArmIOREV implements ArmIO {
   public final AbsoluteEncoder absoluteEncoder = leader.getAbsoluteEncoder();
 
   private final SparkClosedLoopController closedLoopController = leader.getClosedLoopController();
-  private final ArmFeedforward feedforward = new ArmFeedforward(0, 1.71, 2.12, 0.39);
+  private final ArmFeedforward feedforward = new ArmFeedforward(0, 1.405, 2.12, 0.39);
   // (leader.getAppliedOutput() * RobotController.getBatteryVoltage()) /
   // Math.cos(Rotations.of(leaderEncoder.getPosition()).in(Degrees))
 

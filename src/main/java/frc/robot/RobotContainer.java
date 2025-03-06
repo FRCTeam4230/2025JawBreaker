@@ -460,15 +460,15 @@ public class RobotContainer {
 
     //    var score = scoreCommands.score();
     //    SmartDashboard.putData("scoreCommand", score);
-    primaryController.a().onTrue(scoreCommands.score());
 
     // MOVE ARM
+    primaryController.a().onTrue(arm.intake());
     primaryController.y().onTrue(arm.L2());
     primaryController.x().onTrue(arm.L1());
 
-    primaryController
-        .b()
-        .onTrue(Commands.runOnce(() -> CommandScheduler.getInstance().cancelAll()));
+    //    primaryController
+    //        .b()
+    //        .onTrue(Commands.runOnce(() -> CommandScheduler.getInstance().cancelAll()));
     // CommandScheduler.getInstance().printWatchdogEpochs();
 
     // TODO: MAKE EVERYTHING INTERRUPTABLE
@@ -528,7 +528,7 @@ public class RobotContainer {
                         reefBranch.transformBy(FieldConstants.Reef.leftReefOffset), drivetrain),
                 drivetrain));
 
-    primaryController.rightStick().onTrue(Commands.runOnce(() -> DriveCommands.reconfigurePID()));
+    primaryController.rightStick().onTrue(Commands.runOnce(arm::reconfigPID));
 
     //    primaryController
     //        .start()

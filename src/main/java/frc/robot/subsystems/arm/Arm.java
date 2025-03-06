@@ -94,8 +94,8 @@ public class Arm extends SubsystemBase {
     STOP(Degrees.of(0)), // Stop the arm
     INTAKE(Degrees.of(-88)), // Arm tucked in
     PARKED(Degrees.of(-90)), // try to hold
-    L1(Degrees.of(16)), //  Position for scoring in L1
-    L2(Degrees.of(55)), //  Position for scoring in L2
+    L1(Degrees.of(0)), //  Position for scoring in L1
+    L2(Degrees.of(45)), //  Position for scoring in L2
     L3(Degrees.of(45)), // Position for scoring in L3
     L4(Degrees.of(70)); // Position for scoring in L4
 
