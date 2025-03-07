@@ -41,11 +41,11 @@ public class DriveCommands extends Command {
   private static final TunableNumberWrapper tunableTable =
       new TunableNumberWrapper(MethodHandles.lookup().lookupClass());
 
-  public static final LoggedTunableNumber kP = tunableTable.makeField("kP", 8.1); // 4.5
+  public static final LoggedTunableNumber kP = tunableTable.makeField("kP", 7.0); // 4.5
   public static final LoggedTunableNumber kI = tunableTable.makeField("kI", 0.0);
   public static final LoggedTunableNumber kD = tunableTable.makeField("kD", 0.0);
 
-  public static final LoggedTunableNumber kPRotation = tunableTable.makeField("kPRotation", 21.5);
+  public static final LoggedTunableNumber kPRotation = tunableTable.makeField("kPRotation", 19.5);
   public static final LoggedTunableNumber kDRotation = tunableTable.makeField("kDRotation", 1.5);
 
   // private static PhoenixPIDController translationController =

@@ -83,7 +83,7 @@ public class FieldConstants {
     public static final LoggedTunableNumber leftOffsetOneReef =
         tunableTable.makeField("leftOffsetOneReef", 27.3);
     public static final LoggedTunableNumber leftOffsetTwoReef =
-        tunableTable.makeField("leftOffsetTwoReef", -20.4);
+        tunableTable.makeField("leftOffsetTwoReef", -21.4);
 
     public static final Transform2d leftReefOffset =
         new Transform2d(
@@ -104,7 +104,7 @@ public class FieldConstants {
     public static final LoggedTunableNumber offsetOneReef =
         tunableTable.makeField("offsetOneReef", 27.3); // forward back offset
     public static final LoggedTunableNumber offsetTwoReef =
-        tunableTable.makeField("offsetTwoReef", -5.7); // left right offset
+        tunableTable.makeField("offsetTwoReef", -6.7); // left right offset
 
     public static final Transform2d reefOffset =
         /*new Transform2d(Inches.of(10.25), Inches.of(5.0), Rotation2d.k180deg)*/

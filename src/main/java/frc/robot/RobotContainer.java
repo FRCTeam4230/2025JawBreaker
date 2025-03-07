@@ -53,9 +53,9 @@ public class RobotContainer {
   // private final ControlScheme controlScheme;
 
   private final TunableController primaryController =
-      new TunableController(0).withControllerType(TunableControllerType.LINEAR);
+      new TunableController(0).withControllerType(TunableControllerType.QUADRATIC);
   private final TunableController secondController =
-      new TunableController(1).withControllerType(TunableControllerType.LINEAR);
+      new TunableController(1).withControllerType(TunableControllerType.QUADRATIC);
 
   private final LoggedDashboardChooser<Command> autoChooser;
 
