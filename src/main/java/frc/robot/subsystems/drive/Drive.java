@@ -515,7 +515,9 @@ public class Drive extends SubsystemBase {
   }
 
   public SwerveSetpointGen getSetpointGenerator() {
-    return setpointGen.withOperatorForwardDirection(getOperatorForwardDirection());
+    return setpointGen
+        .withOperatorForwardDirection(getOperatorForwardDirection())
+        .withPathConstraints(null);
   }
 
   public double getCurrentTimestamp() {
