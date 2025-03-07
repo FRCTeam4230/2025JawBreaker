@@ -53,9 +53,9 @@ public class RobotContainer {
   // private final ControlScheme controlScheme;
 
   private final TunableController primaryController =
-      new TunableController(0).withControllerType(TunableControllerType.QUADRATIC);
+      new TunableController(0).withControllerType(TunableControllerType.LINEAR);
   private final TunableController secondController =
-      new TunableController(1).withControllerType(TunableControllerType.QUADRATIC);
+      new TunableController(1).withControllerType(TunableControllerType.LINEAR);
 
   private final LoggedDashboardChooser<Command> autoChooser;
 
@@ -94,7 +94,7 @@ public class RobotContainer {
 
         new Vision(
             drivetrain::addVisionData,
-            new VisionIOLimelight("limelight-fc", drivetrain::getVisionParameters),
+            new VisionIOLimelight("limelight-fr", drivetrain::getVisionParameters),
             new VisionIOLimelight("limelight-fl", drivetrain::getVisionParameters),
             new VisionIOLimelight("limelight-back", drivetrain::getVisionParameters));
 
@@ -462,7 +462,8 @@ public class RobotContainer {
     //    SmartDashboard.putData("scoreCommand", score);
 
     // MOVE ARM
-    primaryController.a().onTrue(arm.intake());
+    //    primaryController.a().onTrue(arm.intake());
+    primaryController.a().onTrue(scoreCommands.score());
     primaryController.y().onTrue(arm.L2());
     primaryController.x().onTrue(arm.L1());
 
@@ -499,15 +500,6 @@ public class RobotContainer {
                 drivetrain));
 
     // DRIVE TO REEF
-
-    //    primaryController
-    //        .rightBumper()
-    //        .whileTrue(
-    //            Commands.run(
-    //                () ->
-    //                    DriveCommands.driveToPointMA(
-    //                        reefBranch.transformBy(FieldConstants.Reef.reefOffset), drivetrain),
-    //                drivetrain));
 
     primaryController
         .rightBumper()

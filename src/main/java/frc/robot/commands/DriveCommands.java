@@ -30,9 +30,7 @@ import frc.robot.utils.*;
 import java.lang.invoke.MethodHandles;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import org.littletonrobotics.junction.AutoLogOutput;
@@ -43,12 +41,12 @@ public class DriveCommands extends Command {
   private static final TunableNumberWrapper tunableTable =
       new TunableNumberWrapper(MethodHandles.lookup().lookupClass());
 
-  public static final LoggedTunableNumber kP = tunableTable.makeField("kP", 4.5);
+  public static final LoggedTunableNumber kP = tunableTable.makeField("kP", 8.1); // 4.5
   public static final LoggedTunableNumber kI = tunableTable.makeField("kI", 0.0);
   public static final LoggedTunableNumber kD = tunableTable.makeField("kD", 0.0);
 
-  public static final LoggedTunableNumber kPRotation = tunableTable.makeField("kPRotation", 18.0);
-  public static final LoggedTunableNumber kDRotation = tunableTable.makeField("kDRotation", 1.0);
+  public static final LoggedTunableNumber kPRotation = tunableTable.makeField("kPRotation", 21.5);
+  public static final LoggedTunableNumber kDRotation = tunableTable.makeField("kDRotation", 1.5);
 
   // private static PhoenixPIDController translationController =
   private static PIDController translationController =
@@ -286,10 +284,20 @@ public class DriveCommands extends Command {
           Set.of("limelight-fl", "limelight-fr").stream()
               .map(getTag::apply)
               .filter(val -> val != -1.0)
-              .collect(Collectors.toSet());
+              .collect(Collectors.toCollection(LinkedHashSet::new));
 
       if (tags.size() == 1) { // they match or we see 1 tag and not on the other
         return tags.iterator().next().intValue();
+      }
+
+      if (tags.size() > 1) {
+        double leftTA = LimelightHelpers.getTA("limelight-fl");
+        double rightTA = LimelightHelpers.getTA("limelight-fr");
+        // tags.iterator().forEachRemaining(tag -> {});
+        if (leftTA > rightTA) {
+          return tags.stream().findFirst().get().intValue();
+        }
+        return tags.stream().skip(1).findFirst().get().intValue();
       }
 
       // at this point we have more than 1 unique tag and need to discover the closet tag

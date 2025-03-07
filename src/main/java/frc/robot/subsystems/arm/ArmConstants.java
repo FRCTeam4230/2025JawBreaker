@@ -12,9 +12,9 @@ public class ArmConstants {
       new TunableNumberWrapper(MethodHandles.lookup().lookupClass());
 
   public static final int MOTOR_ID = 32;
-  public static final LoggedTunableNumber kP = tunableTable.makeField("kP", 2);
+  public static final LoggedTunableNumber kP = tunableTable.makeField("kP", 3.0);
   public static final LoggedTunableNumber kI = tunableTable.makeField("kI", 0.0);
-  public static final LoggedTunableNumber kD = tunableTable.makeField("kD", 0.5);
+  public static final LoggedTunableNumber kD = tunableTable.makeField("kD", 0.0);
   public static final LoggedTunableNumber setpointToleranceRad =
       tunableTable.makeField("setpoint tolerance rad", 0.0);
 
@@ -28,7 +28,7 @@ public class ArmConstants {
   public static final int LOWER_LIMIT_SWITCH_DIO_PORT = 2;
 
   public static final double MAX_ARM_VOLTS = 0;
-  public static final double GEAR_RATIO = 20.0;
+  public static final double GEAR_RATIO = 100.0;
 
   //  public static class Positions {
   //    public static final LoggedTunableNumber PICKUP_POS_RAD =

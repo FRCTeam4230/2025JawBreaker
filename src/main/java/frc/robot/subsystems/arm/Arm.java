@@ -97,7 +97,7 @@ public class Arm extends SubsystemBase {
     L1(Degrees.of(0)), //  Position for scoring in L1
     L2(Degrees.of(45)), //  Position for scoring in L2
     L3(Degrees.of(45)), // Position for scoring in L3
-    L4(Degrees.of(70)); // Position for scoring in L4
+    L4(Degrees.of(50)); // Position for scoring in L4
 
     private final Angle targetAngle;
     private final Angle angleTolerance;
