@@ -4,8 +4,6 @@
 
 package frc.robot.commands;
 
-import static edu.wpi.first.units.Units.*;
-
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 import com.ctre.phoenix6.swerve.SwerveModule.SteerRequestType;
 import com.ctre.phoenix6.swerve.SwerveRequest;
@@ -28,6 +26,9 @@ import frc.robot.LimelightHelpers;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.drive.requests.SwerveSetpointGen;
 import frc.robot.utils.*;
+import org.littletonrobotics.junction.AutoLogOutput;
+import org.littletonrobotics.junction.Logger;
+
 import java.lang.invoke.MethodHandles;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
@@ -37,8 +38,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
-import org.littletonrobotics.junction.AutoLogOutput;
-import org.littletonrobotics.junction.Logger;
+
+import static edu.wpi.first.units.Units.*;
 
 public class DriveCommands extends Command {
 
@@ -51,6 +52,7 @@ public class DriveCommands extends Command {
 
   public static final LoggedTunableNumber kPRotation = tunableTable.makeField("kPRotation", 19.5);
   public static final LoggedTunableNumber kDRotation = tunableTable.makeField("kDRotation", 1.5);
+  private static final PathConstraints driveToPointConstraints = new PathConstraints(2, 999, 540 / 2, 9999);
 
   // private static PhoenixPIDController translationController =
   private static PIDController translationController =
@@ -239,7 +241,7 @@ public class DriveCommands extends Command {
         .withVelocityY(speeds.vyMetersPerSecond)
         .withRotationalRate(speeds.omegaRadiansPerSecond)
         .withOperatorForwardDirection(Rotation2d.kZero)
-        .withPathConstraints(new PathConstraints(2, 999, 540 / 2, 9999));
+        .withPathConstraints(driveToPointConstraints);
     drive.setControl(setpointGenerator);
   }
 
