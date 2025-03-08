@@ -31,7 +31,10 @@ import frc.robot.utils.*;
 import java.lang.invoke.MethodHandles;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
-import java.util.*;
+import java.util.HashMap;
+import java.util.LinkedHashSet;
+import java.util.Map;
+import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import org.littletonrobotics.junction.AutoLogOutput;
@@ -278,6 +281,8 @@ public class DriveCommands extends Command {
     @AutoLogOutput
     public int getClosestTag() {
 
+      var resultTag = -1;
+
       Function<String, Double> getTag =
           (camera) -> {
             if (LimelightHelpers.getTV(camera)) {
@@ -293,12 +298,8 @@ public class DriveCommands extends Command {
               .collect(Collectors.toCollection(LinkedHashSet::new));
 
       if (tags.size() == 1) { // they match or we see 1 tag and not on the other
-        return tags.iterator().next().intValue();
-      }
-
-      var resultTag = -1;
-
-      if (tags.size() > 1) {
+        resultTag = tags.iterator().next().intValue();
+      } else if (tags.size() > 1) {
         double leftTA = LimelightHelpers.getTA("limelight-fl");
         double rightTA = LimelightHelpers.getTA("limelight-fr");
 
@@ -307,33 +308,9 @@ public class DriveCommands extends Command {
         }
 
         resultTag = tags.stream().skip(1).findFirst().get().intValue();
-
-        return resultTag;
       }
 
-      // at this point we have more than 1 unique tag and need to discover the closet tag
-
-      /*
-
-            NetworkTableEntry ty = table.getEntry("ty");
-            double targetOffsetAngle_Vertical = ty.getDouble(0.0);
-
-            // how many degrees back is your limelight rotated from perfectly vertical?
-            double limelightMountAngleDegrees = 25.0;
-
-            // distance from the center of the Limelight lens to the floor
-            double limelightLensHeightInches = 20.0;
-
-            // distance from the target to the floor
-            double goalHeightInches = 60.0;
-
-            double angleToGoalDegrees = limelightMountAngleDegrees + targetOffsetAngle_Vertical;
-            double angleToGoalRadians = angleToGoalDegrees * (3.14159 / 180.0);
-
-            //calculate distance
-            double distanceFromLimelightToGoalInches = (goalHeightInches - limelightLensHeightInches) / Math.tan(angleToGoalRadians);LimelightHelpers.
-      */
-      return -1;
+      return resultTag;
     }
 
     @AutoLogOutput

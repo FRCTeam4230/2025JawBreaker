@@ -68,18 +68,6 @@ public class ScoringCommands {
         elevator.park(),
         claw.intake().until(claw::hasCoral),
         arm.L3());
-    // .withInterruptBehavior(Command.InterruptionBehavior.kCancelSelf);
-
-    //            Commands.sequence(elevator.park(), claw.intake().until(claw::hasCoral))
-    //                .onlyWhile(elevator::hasCoral))
-    //                    claw.hold())
-
-    //    return new FunctionalCommand(
-    //            () -> Commands.waitUntil(() -> elevator.hasCoral()),
-    //            () -> claw.intake().alongWith(elevator.intake()).alongWith(arm.intake()),
-    //            onEnd -> {},
-    //            claw::hasCoral)
-    //        .withName("intake");
   }
 
   public Command score() {
