@@ -10,11 +10,9 @@ public class UtilityCommands {
   //for each camera, blink, wait 1 second, andn then turn off
   public static Command flashLimelights(){
     return Commands.runOnce( () -> {
-      Constants.limelightCameras.forEach(camera ->
-          LimelightHelpers.setLEDMode_ForceBlink(camera));
+      Constants.limelightCameras.forEach(LimelightHelpers::setLEDMode_ForceBlink);
         }).andThen(Commands.waitSeconds(1)).andThen(Commands.runOnce(() -> {
-          Constants.limelightCameras.forEach(camera ->
-            LimelightHelpers.setLEDMode_ForceOff(camera));
+          Constants.limelightCameras.forEach(LimelightHelpers::setLEDMode_ForceOff);
         }));
   }
 }
