@@ -87,7 +87,7 @@ public class Elevator extends SubsystemBase {
     PARKED(Rotations.of(0)),
     L1(Rotations.of(0.2)), // Position for scoring in L1
     L2(Rotations.of(1.25)), // Position for scoring in L2
-    L3(Rotations.of(6)), // Position for scoring in L3
+    L3(Rotations.of(3.5)), // Position for scoring in L3
     L4(Rotations.of(14)); // Position for scoring in L4
 
     private final Angle targetDistance;

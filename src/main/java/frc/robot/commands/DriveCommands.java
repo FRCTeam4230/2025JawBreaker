@@ -4,6 +4,8 @@
 
 package frc.robot.commands;
 
+import static edu.wpi.first.units.Units.*;
+
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 import com.ctre.phoenix6.swerve.SwerveModule.SteerRequestType;
 import com.ctre.phoenix6.swerve.SwerveRequest;
@@ -37,8 +39,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
-
-import static edu.wpi.first.units.Units.*;
+import org.littletonrobotics.junction.AutoLogOutput;
+import org.littletonrobotics.junction.Logger;
 
 public class DriveCommands extends Command {
 
@@ -227,15 +229,16 @@ public class DriveCommands extends Command {
     double pidRot =
         rotationController.calculate(
             drive.getRotation().getRotations(), target.getRotation().getRotations());
-
+    // drive.getCurrentTimestamp());
     ChassisSpeeds speeds = new ChassisSpeeds(pidX, pidY, Rotations.of(pidRot).in(Radians));
 
-    SwerveSetpointGen setpointGenerator =
-        drive.getSetpointGenerator().withOperatorForwardDirection(Rotation2d.kZero);
+    SwerveSetpointGen setpointGenerator = drive.getSetpointGenerator();
+
     setpointGenerator
         .withVelocityX(speeds.vxMetersPerSecond)
         .withVelocityY(speeds.vyMetersPerSecond)
-        .withRotationalRate(speeds.omegaRadiansPerSecond);
+        .withRotationalRate(speeds.omegaRadiansPerSecond)
+        .withOperatorForwardDirection(Rotation2d.kZero);
     drive.setControl(setpointGenerator);
   }
 
@@ -335,6 +338,7 @@ public class DriveCommands extends Command {
       return -1;
     }
 
+    @AutoLogOutput
     public int aprilTagToBranch(boolean isRight) {
 
       var tid = getClosestTag();
