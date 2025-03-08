@@ -6,13 +6,15 @@ import frc.robot.Constants;
 import frc.robot.LimelightHelpers;
 
 public class UtilityCommands {
+
+  //for each camera, blink, wait 1 second, andn then turn off
   public static Command flashLimelights(){
     return Commands.runOnce( () -> {
       Constants.limelightCameras.forEach(camera ->
           LimelightHelpers.setLEDMode_ForceBlink(camera));
-        }).andThen(Commands.runOnce(() -> {
+        }).andThen(Commands.waitSeconds(1)).andThen(Commands.runOnce(() -> {
           Constants.limelightCameras.forEach(camera ->
-          LimelightHelpers.setLEDMode_ForceOff(camera));
+            LimelightHelpers.setLEDMode_ForceOff(camera));
         }));
   }
 }
