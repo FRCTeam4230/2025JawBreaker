@@ -105,7 +105,6 @@ public class DriveIOCTRE extends TunerSwerveDrivetrain implements DriveIO {
     super.getOdometryThread().setThreadPriority(2);
     // This pulls data from our Odometry thread or in this case at 250 Hz
     registerTelemetry(this::updateTelemetry);
-    super.getOdometryThread().setThreadPriority(2);
     setupSimulation();
   }
 

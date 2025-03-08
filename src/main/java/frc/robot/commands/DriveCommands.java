@@ -31,7 +31,10 @@ import org.littletonrobotics.junction.Logger;
 import java.lang.invoke.MethodHandles;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
-import java.util.*;
+import java.util.HashMap;
+import java.util.LinkedHashSet;
+import java.util.Map;
+import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -224,7 +227,7 @@ public class DriveCommands extends Command {
     double pidRot =
         rotationController.calculate(
             drive.getRotation().getRotations(), target.getRotation().getRotations());
-    // drive.getCurrentTimestamp());
+
     ChassisSpeeds speeds = new ChassisSpeeds(pidX, pidY, Rotations.of(pidRot).in(Radians));
 
     SwerveSetpointGen setpointGenerator =
@@ -298,14 +301,13 @@ public class DriveCommands extends Command {
         double rightTA = LimelightHelpers.getTA("limelight-fr");
 
         if (leftTA > rightTA) {
-         resultTag =  tags.stream().findFirst().get().intValue();
+          resultTag = tags.stream().findFirst().get().intValue();
         }
 
-        resultTag =  tags.stream().skip(1).findFirst().get().intValue();
+        resultTag = tags.stream().skip(1).findFirst().get().intValue();
 
         Logger.recordOutput("Drive/ResultTag", resultTag);
         return resultTag;
-
       }
 
       // at this point we have more than 1 unique tag and need to discover the closet tag
