@@ -9,6 +9,7 @@ import static edu.wpi.first.units.Units.*;
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 import com.ctre.phoenix6.swerve.SwerveModule.SteerRequestType;
 import com.ctre.phoenix6.swerve.SwerveRequest;
+import com.pathplanner.lib.path.PathConstraints;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.filter.SlewRateLimiter;
@@ -234,7 +235,8 @@ public class DriveCommands extends Command {
         .withVelocityX(speeds.vxMetersPerSecond)
         .withVelocityY(speeds.vyMetersPerSecond)
         .withRotationalRate(speeds.omegaRadiansPerSecond)
-        .withOperatorForwardDirection(Rotation2d.kZero);
+        .withOperatorForwardDirection(Rotation2d.kZero)
+        .withPathConstraints(new PathConstraints(2, 999, 540 / 2, 9999));
     drive.setControl(setpointGenerator);
   }
 
@@ -273,6 +275,7 @@ public class DriveCommands extends Command {
           drive.getSetpointGenerator().withVelocityX(0).withVelocityY(0).withRotationalRate(0));
     }
 
+    @AutoLogOutput
     public int getClosestTag() {
 
       Function<String, Double> getTag =
@@ -305,7 +308,6 @@ public class DriveCommands extends Command {
 
         resultTag = tags.stream().skip(1).findFirst().get().intValue();
 
-        Logger.recordOutput("Drive/ResultTag", resultTag);
         return resultTag;
       }
 

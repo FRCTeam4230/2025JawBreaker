@@ -477,19 +477,19 @@ public class RobotContainer {
 
     // DRIVE TO STATION
     primaryController
-        .leftTrigger()
+        .rightTrigger()
         .whileTrue(
             Commands.run(
                 () ->
                     DriveCommands.driveToPointMA(
-                        FieldConstants.CoralStation.leftCenterFace.transformBy(
+                        FieldConstants.CoralStation.rightCenterFace.transformBy(
                             FieldConstants.CoralStation.coralOffset),
                         drivetrain,
                         true),
                 drivetrain));
 
     primaryController
-        .rightTrigger()
+        .leftTrigger()
         .whileTrue(
             drivetrain.applyRequest(
                 () ->
