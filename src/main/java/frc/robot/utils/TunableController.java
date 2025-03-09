@@ -31,7 +31,7 @@ public class TunableController extends CommandXboxController {
   private TunableControllerType type = TunableControllerType.LINEAR;
 
   /** Minimum magnitude threshold for considering stick input non-zero */
-  private static final double DEADBAND_THRESHOLD = 1e-6;
+  private static final double DEADBAND_THRESHOLD = 0.15; // 1e-6
 
   /**
    * Constructs a new TunableController.

@@ -81,9 +81,9 @@ public class FieldConstants {
         Inches.of(12); // Side of the reef to the inside of the reef zone
     // line
     public static final LoggedTunableNumber leftOffsetOneReef =
-        tunableTable.makeField("leftOffsetOneReef", 28.8);
+        tunableTable.makeField("leftOffsetOneReef", 30.4); // was 29.5, perfect for L3, bad for L4
     public static final LoggedTunableNumber leftOffsetTwoReef =
-        tunableTable.makeField("leftOffsetTwoReef", 9.0); // 21.4
+        tunableTable.makeField("leftOffsetTwoReef", 9.0);
 
     public static final Transform2d leftReefOffset =
         new Transform2d(
@@ -102,7 +102,7 @@ public class FieldConstants {
             Rotation2d.k180deg);
 
     public static final LoggedTunableNumber offsetOneReef =
-        tunableTable.makeField("offsetOneReef", 29.8); // forward back offset
+        tunableTable.makeField("offsetOneReef", 30.4); // forward back offset
     public static final LoggedTunableNumber offsetTwoReef =
         tunableTable.makeField("offsetTwoReef", -6.7); // left right offset
 

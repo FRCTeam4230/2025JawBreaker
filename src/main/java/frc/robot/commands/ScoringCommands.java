@@ -23,7 +23,7 @@ public class ScoringCommands {
   }
 
   public Command bottomLevel() {
-    return Commands.sequence(arm.L1(), elevator.intake()).withName("bottomLevel");
+    return Commands.sequence(arm.park(), elevator.park()).withName("bottomLevel");
     // .withInterruptBehavior(Command.InterruptionBehavior.kCancelSelf);
 
     //    return new FunctionalCommand(
@@ -73,7 +73,7 @@ public class ScoringCommands {
   public Command score() {
     return Commands.sequence(
         arm.L1(),
-        Commands.waitSeconds(0.25),
+        Commands.waitSeconds(0.4),
         claw.extake().until(() -> !claw.hasCoral()),
         elevator.intake(), // if this causes something to get stuck, we could do
         // elevator.stop().andThen(elevator.intake()), this would unschedule the

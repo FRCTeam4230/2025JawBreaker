@@ -10,9 +10,6 @@ import com.pathplanner.lib.auto.NamedCommands;
 import com.pathplanner.lib.events.EventTrigger;
 import com.pathplanner.lib.path.PathConstraints;
 import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation3d;
-import edu.wpi.first.math.geometry.Transform3d;
-import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.units.measure.LinearVelocity;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -41,7 +38,6 @@ import frc.robot.subsystems.elevator.ElevatorIOSIMREV;
 import frc.robot.subsystems.vision.Vision;
 import frc.robot.subsystems.vision.VisionIO;
 import frc.robot.subsystems.vision.VisionIOLimelight;
-import frc.robot.subsystems.vision.VisionIOPhotonVisionSIM;
 import frc.robot.utils.FieldConstants;
 import frc.robot.utils.TunableController;
 import frc.robot.utils.TunableController.TunableControllerType;
@@ -54,9 +50,9 @@ public class RobotContainer {
   // private final ControlScheme controlScheme;
 
   private final TunableController primaryController =
-      new TunableController(0).withControllerType(TunableControllerType.QUADRATIC);
+      new TunableController(0).withControllerType(TunableControllerType.LINEAR);
   private final TunableController secondController =
-      new TunableController(1).withControllerType(TunableControllerType.QUADRATIC);
+      new TunableController(1).withControllerType(TunableControllerType.LINEAR);
 
   private final LoggedDashboardChooser<Command> autoChooser;
 
@@ -102,6 +98,7 @@ public class RobotContainer {
         elevator = new Elevator(new ElevatorIOREV() {});
         arm = new Arm(new ArmIOREV() {});
         claw = new Claw(new ClawIOREV() {});
+
         climber = new Climber(new ClimberIOREV() {});
         //        counterWeight = new CounterWeight(new CounterWeightIOREV());
 
@@ -111,32 +108,32 @@ public class RobotContainer {
         // Sim robot, instantiate physics sim IO implementations
         drivetrain = new Drive(currentDriveTrain);
 
-        new Vision(
-            drivetrain::addVisionData,
-            new VisionIOPhotonVisionSIM(
-                "Front Camera",
-                new Transform3d(
-                    new Translation3d(0.2, 0.0, 0.8),
-                    new Rotation3d(0, Math.toRadians(20), Math.toRadians(0))),
-                drivetrain::getVisionParameters),
-            new VisionIOPhotonVisionSIM(
-                "Back Camera",
-                new Transform3d(
-                    new Translation3d(-0.2, 0.0, 0.8),
-                    new Rotation3d(0, Math.toRadians(20), Math.toRadians(180))),
-                drivetrain::getVisionParameters),
-            new VisionIOPhotonVisionSIM(
-                "Left Camera",
-                new Transform3d(
-                    new Translation3d(0.0, 0.2, 0.8),
-                    new Rotation3d(0, Math.toRadians(20), Math.toRadians(90))),
-                drivetrain::getVisionParameters),
-            new VisionIOPhotonVisionSIM(
-                "Right Camera",
-                new Transform3d(
-                    new Translation3d(0.0, -0.2, 0.8),
-                    new Rotation3d(0, Math.toRadians(20), Math.toRadians(-90))),
-                drivetrain::getVisionParameters));
+        //        new Vision(
+        //            drivetrain::addVisionData,
+        //            new VisionIOPhotonVisionSIM(
+        //                "Front Camera",
+        //                new Transform3d(
+        //                    new Translation3d(0.2, 0.0, 0.8),
+        //                    new Rotation3d(0, Math.toRadians(20), Math.toRadians(0))),
+        //                drivetrain::getVisionParameters),
+        //            new VisionIOPhotonVisionSIM(
+        //                "Back Camera",
+        //                new Transform3d(
+        //                    new Translation3d(-0.2, 0.0, 0.8),
+        //                    new Rotation3d(0, Math.toRadians(20), Math.toRadians(180))),
+        //                drivetrain::getVisionParameters),
+        //            new VisionIOPhotonVisionSIM(
+        //                "Left Camera",
+        //                new Transform3d(
+        //                    new Translation3d(0.0, 0.2, 0.8),
+        //                    new Rotation3d(0, Math.toRadians(20), Math.toRadians(90))),
+        //                drivetrain::getVisionParameters),
+        //            new VisionIOPhotonVisionSIM(
+        //                "Right Camera",
+        //                new Transform3d(
+        //                    new Translation3d(0.0, -0.2, 0.8),
+        //                    new Rotation3d(0, Math.toRadians(20), Math.toRadians(-90))),
+        //                drivetrain::getVisionParameters));
 
         elevator = new Elevator(new ElevatorIOSIMREV());
         arm = new Arm(new ArmIOREVSIM());
@@ -167,12 +164,14 @@ public class RobotContainer {
     aprilTagToBranch = new DriveCommands.AprilTagToBranch(drivetrain);
     scoreCommands = new ScoringCommands(elevator, arm, claw);
 
-    NamedCommands.registerCommand("scoreCoral", scoreCommands.score());
-    NamedCommands.registerCommand("intake", scoreCommands.intakeCoral());
-    NamedCommands.registerCommand("topLevel", scoreCommands.topLevel());
+    //    NamedCommands.registerCommand("scoreCoral", scoreCommands.score());
+    //    NamedCommands.registerCommand("intake", scoreCommands.intakeCoral());
+    //    NamedCommands.registerCommand("topLevel", scoreCommands.topLevel());
     new EventTrigger("topLevel").onTrue(scoreCommands.topLevel());
     new EventTrigger("scoreCoral").onTrue(scoreCommands.score());
-    new EventTrigger("waitForCoral").onTrue(Commands.waitUntil(() -> elevator.hasCoral()));
+    new EventTrigger("waitForCoral").onTrue(Commands.waitUntil(elevator::hasCoral));
+    new EventTrigger("intakeCoral").onTrue(scoreCommands.intakeCoral());
+    NamedCommands.registerCommand("waitForCoral", Commands.waitUntil(elevator::hasCoral));
 
     // Set up auto routines
     autoChooser = new LoggedDashboardChooser<>("Auto Choices", AutoBuilder.buildAutoChooser());
@@ -445,7 +444,7 @@ public class RobotContainer {
     //    controlScheme.getController().leftTrigger().whileTrue(climber.climberOut(Volts.of(-12)));
     //    controlScheme.getController().rightTrigger().whileTrue(climber.climberOut(Volts.of(8)));
     primaryController.start().whileTrue(climber.climberOut(Volts.of(12)));
-    primaryController.back().whileTrue(climber.climberOut(Volts.of(-8)));
+    primaryController.back().whileTrue(climber.climberOut(Volts.of(-12)));
 
     // CLAW
     //    primaryController.a().whileTrue(claw.extake());
