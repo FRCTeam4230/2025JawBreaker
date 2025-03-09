@@ -1,0 +1,54 @@
+{
+  "version": "2025.0",
+  "waypoints": [
+    {
+      "anchor": {
+        "x": 3.924533279220779,
+        "y": 2.6859577922077915
+      },
+      "prevControl": null,
+      "nextControl": {
+        "x": 4.479893576555183,
+        "y": 3.030170357239079
+      },
+      "isLocked": false,
+      "linkedName": "Score D"
+    },
+    {
+      "anchor": {
+        "x": 1.296306818181818,
+        "y": 1.069135551948052
+      },
+      "prevControl": {
+        "x": 1.0834357130283236,
+        "y": 0.9380405764885404
+      },
+      "nextControl": null,
+      "isLocked": false,
+      "linkedName": "Refill for Copy Right"
+    }
+  ],
+  "rotationTargets": [],
+  "constraintZones": [],
+  "pointTowardsZones": [],
+  "eventMarkers": [],
+  "globalConstraints": {
+    "maxVelocity": 3.0,
+    "maxAcceleration": 3.5,
+    "maxAngularVelocity": 385.714,
+    "maxAngularAcceleration": 2016.0,
+    "nominalVoltage": 12.0,
+    "unlimited": false
+  },
+  "goalEndState": {
+    "velocity": 0,
+    "rotation": 55.0
+  },
+  "reversed": false,
+  "folder": "2025 Paths",
+  "idealStartingState": {
+    "velocity": 0,
+    "rotation": 59.99999999999999
+  },
+  "useDefaultConstraints": false
+}

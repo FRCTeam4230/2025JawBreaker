@@ -1,0 +1,67 @@
+{
+  "version": "2025.0",
+  "waypoints": [
+    {
+      "anchor": {
+        "x": 1.296306818181818,
+        "y": 1.069135551948052
+      },
+      "prevControl": null,
+      "nextControl": {
+        "x": 2.0682079188758413,
+        "y": 1.613306620519226
+      },
+      "isLocked": false,
+      "linkedName": "Refill for Copy Right"
+    },
+    {
+      "anchor": {
+        "x": 3.924533279220779,
+        "y": 2.6859577922077915
+      },
+      "prevControl": {
+        "x": 3.194250750301384,
+        "y": 2.2160042526387964
+      },
+      "nextControl": null,
+      "isLocked": false,
+      "linkedName": "Score D"
+    }
+  ],
+  "rotationTargets": [],
+  "constraintZones": [],
+  "pointTowardsZones": [],
+  "eventMarkers": [
+    {
+      "name": "topLevel",
+      "waypointRelativePos": 0.35,
+      "endWaypointRelativePos": null,
+      "command": null
+    },
+    {
+      "name": "scoreCoral",
+      "waypointRelativePos": 0.95,
+      "endWaypointRelativePos": null,
+      "command": null
+    }
+  ],
+  "globalConstraints": {
+    "maxVelocity": 2.5,
+    "maxAcceleration": 3.0,
+    "maxAngularVelocity": 385.714,
+    "maxAngularAcceleration": 2016.0,
+    "nominalVoltage": 12.0,
+    "unlimited": false
+  },
+  "goalEndState": {
+    "velocity": 0,
+    "rotation": 59.99999999999999
+  },
+  "reversed": false,
+  "folder": "2025 Paths",
+  "idealStartingState": {
+    "velocity": 0,
+    "rotation": 55.0
+  },
+  "useDefaultConstraints": true
+}
