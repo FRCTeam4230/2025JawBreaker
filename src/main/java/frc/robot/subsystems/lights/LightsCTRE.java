@@ -3,7 +3,6 @@ package frc.robot.subsystems.lights;
 import com.ctre.phoenix.led.*;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.subsystems.lights.LightsCTRE.AnimationTypes;
 
 public class LightsCTRE extends SubsystemBase {
   CANdle m_candle = new CANdle(0, "rio");
@@ -11,8 +10,6 @@ public class LightsCTRE extends SubsystemBase {
   private Animation animation = null;
   private XboxController joystick;
   private Animation m_toAnimate = null;
-
-
 
   /* Wrappers so we can access the CANdle from the subsystem */
   public double getVbat() {
@@ -109,7 +106,6 @@ public class LightsCTRE extends SubsystemBase {
     }
   }
 
-
   public void decrementAnimation() {
     switch (m_currentAnimation) {
       case ColorFlow:
@@ -149,12 +145,12 @@ public class LightsCTRE extends SubsystemBase {
     changeAnimation(AnimationTypes.SetAll);
   }
 
-
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
     if (m_toAnimate == null) {
-      m_candle.setLEDs((int) (joystick.getLeftTriggerAxis() * 255),
+      m_candle.setLEDs(
+          (int) (joystick.getLeftTriggerAxis() * 255),
           (int) (joystick.getRightTriggerAxis() * 255),
           (int) (joystick.getLeftX() * 255));
     } else {
@@ -173,31 +169,38 @@ public class LightsCTRE extends SubsystemBase {
 
     switch (toChange) {
       case ColorFlow:
-        m_toAnimate = new ColorFlowAnimation(128, 20, 70, 0, 0.7, LedCount, Direction.Forward);
+        m_toAnimate =
+            new ColorFlowAnimation(
+                128, 20, 70, 0, 0.7, ledCount, ColorFlowAnimation.Direction.Forward);
         break;
       case Fire:
-        m_toAnimate = new FireAnimation(0.5, 0.7, LedCount, 0.7, 0.5);
+        m_toAnimate = new FireAnimation(0.5, 0.7, ledCount, 0.7, 0.5);
         break;
       case Larson:
-        m_toAnimate = new LarsonAnimation(0, 255, 46, 0, 1, LedCount, BounceMode.Front, 3);
+        m_toAnimate =
+            new LarsonAnimation(0, 255, 46, 0, 1, ledCount, LarsonAnimation.BounceMode.Front, 3);
         break;
       case Rainbow:
-        m_toAnimate = new RainbowAnimation(1, 0.1, LedCount);
+        m_toAnimate = new RainbowAnimation(1, 0.1, ledCount);
         break;
       case RgbFade:
-        m_toAnimate = new RgbFadeAnimation(0.7, 0.4, LedCount);
+        m_toAnimate = new RgbFadeAnimation(0.7, 0.4, ledCount);
         break;
       case SingleFade:
-        m_toAnimate = new SingleFadeAnimation(50, 2, 200, 0, 0.5, LedCount);
+        m_toAnimate = new SingleFadeAnimation(50, 2, 200, 0, 0.5, ledCount);
         break;
       case Strobe:
-        m_toAnimate = new StrobeAnimation(240, 10, 180, 0, 98.0 / 256.0, LedCount);
+        m_toAnimate = new StrobeAnimation(240, 10, 180, 0, 98.0 / 256.0, ledCount);
         break;
       case Twinkle:
-        m_toAnimate = new TwinkleAnimation(30, 70, 60, 0, 0.4, LedCount, TwinklePercent.Percent6);
+        m_toAnimate =
+            new TwinkleAnimation(
+                30, 70, 60, 0, 0.4, ledCount, TwinkleAnimation.TwinklePercent.Percent6);
         break;
       case TwinkleOff:
-        m_toAnimate = new TwinkleOffAnimation(70, 90, 175, 0, 0.8, LedCount, TwinkleOffPercent.Percent100);
+        m_toAnimate =
+            new TwinkleOffAnimation(
+                70, 90, 175, 0, 0.8, ledCount, TwinkleOffAnimation.TwinkleOffPercent.Percent100);
         break;
       case SetAll:
         m_toAnimate = null;
@@ -206,4 +209,3 @@ public class LightsCTRE extends SubsystemBase {
     System.out.println("Changed to " + m_currentAnimation.toString());
   }
 }
-

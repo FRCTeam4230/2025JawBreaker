@@ -180,8 +180,7 @@ public class DriveCommands extends Command {
     if (isBackOfRobot) {
       goal = GeomUtil.flipRotation(goal);
       driveToPointConstraints = driveToPointRefillConstraints;
-    }
-    else{
+    } else {
       driveToPointConstraints = driveToPointReefConstraints;
     }
 
@@ -242,14 +241,13 @@ public class DriveCommands extends Command {
     ChassisSpeeds speeds = new ChassisSpeeds(pidX, pidY, Rotations.of(pidRot).in(Radians));
 
     SwerveSetpointGen setpointGenerator = drive.getSetpointGenerator();
-      setpointGenerator
-          .withVelocityX(speeds.vxMetersPerSecond)
-          .withVelocityY(speeds.vyMetersPerSecond)
-          .withRotationalRate(speeds.omegaRadiansPerSecond)
-          .withOperatorForwardDirection(Rotation2d.kZero)
-          .withPathConstraints(driveToPointConstraints);
-      drive.setControl(setpointGenerator);
-
+    setpointGenerator
+        .withVelocityX(speeds.vxMetersPerSecond)
+        .withVelocityY(speeds.vyMetersPerSecond)
+        .withRotationalRate(speeds.omegaRadiansPerSecond)
+        .withOperatorForwardDirection(Rotation2d.kZero)
+        .withPathConstraints(driveToPointConstraints);
+    drive.setControl(setpointGenerator);
   }
 
   public static class AprilTagToBranch {
