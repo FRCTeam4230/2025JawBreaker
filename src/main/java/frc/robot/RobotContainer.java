@@ -7,8 +7,9 @@ import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 import com.ctre.phoenix6.swerve.SwerveRequest;
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
+import com.pathplanner.lib.commands.PathPlannerAuto;
 import com.pathplanner.lib.events.EventTrigger;
-import com.pathplanner.lib.path.PathConstraints;
+import com.pathplanner.lib.path.PathPlannerPath;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.units.measure.LinearVelocity;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -41,6 +42,10 @@ import frc.robot.subsystems.vision.VisionIOLimelight;
 import frc.robot.utils.FieldConstants;
 import frc.robot.utils.TunableController;
 import frc.robot.utils.TunableController.TunableControllerType;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import org.json.simple.parser.ParseException;
 import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
@@ -173,10 +178,40 @@ public class RobotContainer {
     new EventTrigger("intakeCoral").onTrue(scoreCommands.intakeCoral());
     NamedCommands.registerCommand("waitForCoral", Commands.waitUntil(elevator::hasCoral));
 
-    // Set up auto routines
-    autoChooser = new LoggedDashboardChooser<>("Auto Choices", AutoBuilder.buildAutoChooser());
+    List<PathPlannerPath> originalPaths = null;
+    try {
+      originalPaths = PathPlannerAuto.getPathGroupFromAutoFile("Left Side from Right Copy Attempt");
+    } catch (IOException e) {
+      throw new RuntimeException(e);
+    } catch (ParseException e) {
+      throw new RuntimeException(e);
+    }
+    List<PathPlannerPath> mirroredPaths = new ArrayList<>();
+    mirroredPaths.add(originalPaths.get(0).mirrorPath());
+    Command mirroredPathCommand = AutoBuilder.followPath(mirroredPaths.get(0));
 
-    // Set up SysId routines
+    //      List<PathPlannerPath> originalPaths = PathPlannerAuto.getPathGroupFromAutoFile("Left
+    // Side from Right Copy Attempt");
+    //      List<PathPlannerPath> mirroredPaths = new ArrayList<>();
+    //      originalPaths.forEach(path -> {
+    //        PathPlannerPath mirroredPath = path.mirrorPath();
+    //        mirroredPaths.add(mirroredPath);
+    //      });
+
+    for (PathPlannerPath path : originalPaths) {
+      PathPlannerPath mirroredPath = path.mirrorPath();
+      mirroredPaths.add(mirroredPath);
+    }
+
+    for (int i = 1; i < mirroredPaths.size(); i++) {
+      mirroredPathCommand =
+          mirroredPathCommand.andThen(AutoBuilder.followPath(mirroredPaths.get(i)));
+    }
+
+    // Set up auto routines
+    autoChooser =
+        new LoggedDashboardChooser<>(
+            "Auto Choices", AutoBuilder.buildAutoChooser()); // Set up SysId routines
     autoChooser.addOption(
         "Drive SysId (Quasistatic Forward)",
         drivetrain.sysIdQuasistatic(SysIdRoutine.Direction.kForward));
@@ -190,6 +225,7 @@ public class RobotContainer {
     autoChooser.addOption(
         "Drive Wheel Radius Characterization",
         DriveCommands.wheelRadiusCharacterization(drivetrain));
+    autoChooser.addOption("Mirrored Path", mirroredPathCommand);
 
     configureBindings();
   }
@@ -490,22 +526,14 @@ public class RobotContainer {
     primaryController
         .leftTrigger()
         .whileTrue(
-            drivetrain.applyRequest(
+            Commands.run(
                 () ->
-                    drivetrain
-                        .getSetpointGenerator()
-                        .withVelocityX(
-                            MaxSpeed.times(
-                                primaryController.customRight().getY()
-                                    * -1)) // Drive forward with negative Y (forward)
-                        .withVelocityY(
-                            MaxSpeed.times(
-                                primaryController.customRight().getX()
-                                    * -1)) // Drive left with negative X (left)
-                        .withRotationalRate(
-                            Constants.MaxAngularRate.times(
-                                primaryController.customLeft().getX() * -1))
-                        .withPathConstraints(new PathConstraints(2, 999, 540 / 2, 9999))));
+                    DriveCommands.driveToPointMA(
+                        FieldConstants.CoralStation.leftCenterFace.transformBy(
+                            FieldConstants.CoralStation.coralOffset),
+                        drivetrain,
+                        true),
+                drivetrain));
 
     // DRIVE TO REEF
 

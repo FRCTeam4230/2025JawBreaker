@@ -90,7 +90,7 @@ public class ElevatorIOREV implements ElevatorIO {
         .p(ElevatorConstants.kP.get())
         .i(ElevatorConstants.kI.get())
         .d(ElevatorConstants.kD.get())
-        .outputRange(-0.5, 0.8)
+        .outputRange(-0.5, 0.85)
         .maxMotion
         .maxVelocity(ElevatorConstants.elevatorMaxVelocity)
         .maxAcceleration(ElevatorConstants.elevatorMaxAcceleration)

@@ -51,8 +51,11 @@ public class DriveCommands extends Command {
 
   public static final LoggedTunableNumber kPRotation = tunableTable.makeField("kPRotation", 18.5);
   public static final LoggedTunableNumber kDRotation = tunableTable.makeField("kDRotation", 1.5);
-  private static final PathConstraints driveToPointConstraints =
-      new PathConstraints(1, 999, 540, 9999);
+  private static PathConstraints driveToPointConstraints = new PathConstraints(0, 0, 0, 0);
+  private static final PathConstraints driveToPointReefConstraints =
+      new PathConstraints(1.0, 999, 999, 9999);
+  private static final PathConstraints driveToPointRefillConstraints =
+      new PathConstraints(3.0, 999, 999, 9999);
 
   // private static PhoenixPIDController translationController =
   private static PIDController translationController =
@@ -176,6 +179,10 @@ public class DriveCommands extends Command {
     goal = AllianceFlipUtil.apply(goal);
     if (isBackOfRobot) {
       goal = GeomUtil.flipRotation(goal);
+      driveToPointConstraints = driveToPointRefillConstraints;
+    }
+    else{
+      driveToPointConstraints = driveToPointReefConstraints;
     }
 
     // Final line up
@@ -235,14 +242,14 @@ public class DriveCommands extends Command {
     ChassisSpeeds speeds = new ChassisSpeeds(pidX, pidY, Rotations.of(pidRot).in(Radians));
 
     SwerveSetpointGen setpointGenerator = drive.getSetpointGenerator();
+      setpointGenerator
+          .withVelocityX(speeds.vxMetersPerSecond)
+          .withVelocityY(speeds.vyMetersPerSecond)
+          .withRotationalRate(speeds.omegaRadiansPerSecond)
+          .withOperatorForwardDirection(Rotation2d.kZero)
+          .withPathConstraints(driveToPointConstraints);
+      drive.setControl(setpointGenerator);
 
-    setpointGenerator
-        .withVelocityX(speeds.vxMetersPerSecond)
-        .withVelocityY(speeds.vyMetersPerSecond)
-        .withRotationalRate(speeds.omegaRadiansPerSecond)
-        .withOperatorForwardDirection(Rotation2d.kZero)
-        .withPathConstraints(driveToPointConstraints);
-    drive.setControl(setpointGenerator);
   }
 
   public static class AprilTagToBranch {

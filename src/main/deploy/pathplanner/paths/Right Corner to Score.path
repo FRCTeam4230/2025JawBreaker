@@ -16,11 +16,11 @@
     },
     {
       "anchor": {
-        "x": 5.363291396103896,
+        "x": 5.356168831168831,
         "y": 2.8568993506493507
       },
       "prevControl": {
-        "x": 6.255705950454686,
+        "x": 6.248583385519622,
         "y": 2.4834086975438354
       },
       "nextControl": null,
@@ -64,7 +64,7 @@
     "rotation": 119.99999999999999
   },
   "reversed": false,
-  "folder": "2025 Paths",
+  "folder": "Working Right Right Side",
   "idealStartingState": {
     "velocity": 0.0,
     "rotation": 135.0
