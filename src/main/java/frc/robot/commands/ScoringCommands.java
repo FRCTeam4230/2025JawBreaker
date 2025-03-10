@@ -67,6 +67,7 @@ public class ScoringCommands {
         Commands.waitUntil(elevator::hasCoral),
         elevator.park(),
         claw.intake().until(claw::hasCoral),
+        UtilityCommands.flashLimelights(),
         arm.L3());
   }
 

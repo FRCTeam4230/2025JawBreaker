@@ -28,6 +28,9 @@ import frc.robot.LimelightHelpers;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.drive.requests.SwerveSetpointGen;
 import frc.robot.utils.*;
+import org.littletonrobotics.junction.AutoLogOutput;
+import org.littletonrobotics.junction.Logger;
+
 import java.lang.invoke.MethodHandles;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
@@ -236,8 +239,6 @@ public class DriveCommands extends Command {
     double pidRot =
         rotationController.calculate(
             drive.getRotation().getRotations(), target.getRotation().getRotations());
-
-    ;
     // drive.getCurrentTimestamp());
     ChassisSpeeds speeds = new ChassisSpeeds(pidX, pidY, Rotations.of(pidRot).in(Radians));
 
