@@ -1,0 +1,79 @@
+{
+  "version": "2025.0",
+  "command": {
+    "type": "sequential",
+    "data": {
+      "commands": [
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Right Corner to Score"
+          }
+        },
+        {
+          "type": "wait",
+          "data": {
+            "waitTime": 0.2
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Score Far Right to Refill"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "waitForCoral"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "5) Refil Left to Score"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Score 2 to Refill again Copy of Right"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "waitForCoral"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Score 3 Copy of RIGHT"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Score D to Refill"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "waitForCoral"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Refill Right to Score E"
+          }
+        }
+      ]
+    }
+  },
+  "resetOdom": false,
+  "folder": "2025 Autos",
+  "choreoAuto": false
+}

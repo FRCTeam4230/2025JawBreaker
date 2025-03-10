@@ -1,14 +1,15 @@
 package frc.robot.subsystems.lights;
 
 import com.ctre.phoenix.led.*;
-import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.utils.TunableController;
 
 public class LightsCTRE extends SubsystemBase {
-  CANdle m_candle = new CANdle(0, "rio");
-  private final int ledCount = 8;
+  CANdle m_candle = new CANdle(14, "chassis");
+  private final int ledCount = 80;
   private Animation animation = null;
-  private XboxController joystick;
+  private TunableController joystick =
+      new TunableController(3).withControllerType(TunableController.TunableControllerType.LINEAR);
   private Animation m_toAnimate = null;
 
   /* Wrappers so we can access the CANdle from the subsystem */
@@ -59,14 +60,15 @@ public class LightsCTRE extends SubsystemBase {
 
   private AnimationTypes m_currentAnimation;
 
-  public LightsCTRE(XboxController joy) {
+  public LightsCTRE(TunableController joy) {
     this.joystick = joy;
+    configBrightness(100);
     changeAnimation(AnimationTypes.SetAll);
     CANdleConfiguration configAll = new CANdleConfiguration();
     configAll.statusLedOffWhenActive = true;
     configAll.disableWhenLOS = false;
-    configAll.stripType = CANdle.LEDStripType.GRB;
-    configAll.brightnessScalar = 0.1;
+    configAll.stripType = CANdle.LEDStripType.RGB;
+    configAll.brightnessScalar = 1;
     configAll.vBatOutputMode = CANdle.VBatOutputMode.Modulated;
     m_candle.configAllSettings(configAll, 100);
   }
@@ -101,7 +103,7 @@ public class LightsCTRE extends SubsystemBase {
         changeAnimation(AnimationTypes.ColorFlow);
         break;
       case SetAll:
-        changeAnimation(AnimationTypes.ColorFlow);
+        m_toAnimate = null;
         break;
     }
   }
@@ -136,7 +138,7 @@ public class LightsCTRE extends SubsystemBase {
         changeAnimation(AnimationTypes.Twinkle);
         break;
       case SetAll:
-        changeAnimation(AnimationTypes.ColorFlow);
+        m_toAnimate = null;
         break;
     }
   }
@@ -149,10 +151,8 @@ public class LightsCTRE extends SubsystemBase {
   public void periodic() {
     // This method will be called once per scheduler run
     if (m_toAnimate == null) {
-      m_candle.setLEDs(
-          (int) (joystick.getLeftTriggerAxis() * 255),
-          (int) (joystick.getRightTriggerAxis() * 255),
-          (int) (joystick.getLeftX() * 255));
+      //      m_candle.setLEDs(0, 0, 0);
+      changeAnimation(AnimationTypes.Rainbow);
     } else {
       m_candle.animate(m_toAnimate);
     }
@@ -206,6 +206,5 @@ public class LightsCTRE extends SubsystemBase {
         m_toAnimate = null;
         break;
     }
-    System.out.println("Changed to " + m_currentAnimation.toString());
   }
 }

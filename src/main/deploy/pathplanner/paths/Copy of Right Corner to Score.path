@@ -1,0 +1,89 @@
+{
+  "version": "2025.0",
+  "waypoints": [
+    {
+      "anchor": {
+        "x": 7.542796266233766,
+        "y": 1.8953530844155841
+      },
+      "prevControl": null,
+      "nextControl": {
+        "x": 7.900650460028239,
+        "y": 1.8067862254997247
+      },
+      "isLocked": false,
+      "linkedName": null
+    },
+    {
+      "anchor": {
+        "x": 6.3258133561643834,
+        "y": 2.229430650684932
+      },
+      "prevControl": {
+        "x": 6.550049376000078,
+        "y": 2.118894650177197
+      },
+      "nextControl": {
+        "x": 6.101577336328689,
+        "y": 2.339966651192667
+      },
+      "isLocked": false,
+      "linkedName": null
+    },
+    {
+      "anchor": {
+        "x": 5.356168831168831,
+        "y": 2.828409090909091
+      },
+      "prevControl": {
+        "x": 6.178140814353908,
+        "y": 2.3210061880870487
+      },
+      "nextControl": null,
+      "isLocked": false,
+      "linkedName": null
+    }
+  ],
+  "rotationTargets": [],
+  "constraintZones": [],
+  "pointTowardsZones": [],
+  "eventMarkers": [
+    {
+      "name": "intakeCoral",
+      "waypointRelativePos": 0,
+      "endWaypointRelativePos": null,
+      "command": null
+    },
+    {
+      "name": "topLevel",
+      "waypointRelativePos": 0.7,
+      "endWaypointRelativePos": null,
+      "command": null
+    },
+    {
+      "name": "scoreCoral",
+      "waypointRelativePos": 1.9,
+      "endWaypointRelativePos": null,
+      "command": null
+    }
+  ],
+  "globalConstraints": {
+    "maxVelocity": 2.0,
+    "maxAcceleration": 2.5,
+    "maxAngularVelocity": 385.714,
+    "maxAngularAcceleration": 2016.0,
+    "nominalVoltage": 12.0,
+    "unlimited": false
+  },
+  "goalEndState": {
+    "velocity": 0,
+    "rotation": 119.99999999999999
+  },
+  "reversed": false,
+  "folder": "Left Side from Right Copy",
+  "idealStartingState": {
+    "velocity": 0.0,
+    "rotation": 135.0
+  },
+  "useDefaultConstraints": false
+}

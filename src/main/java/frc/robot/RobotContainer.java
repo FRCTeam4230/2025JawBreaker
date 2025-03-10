@@ -2,6 +2,7 @@ package frc.robot;
 
 import static edu.wpi.first.units.Units.*;
 import static frc.robot.Constants.*;
+import static frc.robot.subsystems.lights.LightsCTRE.AnimationTypes.*;
 
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 import com.ctre.phoenix6.swerve.SwerveRequest;
@@ -36,6 +37,7 @@ import frc.robot.subsystems.elevator.Elevator;
 import frc.robot.subsystems.elevator.ElevatorIO;
 import frc.robot.subsystems.elevator.ElevatorIOREV;
 import frc.robot.subsystems.elevator.ElevatorIOSIMREV;
+import frc.robot.subsystems.lights.LightsCTRE;
 import frc.robot.subsystems.vision.Vision;
 import frc.robot.subsystems.vision.VisionIO;
 import frc.robot.subsystems.vision.VisionIOLimelight;
@@ -58,6 +60,8 @@ public class RobotContainer {
       new TunableController(0).withControllerType(TunableControllerType.LINEAR);
   private final TunableController secondController =
       new TunableController(1).withControllerType(TunableControllerType.LINEAR);
+  private TunableController lightsTesting =
+      new TunableController(3).withControllerType(TunableController.TunableControllerType.LINEAR);
 
   private final LoggedDashboardChooser<Command> autoChooser;
 
@@ -73,6 +77,7 @@ public class RobotContainer {
   private final Arm arm;
   private final Claw claw;
   private final Climber climber;
+  private final LightsCTRE lights;
   //  private final CounterWeight counterWeight;
 
   private final ScoringCommands scoreCommands;
@@ -105,6 +110,8 @@ public class RobotContainer {
         claw = new Claw(new ClawIOREV() {});
 
         climber = new Climber(new ClimberIOREV() {});
+
+        lights = new LightsCTRE(lightsTesting);
         //        counterWeight = new CounterWeight(new CounterWeightIOREV());
 
         break;
@@ -144,6 +151,7 @@ public class RobotContainer {
         arm = new Arm(new ArmIOREVSIM());
         claw = new Claw(new ClawIOSIMREV());
         climber = new Climber(new ClimberIOSIM());
+        lights = new LightsCTRE(lightsTesting);
         //        counterWeight = new CounterWeight(new CounterWeightIOSIM());
 
         break;
@@ -163,6 +171,7 @@ public class RobotContainer {
         arm = new Arm(new ArmIOREV() {});
         claw = new Claw(new ClawIOREV() {});
         climber = new Climber(new ClimberIOREV() {});
+        lights = new LightsCTRE(lightsTesting);
         //        counterWeight = new CounterWeight(new CounterWeightIOREV());
         break;
     }
@@ -180,10 +189,9 @@ public class RobotContainer {
 
     List<PathPlannerPath> originalPaths = null;
     try {
-      originalPaths = PathPlannerAuto.getPathGroupFromAutoFile("Left Side from Right Copy Attempt");
-    } catch (IOException e) {
-      throw new RuntimeException(e);
-    } catch (ParseException e) {
+      originalPaths =
+          PathPlannerAuto.getPathGroupFromAutoFile("Copy of Right Side Full Auto Attempt");
+    } catch (IOException | ParseException e) {
       throw new RuntimeException(e);
     }
     List<PathPlannerPath> mirroredPaths = new ArrayList<>();
@@ -588,6 +596,17 @@ public class RobotContainer {
     secondController.povUp().onTrue(scoreCommands.topLevel()); // D-PAD UP
 
     secondController.b().onTrue(Commands.runOnce(() -> CommandScheduler.getInstance().cancelAll()));
+
+    lightsTesting.a().onTrue(Commands.runOnce(() -> lights.changeAnimation(Rainbow)));
+    lightsTesting.x().onTrue(Commands.runOnce(() -> lights.changeAnimation(RgbFade)));
+    lightsTesting.y().onTrue(Commands.runOnce(() -> lights.changeAnimation(Larson)));
+    lightsTesting.b().onTrue(Commands.runOnce(() -> lights.changeAnimation(SetAll)));
+
+    lightsTesting.povUp().onTrue(Commands.runOnce(() -> lights.changeAnimation(Fire)));
+    lightsTesting.povLeft().onTrue(Commands.runOnce(() -> lights.changeAnimation(ColorFlow)));
+    lightsTesting.povRight().onTrue(Commands.runOnce(() -> lights.changeAnimation(Twinkle)));
+    lightsTesting.povDown().onTrue(Commands.runOnce(() -> lights.changeAnimation(TwinkleOff)));
+    lightsTesting.start().onTrue(Commands.runOnce(() -> lights.changeAnimation(SingleFade)));
 
     //    secondController.leftTrigger().whileTrue(counterWeight.counterWeightIn());
     //    secondController.rightTrigger().whileTrue(counterWeight.counterWeightOut());
