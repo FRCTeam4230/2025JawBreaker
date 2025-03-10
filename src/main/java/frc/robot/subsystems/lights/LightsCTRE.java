@@ -6,7 +6,7 @@ import frc.robot.utils.TunableController;
 
 public class LightsCTRE extends SubsystemBase {
   CANdle m_candle = new CANdle(14, "chassis");
-  private final int ledCount = 80;
+  private final int ledCount = 69;
   private Animation animation = null;
   private TunableController joystick =
       new TunableController(3).withControllerType(TunableController.TunableControllerType.LINEAR);
@@ -62,14 +62,14 @@ public class LightsCTRE extends SubsystemBase {
 
   public LightsCTRE(TunableController joy) {
     this.joystick = joy;
-    configBrightness(100);
     changeAnimation(AnimationTypes.SetAll);
+    configBrightness(100);
     CANdleConfiguration configAll = new CANdleConfiguration();
     configAll.statusLedOffWhenActive = true;
     configAll.disableWhenLOS = false;
     configAll.stripType = CANdle.LEDStripType.RGB;
-    configAll.brightnessScalar = 1;
-    configAll.vBatOutputMode = CANdle.VBatOutputMode.Modulated;
+    configAll.brightnessScalar = 0.1;
+    configAll.vBatOutputMode = CANdle.VBatOutputMode.On;
     m_candle.configAllSettings(configAll, 100);
   }
 
@@ -153,10 +153,10 @@ public class LightsCTRE extends SubsystemBase {
     if (m_toAnimate == null) {
       //      m_candle.setLEDs(0, 0, 0);
       changeAnimation(AnimationTypes.Rainbow);
+
     } else {
       m_candle.animate(m_toAnimate);
     }
-    m_candle.modulateVBatOutput(joystick.getRightY());
   }
 
   @Override

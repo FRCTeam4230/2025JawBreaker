@@ -47,6 +47,8 @@ import frc.robot.utils.TunableController.TunableControllerType;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+
+import lombok.Getter;
 import org.json.simple.parser.ParseException;
 import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
@@ -64,7 +66,7 @@ public class RobotContainer {
       new TunableController(3).withControllerType(TunableController.TunableControllerType.LINEAR);
 
   private final LoggedDashboardChooser<Command> autoChooser;
-
+  @Getter
   public final Drive drivetrain;
   // CTRE Default Drive Request
   private final SwerveRequest.FieldCentric drive =

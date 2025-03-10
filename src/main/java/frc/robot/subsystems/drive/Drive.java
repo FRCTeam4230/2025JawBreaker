@@ -44,6 +44,8 @@ import frc.robot.subsystems.vision.VisionUtil.VisionMeasurement;
 import frc.robot.utils.ArrayBuilder;
 import java.util.List;
 import java.util.function.Supplier;
+
+import lombok.Getter;
 import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
 
@@ -52,6 +54,7 @@ import org.littletonrobotics.junction.Logger;
  * be used in command-based projects.
  */
 public class Drive extends SubsystemBase {
+  @Getter
   private final DriveIO io;
   private final DriveIOInputsAutoLogged inputs;
   private final ModuleIOInputsAutoLogged[] modules = ArrayBuilder.buildModuleAutoLogged();
@@ -528,4 +531,6 @@ public class Drive extends SubsystemBase {
   private double totalSpeed() {
     return Math.hypot(inputs.speeds.vxMetersPerSecond, inputs.speeds.vyMetersPerSecond);
   }
+
+
 }

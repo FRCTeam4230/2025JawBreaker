@@ -6,8 +6,10 @@
 
 package frc.robot.subsystems.drive;
 
+import com.ctre.phoenix6.Orchestra;
 import com.ctre.phoenix6.Utils;
 import com.ctre.phoenix6.hardware.CANcoder;
+import com.ctre.phoenix6.hardware.ParentDevice;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.swerve.SwerveDrivetrainConstants;
 import com.ctre.phoenix6.swerve.SwerveModule;
@@ -24,10 +26,10 @@ import edu.wpi.first.wpilibj.Timer;
 import frc.robot.Constants;
 import frc.robot.Constants.Mode;
 import frc.robot.generated.TunerConstants.TunerSwerveDrivetrain;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.Queue;
+import lombok.Getter;
+import lombok.Setter;
+
+import java.util.*;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
@@ -45,6 +47,7 @@ public class DriveIOCTRE extends TunerSwerveDrivetrain implements DriveIO {
   private Notifier simulationNotifier;
   private double lastSimulationTime;
 
+  private TalonFX[] talonFXES;
   // Queue configuration
   private static final int QUEUE_SIZE = 20;
 
@@ -99,6 +102,7 @@ public class DriveIOCTRE extends TunerSwerveDrivetrain implements DriveIO {
 
   /** Sets up the DriveIOCTRE with telemetry and simulation support if needed. */
   private void setup() {
+    TalonFX[] talonFXES = new TalonFX[Constants.PP_CONFIG.numModules];
     initializeQueues();
     // Set the priority of the odometry thread to ensure it's running at
     // full priority and doesn't lag behind
@@ -237,13 +241,19 @@ public class DriveIOCTRE extends TunerSwerveDrivetrain implements DriveIO {
     super.addVisionMeasurement(visionRobotPoseMeters, ctreTimeStamp, visionMeasurementStdDevs);
   }
 
+
   @Override
   public void updateModules(ModuleIOInputs[] inputs) {
     // Update modules with the given inputs
     for (int i = 0; i < Constants.PP_CONFIG.numModules; i++) {
       inputs[i] = updateModule(inputs[i], getModule(i));
+      talonFXES[i] = getModule(i).getDriveMotor();
     }
   }
+
+
+
+
 
   private ModuleIOInputs updateModule(
       ModuleIOInputs inputs, SwerveModule<TalonFX, TalonFX, CANcoder> module) {
@@ -271,4 +281,22 @@ public class DriveIOCTRE extends TunerSwerveDrivetrain implements DriveIO {
 
     return inputs;
   }
+
+  Orchestra orchestra;
+
+  @Override
+  public void chirps() {
+    Collection<ParentDevice> instruments = new ArrayList<>();
+
+    if (talonFXES != null) {
+      instruments.addAll(Arrays.asList(talonFXES));
+      orchestra = new Orchestra(instruments);
+      orchestra.loadMusic("mariocastlewinsound.chrp");
+    }
+    orchestra.play();
+  }
+
+
+
+
 }

@@ -96,6 +96,8 @@ public interface DriveIO {
     return Optional.empty();
   }
 
+  default void chirps(){}
+
   /**
    * Adds a vision measurement to the Kalman Filter. This will correct the odometry pose estimate
    * while still accounting for measurement noise.

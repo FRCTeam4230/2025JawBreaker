@@ -4,10 +4,17 @@
 
 package frc.robot;
 
+import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
+import com.ctre.phoenix6.Orchestra;
+import com.ctre.phoenix6.hardware.ParentDevice;
+import com.ctre.phoenix6.hardware.TalonFX;
 import com.pathplanner.lib.commands.FollowPathCommand;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import frc.robot.subsystems.drive.DriveIOCTRE;
+import lombok.Getter;
+import lombok.Setter;
 import org.littletonrobotics.junction.LogFileUtil;
 import org.littletonrobotics.junction.LoggedRobot;
 import org.littletonrobotics.junction.Logger;
@@ -15,12 +22,18 @@ import org.littletonrobotics.junction.networktables.NT4Publisher;
 import org.littletonrobotics.junction.wpilog.WPILOGReader;
 import org.littletonrobotics.junction.wpilog.WPILOGWriter;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+
 public class Robot extends LoggedRobot {
   private Command m_autonomousCommand;
   // Configuration constants
   public static volatile boolean BEFORE_MATCH = true; // Controls MT1-only usage before match
 
   private final RobotContainer m_robotContainer;
+
+
 
   public Robot() {
     // Set up data receivers & replay source
@@ -44,7 +57,9 @@ public class Robot extends LoggedRobot {
         Logger.setReplaySource(new WPILOGReader(logPath));
         Logger.addDataReceiver(new WPILOGWriter(LogFileUtil.addPathSuffix(logPath, "_sim")));
         break;
+
     }
+
 
     // See http://bit.ly/3YIzFZ6 for more information on timestamps in AdvantageKit.
     // Logger.disableDeterministicTimestamps()
@@ -62,6 +77,12 @@ public class Robot extends LoggedRobot {
     FollowPathCommand.warmupCommand().schedule();
 
     m_robotContainer = new RobotContainer();
+
+  }
+
+  @Override
+  public void robotInit() {
+    m_robotContainer.getDrivetrain().getIo().chirps();
   }
 
   @Override
@@ -121,4 +142,6 @@ public class Robot extends LoggedRobot {
 
   @Override
   public void simulationPeriodic() {}
+
+
 }
