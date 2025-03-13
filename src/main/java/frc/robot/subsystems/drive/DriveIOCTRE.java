@@ -8,6 +8,7 @@ package frc.robot.subsystems.drive;
 
 import com.ctre.phoenix6.Orchestra;
 import com.ctre.phoenix6.Utils;
+import com.ctre.phoenix6.configs.AudioConfigs;
 import com.ctre.phoenix6.hardware.CANcoder;
 import com.ctre.phoenix6.hardware.ParentDevice;
 import com.ctre.phoenix6.hardware.TalonFX;
