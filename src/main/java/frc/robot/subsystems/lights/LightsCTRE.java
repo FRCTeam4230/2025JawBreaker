@@ -69,7 +69,7 @@ public class LightsCTRE extends SubsystemBase {
     configAll.disableWhenLOS = false;
     configAll.stripType = CANdle.LEDStripType.RGB;
     configAll.brightnessScalar = 1;
-    configAll.vBatOutputMode = CANdle.VBatOutputMode.Modulated;
+    configAll.vBatOutputMode = CANdle.VBatOutputMode.On;
     m_candle.configAllSettings(configAll, 100);
   }
 
@@ -156,7 +156,6 @@ public class LightsCTRE extends SubsystemBase {
     } else {
       m_candle.animate(m_toAnimate);
     }
-    m_candle.modulateVBatOutput(joystick.getRightY());
   }
 
   @Override
