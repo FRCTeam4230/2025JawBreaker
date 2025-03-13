@@ -11,6 +11,7 @@ public class LightsCTRE extends SubsystemBase {
   private TunableController joystick =
       new TunableController(3).withControllerType(TunableController.TunableControllerType.LINEAR);
   private Animation m_toAnimate = null;
+  private boolean noAnim = false;
 
   /* Wrappers so we can access the CANdle from the subsystem */
   public double getVbat() {
@@ -52,6 +53,8 @@ public class LightsCTRE extends SubsystemBase {
     Rainbow,
     RgbFade,
     SingleFade,
+    SingleFadeRed,
+    SingleFadeGreen,
     Strobe,
     Twinkle,
     TwinkleOff,
@@ -60,8 +63,7 @@ public class LightsCTRE extends SubsystemBase {
 
   private AnimationTypes m_currentAnimation;
 
-  public LightsCTRE(TunableController joy) {
-    this.joystick = joy;
+  public LightsCTRE() {
     configBrightness(100);
     changeAnimation(AnimationTypes.SetAll);
     CANdleConfiguration configAll = new CANdleConfiguration();
@@ -149,7 +151,6 @@ public class LightsCTRE extends SubsystemBase {
 
   @Override
   public void periodic() {
-    // This method will be called once per scheduler run
     if (m_toAnimate == null) {
       //      m_candle.setLEDs(0, 0, 0);
       changeAnimation(AnimationTypes.Rainbow);
@@ -186,7 +187,13 @@ public class LightsCTRE extends SubsystemBase {
         m_toAnimate = new RgbFadeAnimation(0.7, 0.4, ledCount);
         break;
       case SingleFade:
-        m_toAnimate = new SingleFadeAnimation(50, 2, 200, 0, 0.5, ledCount);
+        m_toAnimate = new SingleFadeAnimation(0, 200, 0, 0, 1, ledCount);
+        break;
+      case SingleFadeGreen:
+        m_toAnimate = new SingleFadeAnimation(0, 200, 0, 0, 1, ledCount);
+        break;
+      case SingleFadeRed:
+        m_toAnimate = new SingleFadeAnimation(200, 0, 0, 0, 1, ledCount);
         break;
       case Strobe:
         m_toAnimate = new StrobeAnimation(240, 10, 180, 0, 98.0 / 256.0, ledCount);
@@ -205,5 +212,34 @@ public class LightsCTRE extends SubsystemBase {
         m_toAnimate = null;
         break;
     }
+  }
+
+  public void changeColour(String colour) {
+    noAnim = true;
+    if (m_toAnimate != null) {
+      m_candle.clearAnimation(0);
+    }
+    switch (colour) {
+      case "red":
+        m_candle.setLEDs(0, 255, 0);
+      case "green":
+        m_candle.setLEDs(255, 0, 0);
+      case "orange":
+        m_candle.setLEDs(255, 165, 0);
+      case "blue":
+        m_candle.setLEDs(0, 0, 255);
+    }
+  }
+
+  //  public Command flashColour(String colour) {
+  //    return Commands.startEnd(() -> flash = true, () -> flash = false).until();
+  //    flash = true;
+  //
+  //    setZero();
+  //    flash = false;
+  //  }
+
+  public void setZero() {
+    m_candle.setLEDs(0, 0, 0);
   }
 }

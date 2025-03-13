@@ -5,12 +5,14 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.subsystems.arm.Arm;
 import frc.robot.subsystems.claw.Claw;
 import frc.robot.subsystems.elevator.Elevator;
+import frc.robot.subsystems.lights.LightsCTRE;
 
 public class ScoringCommands {
 
   private final Elevator elevator;
   private final Arm arm;
   private final Claw claw;
+  private final LightsCTRE lights;
 
   //  private final Trigger elevatorHasGamePiece;
 
@@ -18,6 +20,7 @@ public class ScoringCommands {
     this.elevator = elevator;
     this.arm = arm;
     this.claw = claw;
+    this.lights = new LightsCTRE();
 
     //    this.elevatorHasGamePiece = elevatorHasGamePiece();
   }
@@ -67,6 +70,10 @@ public class ScoringCommands {
         Commands.waitUntil(elevator::hasCoral),
         elevator.park(),
         claw.intake().until(claw::hasCoral),
+        //        Commands.runOnce(() ->
+        // lights.changeAnimation(LightsCTRE.AnimationTypes.SingleFadeGreen)),
+        //                Commands.runOnce(() -> lights.flashColour("green"), lights),
+        //                Commands.runOnce(() -> lights.setZero(), lights),
         arm.L3());
   }
 
@@ -75,10 +82,9 @@ public class ScoringCommands {
         arm.L1(),
         Commands.waitSeconds(0.4),
         claw.extake().until(() -> !claw.hasCoral()),
-        elevator.intake(), // if this causes something to get stuck, we could do
-        // elevator.stop().andThen(elevator.intake()), this would unschedule the
-        // last command for 20ms and then reschedule the one we want, kind of
-        // resetting it so its less error prone
+        //        Commands.runOnce(() ->
+        // lights.changeAnimation(LightsCTRE.AnimationTypes.SingleFadeRed)),
+        elevator.intake(),
         arm.intake(),
         intakeCoral());
     // .withInterruptBehavior(Command.InterruptionBehavior.kCancelSelf);

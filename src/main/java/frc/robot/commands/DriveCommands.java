@@ -343,3 +343,5 @@ public class DriveCommands extends Command {
     translationController.setPID(kP.get(), kI.get(), kD.get());
   }
 }
+// X: 13.57m Y: 5.36m RED
+// X: 3.09m Y: 2.69m BLUE

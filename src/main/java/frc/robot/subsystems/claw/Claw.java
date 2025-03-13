@@ -93,6 +93,7 @@ public class Claw extends SubsystemBase {
   }
 
   public boolean hasCoral() {
+
     return inputs.beamBreakTriggered;
   }
 

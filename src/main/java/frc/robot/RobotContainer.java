@@ -60,8 +60,6 @@ public class RobotContainer {
       new TunableController(0).withControllerType(TunableControllerType.LINEAR);
   private final TunableController secondController =
       new TunableController(1).withControllerType(TunableControllerType.LINEAR);
-  private TunableController lightsTesting =
-      new TunableController(3).withControllerType(TunableController.TunableControllerType.LINEAR);
 
   private final LoggedDashboardChooser<Command> autoChooser;
 
@@ -102,8 +100,7 @@ public class RobotContainer {
         new Vision(
             drivetrain::addVisionData,
             new VisionIOLimelight("limelight-fr", drivetrain::getVisionParameters),
-            new VisionIOLimelight("limelight-fl", drivetrain::getVisionParameters),
-            new VisionIOLimelight("limelight-back", drivetrain::getVisionParameters));
+            new VisionIOLimelight("limelight-fl", drivetrain::getVisionParameters));
 
         elevator = new Elevator(new ElevatorIOREV() {});
         arm = new Arm(new ArmIOREV() {});
@@ -111,7 +108,7 @@ public class RobotContainer {
 
         climber = new Climber(new ClimberIOREV() {});
 
-        lights = new LightsCTRE(lightsTesting);
+        lights = new LightsCTRE();
         //        counterWeight = new CounterWeight(new CounterWeightIOREV());
 
         break;
@@ -151,7 +148,7 @@ public class RobotContainer {
         arm = new Arm(new ArmIOREVSIM());
         claw = new Claw(new ClawIOSIMREV());
         climber = new Climber(new ClimberIOSIM());
-        lights = new LightsCTRE(lightsTesting);
+        lights = new LightsCTRE();
         //        counterWeight = new CounterWeight(new CounterWeightIOSIM());
 
         break;
@@ -171,7 +168,7 @@ public class RobotContainer {
         arm = new Arm(new ArmIOREV() {});
         claw = new Claw(new ClawIOREV() {});
         climber = new Climber(new ClimberIOREV() {});
-        lights = new LightsCTRE(lightsTesting);
+        lights = new LightsCTRE();
         //        counterWeight = new CounterWeight(new CounterWeightIOREV());
         break;
     }
@@ -566,29 +563,25 @@ public class RobotContainer {
 
     primaryController.rightStick().onTrue(Commands.runOnce(arm::reconfigPID));
 
-    //    primaryController
-    //        .start()
-    //        .and(primaryController.rightBumper())
-    //        .onTrue(Commands.runOnce(() ->
-    // chooseReefBranch(aprilTagToBranch.aprilTagToBranch(false))))
-    //        .whileTrue(
-    //            Commands.run(
-    //                () ->
-    //                    DriveCommands.driveToPointMA(
-    //                        reefBranch.transformBy(FieldConstants.Reef.reefOffsetForward),
-    //                        drivetrain)));
-    //
-    //    primaryController
-    //        .start()
-    //        .and(primaryController.leftBumper())
-    //        .onTrue(Commands.runOnce(() ->
-    // chooseReefBranch(aprilTagToBranch.aprilTagToBranch(false))))
-    //        .whileTrue(
-    //            Commands.run(
-    //                () ->
-    //                    DriveCommands.driveToPointMA(
-    //                        reefBranch.transformBy(FieldConstants.Reef.leftReefOffsetForward),
-    //                        drivetrain)));
+    primaryController
+        .start()
+        .onTrue(Commands.runOnce(() -> chooseReefBranch(aprilTagToBranch.aprilTagToBranch(true))))
+        .whileTrue(
+            Commands.run(
+                () ->
+                    DriveCommands.driveToPointMA(
+                        reefBranch.transformBy(FieldConstants.Reef.reefOffsetForward),
+                        drivetrain)));
+
+    primaryController
+        .start()
+        .onTrue(Commands.runOnce(() -> chooseReefBranch(aprilTagToBranch.aprilTagToBranch(false))))
+        .whileTrue(
+            Commands.run(
+                () ->
+                    DriveCommands.driveToPointMA(
+                        reefBranch.transformBy(FieldConstants.Reef.leftReefOffsetForward),
+                        drivetrain)));
 
     secondController.povRight().onTrue(scoreCommands.intakeCoral()); // D-PAD RIGHT
     secondController.povDown().onTrue(scoreCommands.bottomLevel()); // D-PAD DOWN
@@ -597,16 +590,8 @@ public class RobotContainer {
 
     secondController.b().onTrue(Commands.runOnce(() -> CommandScheduler.getInstance().cancelAll()));
 
-    lightsTesting.a().onTrue(Commands.runOnce(() -> lights.changeAnimation(Rainbow)));
-    lightsTesting.x().onTrue(Commands.runOnce(() -> lights.changeAnimation(RgbFade)));
-    lightsTesting.y().onTrue(Commands.runOnce(() -> lights.changeAnimation(Larson)));
-    lightsTesting.b().onTrue(Commands.runOnce(() -> lights.changeAnimation(SetAll)));
-
-    lightsTesting.povUp().onTrue(Commands.runOnce(() -> lights.changeAnimation(Fire)));
-    lightsTesting.povLeft().onTrue(Commands.runOnce(() -> lights.changeAnimation(ColorFlow)));
-    lightsTesting.povRight().onTrue(Commands.runOnce(() -> lights.changeAnimation(Twinkle)));
-    lightsTesting.povDown().onTrue(Commands.runOnce(() -> lights.changeAnimation(TwinkleOff)));
-    lightsTesting.start().onTrue(Commands.runOnce(() -> lights.changeAnimation(SingleFade)));
+    secondController.rightTrigger().whileTrue(climber.climberOut(Volts.of(12)));
+    secondController.leftTrigger().whileTrue(climber.climberOut(Volts.of(-12)));
 
     //    secondController.leftTrigger().whileTrue(counterWeight.counterWeightIn());
     //    secondController.rightTrigger().whileTrue(counterWeight.counterWeightOut());
