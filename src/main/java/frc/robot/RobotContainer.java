@@ -1,9 +1,5 @@
 package frc.robot;
 
-import static edu.wpi.first.units.Units.*;
-import static frc.robot.Constants.*;
-import static frc.robot.subsystems.lights.LightsCTRE.AnimationTypes.*;
-
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 import com.ctre.phoenix6.swerve.SwerveRequest;
 import com.pathplanner.lib.auto.AutoBuilder;
@@ -44,12 +40,16 @@ import frc.robot.subsystems.vision.VisionIOLimelight;
 import frc.robot.utils.FieldConstants;
 import frc.robot.utils.TunableController;
 import frc.robot.utils.TunableController.TunableControllerType;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 import org.json.simple.parser.ParseException;
 import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
+
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+
+import static edu.wpi.first.units.Units.*;
+import static frc.robot.Constants.*;
 
 public class RobotContainer {
 
@@ -172,6 +172,7 @@ public class RobotContainer {
         //        counterWeight = new CounterWeight(new CounterWeightIOREV());
         break;
     }
+
     aprilTagToBranch = new DriveCommands.AprilTagToBranch(drivetrain);
     scoreCommands = new ScoringCommands(elevator, arm, claw);
 

@@ -4,8 +4,6 @@
 
 package frc.robot.commands;
 
-import static edu.wpi.first.units.Units.*;
-
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 import com.ctre.phoenix6.swerve.SwerveModule.SteerRequestType;
 import com.ctre.phoenix6.swerve.SwerveRequest;
@@ -28,6 +26,9 @@ import frc.robot.LimelightHelpers;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.drive.requests.SwerveSetpointGen;
 import frc.robot.utils.*;
+import org.littletonrobotics.junction.AutoLogOutput;
+import org.littletonrobotics.junction.Logger;
+
 import java.lang.invoke.MethodHandles;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
@@ -37,8 +38,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
-import org.littletonrobotics.junction.AutoLogOutput;
-import org.littletonrobotics.junction.Logger;
+
+import static edu.wpi.first.units.Units.*;
 
 public class DriveCommands extends Command {
 
@@ -251,7 +252,10 @@ public class DriveCommands extends Command {
   }
 
   public static class AprilTagToBranch {
-    private static final Map<Integer, Integer> TAG_TO_BRANCH_MAP = new HashMap<>();
+
+    private static final Map<Integer,Integer> redTagToBranch = new HashMap<>();
+    private static final Map<Integer,Integer> blueTagToBranch = new HashMap<>();
+
     private final NetworkTable flLimelightTable;
     private final NetworkTable frLimelightTable;
 
@@ -263,21 +267,29 @@ public class DriveCommands extends Command {
       drive = drivetrain;
     }
 
-    private final boolean isRed = AllianceFlipUtil.shouldFlip();
-
+    static
     {
-      TAG_TO_BRANCH_MAP.put(isRed ? 7 : 18, 0);
-      TAG_TO_BRANCH_MAP.put(isRed ? 6 : 19, 2);
-      TAG_TO_BRANCH_MAP.put(isRed ? 11 : 20, 4);
-      TAG_TO_BRANCH_MAP.put(isRed ? 10 : 21, 6);
-      TAG_TO_BRANCH_MAP.put(isRed ? 9 : 22, 8);
-      TAG_TO_BRANCH_MAP.put(isRed ? 8 : 17, 10);
+      redTagToBranch.put(7,0);
+      redTagToBranch.put(6,2);
+      redTagToBranch.put(11,4);
+      redTagToBranch.put(10,6);
+      redTagToBranch.put(9,8);
+      redTagToBranch.put(8,10);
+
+      blueTagToBranch.put(18,0);
+      blueTagToBranch.put(19,2);
+      blueTagToBranch.put(20,4);
+      blueTagToBranch.put(21,6);
+      blueTagToBranch.put(22,8);
+      blueTagToBranch.put(17,10);
     }
 
     @AutoLogOutput
     private boolean isValidTag(int tagId) {
-      // Check if the tag ID is in our mapping
-      return TAG_TO_BRANCH_MAP.containsKey(tagId);
+      if(AllianceFlipUtil.shouldFlip()) {
+        return redTagToBranch.containsKey(tagId);
+      }
+      return blueTagToBranch.containsKey(tagId);
     }
 
     private void stop() {
@@ -304,6 +316,7 @@ public class DriveCommands extends Command {
               .filter(val -> val != -1.0)
               .collect(Collectors.toCollection(LinkedHashSet::new));
 
+
       if (tags.size() == 1) { // they match or we see 1 tag and not on the other
         resultTag = tags.iterator().next().intValue();
       } else if (tags.size() > 1) {
@@ -324,16 +337,26 @@ public class DriveCommands extends Command {
     public int aprilTagToBranch(boolean isRight) {
 
       var tid = getClosestTag();
+      var branchBase = -1;
+      var result = -1;
 
       if (!isValidTag(tid)) {
-        Logger.recordOutput("isValidTagForAlign", "No valid tag found");
+        Logger.recordOutput("isValidTagForAlign", false);
         stop();
-        return -1;
-      }
-      int branchBase = TAG_TO_BRANCH_MAP.getOrDefault(tid, -1);
+      }else {
+        Logger.recordOutput("isValidTagForAlign", true);
+        branchBase = (AllianceFlipUtil.shouldFlip() ? redTagToBranch.getOrDefault(tid,-1) : blueTagToBranch.getOrDefault(tid,-1));
 
-      Logger.recordOutput("Vision/SelectedTag", tid);
-      return branchBase + (isRight ? 0 : 1);
+        if (branchBase < 0) {
+          Logger.recordOutput("TagNotInMap", true);
+        } else {
+          Logger.recordOutput("TagNotInMap", false);
+          result = branchBase + (isRight ? 0 : 1);
+          Logger.recordOutput("Vision/SelectedTag", tid);
+          Logger.recordOutput("Vision/branchResult", result);
+        }
+      }
+      return result;
     }
   }
 
