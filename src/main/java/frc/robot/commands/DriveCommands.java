@@ -325,9 +325,9 @@ public class DriveCommands extends Command {
 
         if (leftTA > rightTA) {
           resultTag = tags.stream().findFirst().get().intValue();
+        }else {
+          resultTag = tags.stream().skip(1).findFirst().get().intValue();
         }
-
-        resultTag = tags.stream().skip(1).findFirst().get().intValue();
       }
 
       return resultTag;
