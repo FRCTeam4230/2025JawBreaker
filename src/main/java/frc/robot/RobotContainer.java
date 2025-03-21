@@ -563,24 +563,24 @@ public class RobotContainer {
     primaryController.rightStick().onTrue(Commands.runOnce(arm::reconfigPID));
 
     primaryController
-        .start()
-        .onTrue(Commands.runOnce(() -> chooseReefBranch(aprilTagToBranch.aprilTagToBranch(true))))
-        .whileTrue(
-            Commands.run(
-                () ->
-                    DriveCommands.driveToPointMA(
-                        reefBranch.transformBy(FieldConstants.Reef.reefOffsetForward),
-                        drivetrain)));
+            .start()
+            .onTrue(Commands.runOnce(() -> chooseReefBranch(aprilTagToBranch.aprilTagToBranch(true))))
+            .whileTrue(
+                    Commands.run(
+                            () ->
+                                    DriveCommands.driveToPointMA(
+                                            reefBranch.transformBy(FieldConstants.Reef.reefOffsetForward), drivetrain),
+                            drivetrain));
 
     primaryController
-        .back()
-        .onTrue(Commands.runOnce(() -> chooseReefBranch(aprilTagToBranch.aprilTagToBranch(false))))
-        .whileTrue(
-            Commands.run(
-                () ->
-                    DriveCommands.driveToPointMA(
-                        reefBranch.transformBy(FieldConstants.Reef.leftReefOffsetForward),
-                        drivetrain)));
+            .back()
+            .onTrue(Commands.runOnce(() -> chooseReefBranch(aprilTagToBranch.aprilTagToBranch(false))))
+            .whileTrue(
+                    Commands.run(
+                            () ->
+                                    DriveCommands.driveToPointMA(
+                                            reefBranch.transformBy(FieldConstants.Reef.leftReefOffsetForward), drivetrain),
+                            drivetrain));
 
     secondController.povRight().onTrue(scoreCommands.intakeCoral()); // D-PAD RIGHT
     secondController.povDown().onTrue(scoreCommands.bottomLevel()); // D-PAD DOWN
