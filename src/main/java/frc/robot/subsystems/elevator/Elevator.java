@@ -132,7 +132,7 @@ public class Elevator extends SubsystemBase {
     }
   }
 
-  public final boolean hasCoral() {
+  public boolean hasCoral() {
     return inputs.beamBreakTriggered;
   }
 

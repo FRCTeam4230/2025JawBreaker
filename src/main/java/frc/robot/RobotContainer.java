@@ -1,5 +1,8 @@
 package frc.robot;
 
+import static edu.wpi.first.units.Units.*;
+import static frc.robot.Constants.*;
+
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 import com.ctre.phoenix6.swerve.SwerveRequest;
 import com.pathplanner.lib.auto.AutoBuilder;
@@ -40,16 +43,12 @@ import frc.robot.subsystems.vision.VisionIOLimelight;
 import frc.robot.utils.FieldConstants;
 import frc.robot.utils.TunableController;
 import frc.robot.utils.TunableController.TunableControllerType;
-import org.json.simple.parser.ParseException;
-import org.littletonrobotics.junction.AutoLogOutput;
-import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
-
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-
-import static edu.wpi.first.units.Units.*;
-import static frc.robot.Constants.*;
+import org.json.simple.parser.ParseException;
+import org.littletonrobotics.junction.AutoLogOutput;
+import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
 public class RobotContainer {
 
@@ -181,7 +180,8 @@ public class RobotContainer {
     //    NamedCommands.registerCommand("topLevel", scoreCommands.topLevel());
     new EventTrigger("topLevel").onTrue(scoreCommands.topLevel());
     new EventTrigger("scoreCoral").onTrue(scoreCommands.score());
-    new EventTrigger("waitForCoral").onTrue(Commands.waitUntil(elevator::hasCoral));
+    new EventTrigger("waitForCoral")
+        .onTrue(Commands.waitUntil(() -> elevator.hasCoral() || claw.hasCoral()));
     new EventTrigger("intakeCoral").onTrue(scoreCommands.intakeCoral());
     NamedCommands.registerCommand("waitForCoral", Commands.waitUntil(elevator::hasCoral));
 
@@ -485,8 +485,6 @@ public class RobotContainer {
     // CLIMBER
     //    controlScheme.getController().leftTrigger().whileTrue(climber.climberOut(Volts.of(-12)));
     //    controlScheme.getController().rightTrigger().whileTrue(climber.climberOut(Volts.of(8)));
-    primaryController.start().whileTrue(climber.climberOut(Volts.of(12)));
-    primaryController.back().whileTrue(climber.climberOut(Volts.of(-12)));
 
     // CLAW
     //    primaryController.a().whileTrue(claw.extake());
@@ -575,7 +573,7 @@ public class RobotContainer {
                         drivetrain)));
 
     primaryController
-        .start()
+        .back()
         .onTrue(Commands.runOnce(() -> chooseReefBranch(aprilTagToBranch.aprilTagToBranch(false))))
         .whileTrue(
             Commands.run(
@@ -593,6 +591,9 @@ public class RobotContainer {
 
     secondController.rightTrigger().whileTrue(climber.climberOut(Volts.of(12)));
     secondController.leftTrigger().whileTrue(climber.climberOut(Volts.of(-12)));
+
+    secondController.rightBumper().whileTrue(claw.intake());
+    secondController.leftBumper().whileTrue(claw.extake());
 
     //    secondController.leftTrigger().whileTrue(counterWeight.counterWeightIn());
     //    secondController.rightTrigger().whileTrue(counterWeight.counterWeightOut());

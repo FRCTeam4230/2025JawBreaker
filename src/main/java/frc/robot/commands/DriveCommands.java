@@ -4,6 +4,8 @@
 
 package frc.robot.commands;
 
+import static edu.wpi.first.units.Units.*;
+
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 import com.ctre.phoenix6.swerve.SwerveModule.SteerRequestType;
 import com.ctre.phoenix6.swerve.SwerveRequest;
@@ -26,9 +28,6 @@ import frc.robot.LimelightHelpers;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.drive.requests.SwerveSetpointGen;
 import frc.robot.utils.*;
-import org.littletonrobotics.junction.AutoLogOutput;
-import org.littletonrobotics.junction.Logger;
-
 import java.lang.invoke.MethodHandles;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
@@ -38,8 +37,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
-
-import static edu.wpi.first.units.Units.*;
+import org.littletonrobotics.junction.AutoLogOutput;
+import org.littletonrobotics.junction.Logger;
 
 public class DriveCommands extends Command {
 
@@ -253,8 +252,8 @@ public class DriveCommands extends Command {
 
   public static class AprilTagToBranch {
 
-    private static final Map<Integer,Integer> redTagToBranch = new HashMap<>();
-    private static final Map<Integer,Integer> blueTagToBranch = new HashMap<>();
+    private static final Map<Integer, Integer> redTagToBranch = new HashMap<>();
+    private static final Map<Integer, Integer> blueTagToBranch = new HashMap<>();
 
     private final NetworkTable flLimelightTable;
     private final NetworkTable frLimelightTable;
@@ -267,26 +266,25 @@ public class DriveCommands extends Command {
       drive = drivetrain;
     }
 
-    static
-    {
-      redTagToBranch.put(7,0);
-      redTagToBranch.put(6,2);
-      redTagToBranch.put(11,4);
-      redTagToBranch.put(10,6);
-      redTagToBranch.put(9,8);
-      redTagToBranch.put(8,10);
+    static {
+      redTagToBranch.put(7, 0);
+      redTagToBranch.put(6, 2);
+      redTagToBranch.put(11, 4);
+      redTagToBranch.put(10, 6);
+      redTagToBranch.put(9, 8);
+      redTagToBranch.put(8, 10);
 
-      blueTagToBranch.put(18,0);
-      blueTagToBranch.put(19,2);
-      blueTagToBranch.put(20,4);
-      blueTagToBranch.put(21,6);
-      blueTagToBranch.put(22,8);
-      blueTagToBranch.put(17,10);
+      blueTagToBranch.put(18, 0);
+      blueTagToBranch.put(19, 2);
+      blueTagToBranch.put(20, 4);
+      blueTagToBranch.put(21, 6);
+      blueTagToBranch.put(22, 8);
+      blueTagToBranch.put(17, 10);
     }
 
     @AutoLogOutput
     private boolean isValidTag(int tagId) {
-      if(AllianceFlipUtil.shouldFlip()) {
+      if (AllianceFlipUtil.shouldFlip()) {
         return redTagToBranch.containsKey(tagId);
       }
       return blueTagToBranch.containsKey(tagId);
@@ -316,7 +314,6 @@ public class DriveCommands extends Command {
               .filter(val -> val != -1.0)
               .collect(Collectors.toCollection(LinkedHashSet::new));
 
-
       if (tags.size() == 1) { // they match or we see 1 tag and not on the other
         resultTag = tags.iterator().next().intValue();
       } else if (tags.size() > 1) {
@@ -325,7 +322,7 @@ public class DriveCommands extends Command {
 
         if (leftTA > rightTA) {
           resultTag = tags.stream().findFirst().get().intValue();
-        }else {
+        } else {
           resultTag = tags.stream().skip(1).findFirst().get().intValue();
         }
       }
@@ -335,17 +332,21 @@ public class DriveCommands extends Command {
 
     @AutoLogOutput
     public int aprilTagToBranch(boolean isRight) {
-
+      System.out.println("Checking for aptrilTagToBranch");
       var tid = getClosestTag();
       var branchBase = -1;
       var result = -1;
 
+      System.out.println("closettag is " + tid);
       if (!isValidTag(tid)) {
         Logger.recordOutput("isValidTagForAlign", false);
         stop();
-      }else {
+      } else {
         Logger.recordOutput("isValidTagForAlign", true);
-        branchBase = (AllianceFlipUtil.shouldFlip() ? redTagToBranch.getOrDefault(tid,-1) : blueTagToBranch.getOrDefault(tid,-1));
+        branchBase =
+            (AllianceFlipUtil.shouldFlip()
+                ? redTagToBranch.getOrDefault(tid, -1)
+                : blueTagToBranch.getOrDefault(tid, -1));
 
         if (branchBase < 0) {
           Logger.recordOutput("TagNotInMap", true);

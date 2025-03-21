@@ -69,7 +69,7 @@ public class Claw extends SubsystemBase {
 
   private void shouldHold() {
     if (hasCoral()) {
-      io.setVolts(Volts.of(ClawConstants.HOLD_VOLTAGE.get()));
+      io.setVolts(Volts.of(ClawConstants.HOLD_VOLTAGE.get()).times(-1));
     } else {
       io.setVolts(Volts.of(0));
     }
@@ -77,15 +77,13 @@ public class Claw extends SubsystemBase {
 
   public Command intake() {
     return Commands.startEnd(
-        () -> io.setVolts(Volts.of(ClawConstants.INTAKE_VOLTAGE.get())), io::stop, this);
+        () -> io.setVolts(Volts.of(ClawConstants.INTAKE_VOLTAGE.get()).times(-1)), io::stop, this);
   }
   // TODO: smart current limit for motor, set hold mode to only enable when proximity gets too far
 
   public Command extake() {
     return Commands.startEnd(
-        () -> io.setVolts(Volts.of(ClawConstants.INTAKE_VOLTAGE.get()).times(-0.5)),
-        io::stop,
-        this);
+        () -> io.setVolts(Volts.of(ClawConstants.INTAKE_VOLTAGE.get()).times(0.5)), io::stop, this);
   }
 
   public Command stopClaw() {
