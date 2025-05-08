@@ -5,14 +5,12 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.subsystems.arm.Arm;
 import frc.robot.subsystems.claw.Claw;
 import frc.robot.subsystems.elevator.Elevator;
-import frc.robot.subsystems.lights.LightsCTRE;
 
 public class ScoringCommands {
 
   private final Elevator elevator;
   private final Arm arm;
   private final Claw claw;
-  private final LightsCTRE lights;
 
   //  private final Trigger elevatorHasGamePiece;
 
@@ -20,7 +18,6 @@ public class ScoringCommands {
     this.elevator = elevator;
     this.arm = arm;
     this.claw = claw;
-    this.lights = new LightsCTRE();
 
     //    this.elevatorHasGamePiece = elevatorHasGamePiece();
   }
@@ -69,7 +66,7 @@ public class ScoringCommands {
         arm.intake(),
         Commands.waitUntil(elevator::hasCoral),
         elevator.park(),
-        claw.intake().until(claw::hasCoral),
+        claw.intake(6).until(claw::hasCoral),
         //        Commands.runOnce(() ->
         // lights.changeAnimation(LightsCTRE.AnimationTypes.SingleFadeGreen)),
         //                Commands.runOnce(() -> lights.flashColour("green"), lights),
@@ -81,7 +78,7 @@ public class ScoringCommands {
     return Commands.sequence(
         arm.L1(),
         Commands.waitSeconds(0.4),
-        claw.extake().until(() -> !claw.hasCoral()),
+        claw.extake(6).until(() -> !claw.hasCoral()),
         //        Commands.runOnce(() ->
         // lights.changeAnimation(LightsCTRE.AnimationTypes.SingleFadeRed)),
         elevator.intake(),

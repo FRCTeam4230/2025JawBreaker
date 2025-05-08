@@ -33,7 +33,6 @@ public class Claw extends SubsystemBase {
   // Alerts for motor connection status
   private final Alert motorAlert = new Alert("Claw motor isn't connected", AlertType.kError);
   private final Alert encoderAlert = new Alert("Claw encoder isn't connected", AlertType.kError);
-  //  private ClawMode currentMode = ClawMode.OFF;
 
   public Claw(ClawIO io) {
     this.io = io;
@@ -75,15 +74,13 @@ public class Claw extends SubsystemBase {
     }
   }
 
-  public Command intake() {
-    return Commands.startEnd(
-        () -> io.setVolts(Volts.of(ClawConstants.INTAKE_VOLTAGE.get()).times(-1)), io::stop, this);
+  public Command intake(int volts) {
+    return Commands.startEnd(() -> io.setVolts(Volts.of(volts).times(-1)), io::stop, this);
   }
   // TODO: smart current limit for motor, set hold mode to only enable when proximity gets too far
 
-  public Command extake() {
-    return Commands.startEnd(
-        () -> io.setVolts(Volts.of(ClawConstants.INTAKE_VOLTAGE.get()).times(0.5)), io::stop, this);
+  public Command extake(int volts) {
+    return Commands.startEnd(() -> io.setVolts(Volts.of(volts).times(0.5)), io::stop, this);
   }
 
   public Command stopClaw() {

@@ -6,13 +6,7 @@
 
 package frc.robot.subsystems.arm;
 
-import static edu.wpi.first.units.Units.Degrees;
-import static edu.wpi.first.units.Units.Inches;
-import static edu.wpi.first.units.Units.Kilograms;
-import static edu.wpi.first.units.Units.Meters;
-import static edu.wpi.first.units.Units.Pounds;
-import static edu.wpi.first.units.Units.Radians;
-import static edu.wpi.first.units.Units.Rotations;
+import static edu.wpi.first.units.Units.*;
 import static frc.robot.subsystems.arm.ArmConstants.GEAR_RATIO;
 
 import com.revrobotics.sim.SparkFlexSim;
@@ -27,6 +21,10 @@ import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.units.measure.Mass;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.simulation.SingleJointedArmSim;
+import edu.wpi.first.wpilibj.smartdashboard.Mechanism2d;
+import edu.wpi.first.wpilibj.smartdashboard.MechanismLigament2d;
+import edu.wpi.first.wpilibj.smartdashboard.MechanismRoot2d;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 /**
  * Simulation implementation of the REV-based arm IO. This class extends ArmIOREV so that in
@@ -41,6 +39,9 @@ public class ArmIOREVSIM extends ArmIOREV {
 
   /** Simulation state for the leader motor */
   private final SparkFlexSim leaderSim;
+
+  MechanismLigament2d arm2d;
+  MechanismRoot2d mech2dRoot;
 
   /** Constructs a new ArmIOREVSIM instance. */
   public ArmIOREVSIM() {
@@ -73,11 +74,17 @@ public class ArmIOREVSIM extends ArmIOREV {
             motor,
             GEAR_RATIO,
             armLength.in(Meters),
-            Degrees.of(0).in(Radians),
-            Degrees.of(180).in(Radians),
+            -1.58,
+            1.58,
             true,
-            startingAngle.in(Radians));
+            startingAngle.in(Rotations));
     leaderSim.setPosition(startingAngle.in(Rotations));
+
+    Mechanism2d mech2d = new Mechanism2d(0, 0);
+    this.mech2dRoot = mech2d.getRoot("Elevator", 0, 0); // or "Elevator Root"
+    this.arm2d = mech2dRoot.append(new MechanismLigament2d("Arm", 1, 90));
+    arm2d.setAngle(startingAngle.in(Degrees));
+    SmartDashboard.putData("Arm Mechanism2D", mech2d);
   }
 
   /**
@@ -97,9 +104,11 @@ public class ArmIOREVSIM extends ArmIOREV {
     // First, arm velocity in revolutions per second is (simAngularVelocityRadPerSec / (2π)).
     // Then, motor RPM = (arm rev/s) * 60 * GEAR_RATIO.
     double simulatedMotorRPM =
-        Units.radiansPerSecondToRotationsPerMinute(armSimModel.getVelocityRadPerSec() * GEAR_RATIO);
+        Units.radiansPerSecondToRotationsPerMinute(armSimModel.getVelocityRadPerSec());
 
     // Update the simulated motor encoder readings (raw sensor values).
     leaderSim.iterate(simulatedMotorRPM, RobotController.getBatteryVoltage(), 0.02);
+
+    arm2d.setAngle(Radians.of(armSimModel.getAngleRads()).in(Degrees));
   }
 }

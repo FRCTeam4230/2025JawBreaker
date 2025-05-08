@@ -11,6 +11,10 @@ import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.system.plant.LinearSystemId;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.simulation.ElevatorSim;
+import edu.wpi.first.wpilibj.smartdashboard.Mechanism2d;
+import edu.wpi.first.wpilibj.smartdashboard.MechanismLigament2d;
+import edu.wpi.first.wpilibj.smartdashboard.MechanismRoot2d;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 /**
  * Simulation implementation of the elevator subsystem. This class extends ElevatorIOCTRE to provide
@@ -29,6 +33,8 @@ public class ElevatorIOSIMREV extends ElevatorIOREV {
 
   /** Simulation state for the throughbore */
   private final SparkRelativeEncoderSim encoderSim;
+
+  MechanismLigament2d elevatorMech2d;
 
   /**
    * Constructs a new ElevatorIOSIM instance. Initializes the physics simulation with realistic
@@ -60,6 +66,14 @@ public class ElevatorIOSIMREV extends ElevatorIOREV {
             Feet.of(8).in(Meters), // Maximum height (8 feet -> meters)
             true, // Enable gravity simulation
             0); // Start at bottom position
+
+    Mechanism2d mech2d = new Mechanism2d(0, 0);
+    MechanismRoot2d mech2dRoot = mech2d.getRoot("Elevator Root", 0, 0.5);
+    this.elevatorMech2d =
+        mech2dRoot.append(
+            new MechanismLigament2d("Elevator", motorSimModel.getPositionMeters(), 90));
+
+    SmartDashboard.putData("Elevator Mechanism2D", mech2d);
   }
 
   /**
@@ -80,6 +94,8 @@ public class ElevatorIOSIMREV extends ElevatorIOREV {
         motorSimModel.getVelocityMetersPerSecond() / elevatorRadius.in(Meters);
 
     leaderSim.iterate(simulatedMotorRPM, RobotController.getBatteryVoltage(), 0.02);
+
+    elevatorMech2d.setLength(leaderSim.getPosition() / Math.PI);
 
     //    leaderSim.setBusVoltage(RobotController.getBatteryVoltage());
     //
