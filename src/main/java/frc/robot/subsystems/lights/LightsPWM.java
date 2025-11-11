@@ -27,7 +27,7 @@ public class LightsPWM extends SubsystemBase {
 
   public LightsPWM() {
     led = new AddressableLED(0);
-    ledBuffer = new AddressableLEDBuffer(114); // 57 real
+    ledBuffer = new AddressableLEDBuffer(315); // 57 real
     led.setLength(ledBuffer.getLength());
     color.applyTo(ledBuffer);
 

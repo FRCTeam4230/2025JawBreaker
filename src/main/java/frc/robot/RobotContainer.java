@@ -12,9 +12,7 @@ import com.pathplanner.lib.events.EventTrigger;
 import com.pathplanner.lib.path.PathPlannerPath;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.units.measure.LinearVelocity;
-import edu.wpi.first.wpilibj.LEDPattern;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -38,7 +36,6 @@ import frc.robot.subsystems.elevator.Elevator;
 import frc.robot.subsystems.elevator.ElevatorIO;
 import frc.robot.subsystems.elevator.ElevatorIOREV;
 import frc.robot.subsystems.elevator.ElevatorIOSIMREV;
-import frc.robot.subsystems.lights.LightsPWM;
 import frc.robot.subsystems.vision.Vision;
 import frc.robot.subsystems.vision.VisionIO;
 import frc.robot.subsystems.vision.VisionIOLimelight;
@@ -78,9 +75,6 @@ public class RobotContainer {
   private final Arm arm;
   private final Claw claw;
   private final Climber climber;
-  private final LightsPWM lights;
-  //  private final LightsPWM lightsIntake;
-  //  private final CounterWeight counterWeight;
 
   private final ScoringCommands scoreCommands;
   private final DriveCommands.AprilTagToBranch aprilTagToBranch;
@@ -112,8 +106,6 @@ public class RobotContainer {
 
         climber = new Climber(new ClimberIOREV() {});
 
-        lights = new LightsPWM();
-        //        lightsIntake = new LightsPWM(1);
         //        counterWeight = new CounterWeight(new CounterWeightIOREV());
 
         break;
@@ -153,7 +145,6 @@ public class RobotContainer {
         arm = new Arm(new ArmIOREVSIM());
         claw = new Claw(new ClawIOSIMREV());
         climber = new Climber(new ClimberIOSIM());
-        lights = new LightsPWM();
         //        lightsIntake = new LightsPWM(1);
 
         //        counterWeight = new CounterWeight(new CounterWeightIOSIM());
@@ -175,7 +166,6 @@ public class RobotContainer {
         arm = new Arm(new ArmIOREV() {});
         claw = new Claw(new ClawIOREV() {});
         climber = new Climber(new ClimberIOREV() {});
-        lights = new LightsPWM();
         //        lightsIntake = new LightsPWM(1);
         //        counterWeight = new CounterWeight(new CounterWeightIOREV());
         break;
@@ -255,26 +245,27 @@ public class RobotContainer {
                 drivetrain
                     .getSetpointGenerator()
                     .withVelocityX(
-                        MaxSpeed.times(primaryController.customLeft().getY() * -1)
+                        MaxSpeed.times(primaryController.customRight().getY() * -1)
                             .plus(
                                 MaxSpeed.times(
                                     coffeeController.customLeft().getY()
                                         * -0.15))) // Drive forward with negative Y (forward)
                     .withVelocityY(
-                        MaxSpeed.times(primaryController.customLeft().getX() * -1)
+                        MaxSpeed.times(primaryController.customRight().getX() * -1)
                             .plus(
                                 MaxSpeed.times(
                                     coffeeController.customLeft().getX()
                                         * -0.15))) // Drive left with negative X (left)
                     .withRotationalRate(
-                        Constants.MaxAngularRate.times(primaryController.customRight().getX() * -1)
+                        Constants.MaxAngularRate.times(primaryController.customLeft().getX() * -1)
                             .plus(
                                 MaxAngularRate.times(
                                     coffeeController.customRight().getX()
-                                        * -0.2))))); // Drive counterclockwise with
+                                        * -0.2))))); // Drive counterclockwgitise with
     // negative X (left)
 
     coffeeController.back().onTrue(Commands.runOnce(() -> drivetrain.resetPose(Pose2d.kZero)));
+    primaryController.back().onTrue(Commands.runOnce(() -> drivetrain.resetPose(Pose2d.kZero)));
     //        joystick
     //            .b()
     //            .whileTrue(
@@ -586,16 +577,17 @@ public class RobotContainer {
                         reefBranch.transformBy(FieldConstants.Reef.reefOffsetForward), drivetrain),
                 drivetrain));
 
-    primaryController
-        .back()
-        .onTrue(Commands.runOnce(() -> chooseReefBranch(aprilTagToBranch.aprilTagToBranch(false))))
-        .whileTrue(
-            Commands.run(
-                () ->
-                    DriveCommands.driveToPointMA(
-                        reefBranch.transformBy(FieldConstants.Reef.leftReefOffsetForward),
-                        drivetrain),
-                drivetrain));
+    //    primaryController
+    //        .back()
+    //        .onTrue(Commands.runOnce(() ->
+    // chooseReefBranch(aprilTagToBranch.aprilTagToBranch(false))))
+    //        .whileTrue(
+    //            Commands.run(
+    //                () ->
+    //                    DriveCommands.driveToPointMA(
+    //                        reefBranch.transformBy(FieldConstants.Reef.leftReefOffsetForward),
+    //                        drivetrain),
+    //                drivetrain));
 
     secondController.povRight().onTrue(scoreCommands.intakeCoral()); // D-PAD RIGHT
     secondController.povDown().onTrue(scoreCommands.bottomLevel()); // D-PAD DOWN
@@ -610,15 +602,10 @@ public class RobotContainer {
     secondController.rightBumper().whileTrue(claw.intake(6));
     secondController.leftBumper().whileTrue(claw.extake(6));
 
-    coffeeController
-        .y()
-        .onTrue(scoreCommands.stopAll().alongWith(lights.runPattern(LEDPattern.solid(Color.kRed))));
-    coffeeController
-        .b()
-        .onTrue(
-            scoreCommands.bottomLevel().alongWith(lights.runPattern(LEDPattern.rainbow(255, 128))));
-    coffeeController.a().onTrue(arm.L1().alongWith(lights.scrollPattern()));
-    coffeeController.x().onTrue(arm.L2().alongWith(lights.scrollPattern()));
+    coffeeController.y().onTrue(scoreCommands.stopAll());
+    coffeeController.b().onTrue(scoreCommands.bottomLevel());
+    coffeeController.a().onTrue(arm.L1());
+    coffeeController.x().onTrue(arm.L2());
 
     coffeeController.rightBumper().whileTrue(claw.intake(4));
     coffeeController.leftBumper().whileTrue(claw.extake(4));
